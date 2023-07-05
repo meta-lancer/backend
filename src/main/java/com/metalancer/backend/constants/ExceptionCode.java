@@ -8,8 +8,8 @@ public enum ExceptionCode {
     /**
      * 회원가입 및 로그인
      */
-    SIGNUP_CREATED_OK(CREATED, "A001", "회원가입 성공"),
-    SIGNUP_COMPLETE(CREATED, "A002", "이미 존재하는 회원"),
+    SIGNUP_CREATED_OK(SUCCESS, "A001", "회원가입 성공"),
+    SIGNUP_COMPLETE(DUPLICATED_VALUE, "A002", "이미 존재하는 회원"),
     SIGNUP_DUPLICATED_ID(DUPLICATED_VALUE, "A003", "ID 중복"),
     SIGNUP_DUPLICATED_USERNAME(DUPLICATED_VALUE, "A004", "USERNAME 중복"),
 

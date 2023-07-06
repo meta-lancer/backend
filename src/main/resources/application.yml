@@ -1,0 +1,19 @@
+server:
+  port: 3001
+
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        show_sql: true
+        use_sql_comments: true
+

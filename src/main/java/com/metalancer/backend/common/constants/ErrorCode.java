@@ -1,10 +1,15 @@
-package com.metalancer.backend.constants;
+package com.metalancer.backend.common.constants;
+
+import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
+import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.SERVER_ERROR;
+import static com.metalancer.backend.common.constants.HttpStatus.SUCCESS;
+import static com.metalancer.backend.common.constants.HttpStatus.UNAUTHORIZED;
 
 import java.util.Arrays;
 
-import static com.metalancer.backend.constants.HttpStatus.*;
-
-public enum ExceptionCode {
+public enum ErrorCode {
     /**
      * 회원가입 및 로그인
      */
@@ -36,14 +41,18 @@ public enum ExceptionCode {
     AUTHORITY_NOT_HAVE(NOT_FOUND_VALUE, "E002", "수정/삭제 권한이 없습니다."),
 
     /**
-     *  토큰
+     * 토큰
      */
-    REISSUE_TOKEN(SUCCESS, "H001", "reissued token"),
-    EXPIRED_TOKEN(INVALID_ACCESS, "F002","expired access-token"),
-    MALFORMED_TOKEN(INVALID_ACCESS, "F003","incorrect access-token"),
+    REISSUE_TOKEN(SUCCESS, "F001", "reissued token"),
+    EXPIRED_TOKEN(INVALID_ACCESS, "F002", "expired access-token"),
+    MALFORMED_TOKEN(INVALID_ACCESS, "F003", "incorrect access-token"),
     UNAUTHORIZED_TOKEN(INVALID_ACCESS, "F004", "invalid access-token"),
 
-    INVALID_REFRESH_TOKEN(INVALID_ACCESS, "H005", "non-existent refresh-token"),
+    INVALID_REFRESH_TOKEN(INVALID_ACCESS, "F005", "non-existent refresh-token"),
+
+
+    INVALID_PARAMETER(HttpStatus.INVALID_PARAMETER, "Z001", "invalid parameter"),
+    UNEXPECTED_ERROR(SERVER_ERROR, "Z002", "unexpected exception"),
 
     /**
      * 잘못된 ExceptionCode
@@ -54,7 +63,7 @@ public enum ExceptionCode {
     private final String code;
     private final String message;
 
-    ExceptionCode(HttpStatus status, String code, String message) {
+    ErrorCode(HttpStatus status, String code, String message) {
         this.status = status;
         this.code = code;
         this.message = message;
@@ -72,10 +81,10 @@ public enum ExceptionCode {
         return message;
     }
 
-    public static ExceptionCode findExceptionCodeByCode(String code) {
-        return Arrays.stream(ExceptionCode.values())
-                .filter(x -> x.getCode().equals(code))
-                .findFirst()
-                .orElse(EMPTY);
+    public static ErrorCode findExceptionCodeByCode(String code) {
+        return Arrays.stream(ErrorCode.values())
+            .filter(x -> x.getCode().equals(code))
+            .findFirst()
+            .orElse(EMPTY);
     }
 }

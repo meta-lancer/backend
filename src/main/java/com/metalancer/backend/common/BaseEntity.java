@@ -1,7 +1,7 @@
 package com.metalancer.backend.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.metalancer.backend.constants.DataStatus;
+import com.metalancer.backend.common.constants.DataStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @DynamicInsert
 @NoArgsConstructor
 public abstract class BaseEntity {
+
     @CreatedDate
     @Column(updatable = false, name = "created_at", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

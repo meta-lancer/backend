@@ -1,4 +1,4 @@
-package com.metalancer.backend.constants;
+package com.metalancer.backend.common.constants;
 
 import lombok.Getter;
 

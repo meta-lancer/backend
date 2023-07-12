@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
 
         ErrorResponse response = ErrorResponse.builder()
-            .code(ErrorCode.UNEXPECTED_ERROR.getCode())
+            .code(ErrorCode.SYSTEM_ERROR.getCode())
             .message(" 메시지: [" + ex.getMessage() + "]" + ", 이유: [" + ex.getCause() + "]")
             .validation(new HashMap<>())
             .build();

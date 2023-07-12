@@ -2,7 +2,7 @@ package com.metalancer.backend.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.metalancer.backend.constants.ExceptionCode;
+import com.metalancer.backend.common.constants.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @JsonPropertyOrder({"code", "message", "result"})
 public class BaseResponse<T> {
+
     private final String message;
     private final String code;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,7 +27,7 @@ public class BaseResponse<T> {
         this.result = result;
     }
 
-    public BaseResponse(ExceptionCode status) {
+    public BaseResponse(ErrorCode status) {
         this.message = status.getMessage();
         this.code = status.getCode();
     }

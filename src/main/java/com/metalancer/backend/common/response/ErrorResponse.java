@@ -1,4 +1,4 @@
-package com.metalancer.backend.common;
+package com.metalancer.backend.common.response;
 
 import java.util.Map;
 import lombok.Builder;
@@ -11,7 +11,7 @@ public class ErrorResponse {
     private final String code;
     private final String message;
     private final Map<String, String> validation;
-		
+
     @Builder
     public ErrorResponse(String code, String message, Map<String, String> validation) {
         this.code = code;
@@ -22,5 +22,5 @@ public class ErrorResponse {
     public void addValidation(String fieldName, String errorMessage) {
         this.validation.put(fieldName, errorMessage);
     }
-		
+
 }

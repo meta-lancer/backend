@@ -1,4 +1,4 @@
-package com.metalancer.backend.common;
+package com.metalancer.backend.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

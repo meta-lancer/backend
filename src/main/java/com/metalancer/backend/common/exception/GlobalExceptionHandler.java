@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity invalidRequestHandler(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> invalidRequestHandler(MethodArgumentNotValidException e) {
         ErrorCode invalidParameterCode = ErrorCode.INVALID_PARAMETER;
         ErrorResponse response = ErrorResponse.builder()
             .code(invalidParameterCode.getCode())
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BaseException.class)
-    protected ResponseEntity handleBaseException(BaseException ex) {
+    protected ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
         log.error(ex.getErrorCode() + ": ", ex);
         log.info(ex.getMessage());
         ErrorCode code = ex.getErrorCode();

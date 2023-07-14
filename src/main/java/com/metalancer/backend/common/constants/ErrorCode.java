@@ -1,15 +1,8 @@
 package com.metalancer.backend.common.constants;
 
-import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
-import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
-import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
-import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
-import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
-import static com.metalancer.backend.common.constants.HttpStatus.SUCCESS;
-import static com.metalancer.backend.common.constants.HttpStatus.UNAUTHORIZED;
-import static com.metalancer.backend.common.constants.HttpStatus.UNEXPECTED_ERROR;
-
 import java.util.Arrays;
+
+import static com.metalancer.backend.common.constants.HttpStatus.*;
 
 public enum ErrorCode {
     /**
@@ -19,12 +12,14 @@ public enum ErrorCode {
     SIGNUP_COMPLETE(DUPLICATED_VALUE, "A002", "이미 존재하는 회원"),
     SIGNUP_DUPLICATED_ID(DUPLICATED_VALUE, "A003", "ID 중복"),
     SIGNUP_DUPLICATED_USERNAME(DUPLICATED_VALUE, "A004", "USERNAME 중복"),
+    SIGNUP_FAILED(BAD_REQUEST, "A005", "회원가입 실패"),
 
     LOGIN_OK(SUCCESS, "B001", "로그인 성공"),
     LOGIN_NOT_FOUND_ID(NOT_FOUND_VALUE, "B002", "로그인 실패"),
     LOGIN_NOT_FOUND_PW(NOT_FOUND_VALUE, "B003", "로그인 실패"),
     LOGOUT_OK(SUCCESS, "B004", "로그아웃 성공"),
     LOGOUT_STATE(UNAUTHORIZED, "B005", "로그아웃 상태"),
+    LOGIN_DENIED(NOT_FOUND_VALUE, "B006", "로그인 실패"),
 
     /**
      * 회원정보
@@ -57,6 +52,9 @@ public enum ErrorCode {
     ILLEGAL_STATUS(INVALID_VALUE, "Z003", "잘못된 상태 입니다."),
     SYSTEM_ERROR(UNEXPECTED_ERROR, "Z004", "일시적 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
 
+    STATUS_DELETED(INVALID_VALUE, "Z101", "삭제된 상태입니다."),
+    STATUS_PENDING(INVALID_VALUE, "Z102", "승인대기 상태입니다."),
+    STATUS_BANNED(INVALID_VALUE, "Z103", "정지된 상태입니다."),
     /**
      * 잘못된 ExceptionCode
      */
@@ -86,8 +84,8 @@ public enum ErrorCode {
 
     public static ErrorCode findExceptionCodeByCode(String code) {
         return Arrays.stream(ErrorCode.values())
-            .filter(x -> x.getCode().equals(code))
-            .findFirst()
-            .orElse(EMPTY);
+                .filter(x -> x.getCode().equals(code))
+                .findFirst()
+                .orElse(EMPTY);
     }
 }

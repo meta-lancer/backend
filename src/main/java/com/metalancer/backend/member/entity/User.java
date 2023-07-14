@@ -26,8 +26,8 @@ public class User extends BaseEntity implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(nullable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false)
+    private Long id;
 
     private String oauthId;
     @Embedded

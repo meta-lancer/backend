@@ -11,24 +11,24 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "register_link")
+@Entity(name = "approve_link")
 @ToString
-public class RegisterLink extends BaseEntity {
+public class ApproveLink extends BaseEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "register_link_id", nullable = false)
+    @Column(name = "approve_link_id", nullable = false)
     private Long id;
     @Embedded
     private Email email;
-    private String registerLink;
+    private String approveLink;
     private boolean isApproved = false;
     private LocalDateTime approvedAt;
 
     @Builder
-    public RegisterLink(String email, String registerLink) {
+    public ApproveLink(String email, String approveLink) {
         this.email = new Email(email);
-        this.registerLink = registerLink;
+        this.approveLink = approveLink;
     }
 
     public DataStatus getStatus() {

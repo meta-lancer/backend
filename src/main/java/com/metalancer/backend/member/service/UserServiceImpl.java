@@ -6,14 +6,17 @@ import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.RandomStringGenerator;
 import com.metalancer.backend.member.dto.MemberRequestDTO;
-import com.metalancer.backend.member.entity.RegisterLink;
+import com.metalancer.backend.member.entity.ApproveLink;
 import com.metalancer.backend.member.entity.User;
-import com.metalancer.backend.member.repository.RegisterLinkRepository;
+import com.metalancer.backend.member.repository.ApproveLinkRepository;
 import com.metalancer.backend.member.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 
 @Service
 @Slf4j
@@ -21,30 +24,36 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RegisterLinkRepository registerLinkRepository;
+    private final ApproveLinkRepository approveLinkRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
     @Override
-    public Long createUser(MemberRequestDTO.CreateRequest dto) {
+    public Long createUser(MemberRequestDTO.CreateRequest dto) throws MessagingException {
         User createdUser = createEmailUser(dto);
         createdUser = userRepository.save(createdUser);
         User foundUser = userRepository.findById(createdUser.getId()).orElseThrow(
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
-        createdRegisterLink(foundUser);
+        createdApproveLink(foundUser);
         return foundUser.getId();
     }
 
-    private void createdRegisterLink(User foundUser) {
-        String registerLink = new RandomStringGenerator().generateRandomString(12);
-        RegisterLink createdRegisterLink = RegisterLink.builder().email(foundUser.getEmail().value()).registerLink(registerLink).build();
-        createdRegisterLink = registerLinkRepository.save(createdRegisterLink);
-        RegisterLink foundRegisterLink = registerLinkRepository.findById(createdRegisterLink.getId()).orElseThrow(
+    private void createdApproveLink(User foundUser) throws MessagingException {
+        String approveLink = new RandomStringGenerator().generateRandomString(12);
+        ApproveLink createdApproveLink = ApproveLink.builder().email(foundUser.getEmail().value()).approveLink(approveLink).build();
+        createdApproveLink = approveLinkRepository.save(createdApproveLink);
+        ApproveLink foundApproveLink = approveLinkRepository.findById(createdApproveLink.getId()).orElseThrow(
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
-        String approveLink = foundRegisterLink.getRegisterLink();
-        emailService.sendEmail(foundUser.getEmail().value(), ApplicationText.REGISTER_LINK_EMAIL_TITLE, "");
+        sendApproveEmailToUser(foundUser, foundApproveLink);
+    }
+
+    private void sendApproveEmailToUser(User foundUser, ApproveLink foundApproveLink) throws MessagingException {
+        String approveLink = foundApproveLink.getApproveLink();
+        HashMap<String, String> emailValues = new HashMap<>();
+        emailValues.put("url", approveLink);
+        emailService.sendMail(foundUser.getEmail().value(), ApplicationText.REGISTER_LINK_EMAIL_TITLE, "approveUser", emailValues);
     }
 
     private User createEmailUser(MemberRequestDTO.CreateRequest dto) {
@@ -58,11 +67,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User approveUserByLink(String link) {
         link = link.replace(ApplicationText.BASE_URL, "");
-        RegisterLink foundRegisterLink = registerLinkRepository.findByRegisterLink(link).orElseThrow(
+        ApproveLink foundApproveLink = approveLinkRepository.findByApproveLink(link).orElseThrow(
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
-        foundRegisterLink.approve();
-        return userRepository.findByEmail(foundRegisterLink.getEmail())
+        foundApproveLink.approve();
+        return userRepository.findByEmail(foundApproveLink.getEmail())
                 .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
     }
 }

@@ -16,27 +16,26 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final String KEY = "name";
+    /*    private final String KEY = "name";*/
 
-    @GetMapping("/kakao")
-    public BaseResponse<Boolean> kakaoLogin(@RequestParam("code") String code) throws Exception {
-        authService.kakaoLogin(code);
-        return new BaseResponse<Boolean>(true);
-    }
-
-    @GetMapping
-    public String test(HttpSession session, @RequestParam String name) throws Exception {
-        session.setAttribute(KEY, name);
-        return "redis session saved";
-    }
-
+    //    @GetMapping
+//    public String test(HttpSession session, @RequestParam String name) throws Exception {
+//        session.setAttribute(KEY, name);
+//        return "redis session saved";
+//    }
+//
     @GetMapping("/test")
-    public String testValue(HttpSession session) throws Exception {
-        return (String) session.getAttribute(KEY);
+    public Object testValue(HttpSession session, @RequestParam String key) throws Exception {
+        return session.getAttribute(key);
     }
 
     @PostMapping("/login")
     public BaseResponse<Boolean> emailLogin(HttpSession session, @RequestBody AuthRequestDTO.LoginRequest dto) {
         return new BaseResponse<Boolean>(authService.emailLogin(session, dto));
+    }
+
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> emailLogout(HttpSession session) {
+        return new BaseResponse<Boolean>(authService.emailLogout(session));
     }
 }

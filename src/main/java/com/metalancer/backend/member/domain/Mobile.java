@@ -4,15 +4,13 @@ import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 import static java.util.regex.Pattern.matches;
 import static lombok.AccessLevel.PROTECTED;
 
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = PROTECTED)
-public class Mobile implements Serializable {
+public class Mobile {
 
     private String phone;
 

@@ -2,7 +2,6 @@ package com.metalancer.backend.member.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
-import com.metalancer.backend.member.domain.Email;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,15 +18,14 @@ public class ApproveLink extends BaseEntity {
     @Id
     @Column(name = "approve_link_id", nullable = false)
     private Long id;
-    @Embedded
-    private Email email;
+    private String email;
     private String approveLink;
     private boolean isApproved = false;
     private LocalDateTime approvedAt;
 
     @Builder
     public ApproveLink(String email, String approveLink) {
-        this.email = new Email(email);
+        this.email = email;
         this.approveLink = approveLink;
     }
 

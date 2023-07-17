@@ -8,12 +8,11 @@ import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.StatusException;
-import com.metalancer.backend.member.domain.Email;
-import com.metalancer.backend.member.domain.Mobile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -24,18 +23,19 @@ import java.util.UUID;
 @ToString
 public class User extends BaseEntity implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 748309881533993254L;
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "user_id", nullable = false)
     private Long id;
 
     private String oauthId;
-    @Embedded
-    private Email email;
+    private String email;
     private String name;
     private String username;
-    @Embedded
-    private Mobile mobile;
+    private String mobile;
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
     @JsonIgnore
@@ -46,9 +46,9 @@ public class User extends BaseEntity implements Serializable {
     @Builder
     public User(String email, String oauthId, String mobile, String password,
                 LoginType loginType, String name, String username) {
-        this.email = new Email(email);
+        this.email = email;
         this.oauthId = oauthId;
-        this.mobile = new Mobile(mobile);
+        this.mobile = mobile;
         this.password = password;
         this.loginType = loginType;
         this.name = name;

@@ -15,11 +15,10 @@ public enum ErrorCode {
     SIGNUP_FAILED(BAD_REQUEST, "A005", "회원가입 실패"),
 
     LOGIN_OK(SUCCESS, "B001", "로그인 성공"),
-    LOGIN_NOT_FOUND_ID(NOT_FOUND_VALUE, "B002", "로그인 실패"),
-    LOGIN_NOT_FOUND_PW(NOT_FOUND_VALUE, "B003", "로그인 실패"),
-    LOGOUT_OK(SUCCESS, "B004", "로그아웃 성공"),
-    LOGOUT_STATE(UNAUTHORIZED, "B005", "로그아웃 상태"),
-    LOGIN_DENIED(NOT_FOUND_VALUE, "B006", "로그인 실패"),
+    LOGIN_NOT_FOUND_ID_PW(NOT_FOUND_VALUE, "B002", "아이디 존재하지않거나 비밀번호가 일치하지않습니다."),
+    LOGOUT_OK(SUCCESS, "B003", "로그아웃 성공"),
+    LOGOUT_STATE(UNAUTHORIZED, "B004", "로그아웃 상태"),
+    LOGIN_DENIED(NOT_FOUND_VALUE, "B005", "로그인 불가"),
 
     /**
      * 회원정보

@@ -2,7 +2,6 @@ package com.metalancer.backend.member.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
-import com.metalancer.backend.member.domain.Email;
 import com.metalancer.backend.member.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,5 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByName(String name);
 
-    Optional<User> findByEmail(Email email);
+    Optional<User> findByEmail(String email);
 }

@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     private void createdApproveLink(User foundUser) throws MessagingException {
         String approveLink = new RandomStringGenerator().generateRandomString(12);
-        ApproveLink createdApproveLink = ApproveLink.builder().email(foundUser.getEmail().value()).approveLink(approveLink).build();
+        ApproveLink createdApproveLink = ApproveLink.builder().email(foundUser.getEmail()).approveLink(approveLink).build();
         createdApproveLink = approveLinkRepository.save(createdApproveLink);
         ApproveLink foundApproveLink = approveLinkRepository.findById(createdApproveLink.getId()).orElseThrow(
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
         String approveLink = foundApproveLink.getApproveLink();
         HashMap<String, String> emailValues = new HashMap<>();
         emailValues.put("url", approveLink);
-        emailService.sendMail(foundUser.getEmail().value(), ApplicationText.REGISTER_LINK_EMAIL_TITLE, "approveUser", emailValues);
+        emailService.sendMail(foundUser.getEmail(), ApplicationText.REGISTER_LINK_EMAIL_TITLE, "approve", emailValues);
     }
 
     private User createEmailUser(MemberRequestDTO.CreateRequest dto) {

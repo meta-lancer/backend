@@ -1,12 +1,14 @@
 package com.metalancer.backend.member.controller;
 
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.member.dto.AuthRequestDTO;
 import com.metalancer.backend.member.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,7 +27,9 @@ public class AuthController {
 //    }
 //
     @GetMapping("/test")
-    public Object testValue(HttpSession session, @RequestParam String key) throws Exception {
+    public Object testValue(HttpSession session, @RequestParam String key, @AuthenticationPrincipal PrincipalDetails user) throws Exception {
+        log.info("로그인되어있는 유저: {}", session.getAttribute(key));
+        log.info("로그인되어있는 유저: {}", user);
         return session.getAttribute(key);
     }
 

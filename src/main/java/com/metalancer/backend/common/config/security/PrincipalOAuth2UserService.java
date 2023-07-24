@@ -8,8 +8,6 @@ import com.metalancer.backend.member.oauth.KakaoUserInfo;
 import com.metalancer.backend.member.oauth.NaverUserInfo;
 import com.metalancer.backend.member.oauth.OAuth2UserInfo;
 import com.metalancer.backend.member.repository.UserRepository;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -17,6 +15,9 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -44,8 +45,8 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         User user = saveOrGetUser(oAuth2UserInfo, loginType);
-
-        return new PrincipalDetails(user, oAuth2User.getAttributes());
+        log.info("로그인 유저: {}", new UserAdapter(user, oAuth2User.getAttributes()));
+        return new UserAdapter(user, oAuth2User.getAttributes());
     }
 
     private User saveOrGetUser(OAuth2UserInfo oAuth2UserInfo, LoginType loginType) {
@@ -58,17 +59,17 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
         String username = stringBuilder.toString();
 
         Optional<User> optionalUser = userRepository.findByLoginTypeAndOauthIdAndStatus(loginType,
-            oauthId,
-            DataStatus.ACTIVE);
+                oauthId,
+                DataStatus.ACTIVE);
         User user = null;
 
         if (optionalUser.isEmpty()) {
             user = User.builder()
-                .oauthId(oauthId)
-                .email(email)
-                .loginType(loginType)
-                .username(username)
-                .build();
+                    .oauthId(oauthId)
+                    .email(email)
+                    .loginType(loginType)
+                    .username(username)
+                    .build();
             userRepository.save(user);
         } else {
             user = optionalUser.get();

@@ -36,11 +36,12 @@ public class SecurityConfig {
 //            .userInfoEndpoint()
 //            .userService(principalOAuth2UserService);
         http.csrf().disable()
-            .authorizeHttpRequests()
-            .requestMatchers("/user/**", "/h2-console").authenticated()
-            .requestMatchers("/sell/**").hasAuthority("SELLER")
-            .requestMatchers("/admin/**").hasAuthority("ADMIN")
-            .anyRequest().permitAll()
+                .authorizeHttpRequests()
+                .requestMatchers("/api/user/**", "/h2-console").authenticated()
+                .requestMatchers("/api/auth/test").hasRole("USER")
+                .requestMatchers("/api/sell/**").hasRole("SELLER")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()
 
 //            .and()
 //            .formLogin()
@@ -49,14 +50,14 @@ public class SecurityConfig {
 //                "/login") //login 주소가 호출되면 시큐리티가 낚아 채서(post로 오는것) 대신 로그인 진행 -> 컨트롤러를 안만들어도 된다.
 //            .defaultSuccessUrl("/")
 
-            .and()
-            .oauth2Login()
+                .and()
+                .oauth2Login()
 //            .loginPage("/loginForm")'
 //            .defaultSuccessUrl("/")
-            .successHandler(successHandler())
-            .userInfoEndpoint()
-            .userService(
-                principalOAuth2UserService);//구글 로그인이 완료된(구글회원) 뒤의 후처리가 필요함 . Tip.코드x, (엑세스 토큰+사용자 프로필 정보를 받아옴)
+                .successHandler(successHandler())
+                .userInfoEndpoint()
+                .userService(
+                        principalOAuth2UserService);//구글 로그인이 완료된(구글회원) 뒤의 후처리가 필요함 . Tip.코드x, (엑세스 토큰+사용자 프로필 정보를 받아옴)
 
         return http.build();
     }

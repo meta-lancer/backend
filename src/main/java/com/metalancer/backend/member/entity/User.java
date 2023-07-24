@@ -37,7 +37,7 @@ public class User extends BaseEntity implements Serializable {
     private String username;
     private String mobile;
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role = Role.ROLE_USER;
     @JsonIgnore
     private String password;
     @Enumerated(EnumType.STRING)
@@ -71,6 +71,10 @@ public class User extends BaseEntity implements Serializable {
 
     public void update() {
 
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public DataStatus getStatus() {

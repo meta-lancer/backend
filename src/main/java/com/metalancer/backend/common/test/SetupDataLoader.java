@@ -34,8 +34,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
 
         setupSecurityResources();
-        User user1 = createUserIfNotFound("aaa@naver.com", "aaa111");
-        User user2 = createUserIfNotFound("aaa111@naver.com", "aaa111");
+        User user1 = createUserIfNotFound("aaa@naver.com", "aaaaa11111");
+        User user2 = createUserIfNotFound("aaa111@naver.com", "aaaaa11111");
         user1.setRole(Role.ROLE_USER);
         user2.setRole(Role.ROLE_ADMIN);
 

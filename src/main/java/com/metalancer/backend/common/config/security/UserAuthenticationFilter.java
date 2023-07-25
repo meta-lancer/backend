@@ -1,7 +1,7 @@
 package com.metalancer.backend.common.config.security;
 
 import com.metalancer.backend.common.constants.ObjectText;
-import com.metalancer.backend.member.entity.User;
+import com.metalancer.backend.user.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

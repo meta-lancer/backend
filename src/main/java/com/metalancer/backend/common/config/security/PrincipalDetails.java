@@ -1,17 +1,23 @@
 package com.metalancer.backend.common.config.security;
 
-import com.metalancer.backend.member.entity.User;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import com.metalancer.backend.user.entity.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
 
 @Data
-public class PrincipalDetails implements UserDetails, OAuth2User {
+public class PrincipalDetails implements UserDetails, OAuth2User, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -5177589297506989455L;
 
     private User user;
     private Map<String, Object> attributes;

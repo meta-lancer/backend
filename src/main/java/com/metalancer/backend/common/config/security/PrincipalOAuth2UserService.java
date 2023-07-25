@@ -2,12 +2,12 @@ package com.metalancer.backend.common.config.security;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
-import com.metalancer.backend.member.entity.User;
-import com.metalancer.backend.member.oauth.GoogleUserInfo;
-import com.metalancer.backend.member.oauth.KakaoUserInfo;
-import com.metalancer.backend.member.oauth.NaverUserInfo;
-import com.metalancer.backend.member.oauth.OAuth2UserInfo;
-import com.metalancer.backend.member.repository.UserRepository;
+import com.metalancer.backend.user.entity.User;
+import com.metalancer.backend.user.oauth.GoogleUserInfo;
+import com.metalancer.backend.user.oauth.KakaoUserInfo;
+import com.metalancer.backend.user.oauth.NaverUserInfo;
+import com.metalancer.backend.user.oauth.OAuth2UserInfo;
+import com.metalancer.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -45,8 +45,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         User user = saveOrGetUser(oAuth2UserInfo, loginType);
-        log.info("로그인 유저: {}", new UserAdapter(user, oAuth2User.getAttributes()));
-        return new UserAdapter(user, oAuth2User.getAttributes());
+        return new PrincipalDetails(user, oAuth2User.getAttributes());
     }
 
     private User saveOrGetUser(OAuth2UserInfo oAuth2UserInfo, LoginType loginType) {

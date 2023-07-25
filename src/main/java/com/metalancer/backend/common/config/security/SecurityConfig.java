@@ -1,6 +1,6 @@
 package com.metalancer.backend.common.config.security;
 
-import com.metalancer.backend.member.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.metalancer.backend.user.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

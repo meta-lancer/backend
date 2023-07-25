@@ -2,8 +2,8 @@ package com.metalancer.backend.common.test;
 
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
-import com.metalancer.backend.member.entity.User;
-import com.metalancer.backend.member.repository.UserRepository;
+import com.metalancer.backend.user.entity.User;
+import com.metalancer.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

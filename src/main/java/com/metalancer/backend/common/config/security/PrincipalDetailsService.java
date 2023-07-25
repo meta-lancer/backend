@@ -1,7 +1,7 @@
 package com.metalancer.backend.common.config.security;
 
-import com.metalancer.backend.member.entity.User;
-import com.metalancer.backend.member.repository.UserRepository;
+import com.metalancer.backend.user.entity.User;
+import com.metalancer.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

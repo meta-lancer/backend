@@ -1,14 +1,13 @@
 package com.metalancer.backend.common.config.security;
 
-import com.metalancer.backend.user.entity.User;
-import com.metalancer.backend.user.repository.UserRepository;
+import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

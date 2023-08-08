@@ -1,10 +1,9 @@
 package com.metalancer.backend.common.config.security;
 
-import com.metalancer.backend.user.dto.AuthResponseDTO;
-import com.metalancer.backend.user.entity.User;
-import lombok.Getter;
-
+import com.metalancer.backend.users.dto.AuthResponseDTO;
+import com.metalancer.backend.users.entity.User;
 import java.util.Map;
+import lombok.Getter;
 
 @Getter
 public class UserAdapter extends PrincipalDetails {

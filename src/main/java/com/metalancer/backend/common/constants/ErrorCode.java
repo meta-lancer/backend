@@ -1,8 +1,15 @@
 package com.metalancer.backend.common.constants;
 
-import java.util.Arrays;
+import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
+import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
+import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.SUCCESS;
+import static com.metalancer.backend.common.constants.HttpStatus.UNAUTHORIZED;
+import static com.metalancer.backend.common.constants.HttpStatus.UNEXPECTED_ERROR;
 
-import static com.metalancer.backend.common.constants.HttpStatus.*;
+import java.util.Arrays;
 
 public enum ErrorCode {
     /**
@@ -35,6 +42,11 @@ public enum ErrorCode {
      */
     AUTHORITY_HAVE(SUCCESS, "E001", "수정/삭제 권한이 있습니다"),
     AUTHORITY_NOT_HAVE(NOT_FOUND_VALUE, "E002", "수정/삭제 권한이 없습니다."),
+
+    /**
+     * 포트원 결제
+     */
+    PORTONE_ERROR(NOT_FOUND_VALUE, "F002", "포트원 api 호출에 실패했습니다."),
 
     /**
      * 토큰
@@ -83,8 +95,8 @@ public enum ErrorCode {
 
     public static ErrorCode findExceptionCodeByCode(String code) {
         return Arrays.stream(ErrorCode.values())
-                .filter(x -> x.getCode().equals(code))
-                .findFirst()
-                .orElse(EMPTY);
+            .filter(x -> x.getCode().equals(code))
+            .findFirst()
+            .orElse(EMPTY);
     }
 }

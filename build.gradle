@@ -30,6 +30,7 @@ dependencyManagement {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -61,6 +62,8 @@ dependencies {
 
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+
+    implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 }
 
 tasks.named('test') {

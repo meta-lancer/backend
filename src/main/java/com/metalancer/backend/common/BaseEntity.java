@@ -2,15 +2,18 @@ package com.metalancer.backend.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.metalancer.backend.common.constants.DataStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
@@ -33,6 +36,10 @@ public abstract class BaseEntity {
 
     protected void delete() {
         this.status = DataStatus.DELETED;
+    }
+
+    protected void active() {
+        this.status = DataStatus.ACTIVE;
     }
 
     protected void restore() {

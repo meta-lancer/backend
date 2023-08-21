@@ -2,6 +2,7 @@ package com.metalancer.backend.common.exception;
 
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.response.ErrorResponse;
+import com.siot.IamportRestClient.exception.IamportResponseException;
 import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,31 @@ public class GlobalExceptionHandler {
         }
         return new ResponseEntity<>(response,
             HttpStatus.valueOf(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(IamportResponseException.class)
+    protected ResponseEntity<ErrorResponse> handleBaseException(IamportResponseException ex) {
+        ErrorCode code = ErrorCode.PORTONE_ERROR;
+        log.info(ex.getHttpStatusCode() + "-" + code.getMessage() + ": " + ex.getMessage());
+        log.error(code + ": ", ex);
+
+        switch (ex.getHttpStatusCode()) {
+            case 401:
+                //TODO
+                break;
+            case 500:
+                //TODO
+                break;
+        }
+        // 유저가 어떻게 에러가 났는지를 알 수 없게 code 로 보내주면 좋지만... 발생하는 에러 종류가 매번 다르기에
+        ErrorResponse response = ErrorResponse.builder()
+            .code(code.getCode())
+            .message(code.getMessage() + "(" + ex.getMessage() + ")")
+            .validation(new HashMap<>())
+            .build();
+
+        return new ResponseEntity<>(response,
+            HttpStatus.valueOf(code.getStatus().value));
     }
 
     @ExceptionHandler(BaseException.class)

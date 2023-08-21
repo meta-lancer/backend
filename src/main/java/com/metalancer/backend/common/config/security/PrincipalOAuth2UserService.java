@@ -1,7 +1,9 @@
 package com.metalancer.backend.common.config.security;
 
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
+import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.oauth.GoogleUserInfo;
 import com.metalancer.backend.users.oauth.KakaoUserInfo;
@@ -48,27 +50,27 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User saveOrGetUser(OAuth2UserInfo oAuth2UserInfo, LoginType loginType) {
-        String providerId = oAuth2UserInfo.getProviderId();
-        String email = oAuth2UserInfo.getEmail();
-        String oauthId = providerId;
-//        String nickname = oAuth2UserInfo.getName();
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(loginType.toString()).append("_").append(oauthId);
-        String username = stringBuilder.toString();
-
+        String oauthId = oAuth2UserInfo.getProviderId();
         Optional<User> optionalUser = userRepository.findByLoginTypeAndOauthIdAndStatus(loginType,
             oauthId,
             DataStatus.ACTIVE);
         User user = null;
 
         if (optionalUser.isEmpty()) {
+            String email = oAuth2UserInfo.getEmail();
+            String username = loginType.toString() + "_" + oauthId;
+            //        String nickname = oAuth2UserInfo.getName();
+
             user = User.builder()
                 .oauthId(oauthId)
                 .email(email)
                 .loginType(loginType)
                 .username(username)
                 .build();
-            userRepository.save(user);
+            user = userRepository.save(user);
+            userRepository.findById(user.getId()).orElseThrow(
+                () -> new BaseException(ErrorCode.SIGNUP_FAILED)
+            );
         } else {
             user = optionalUser.get();
         }

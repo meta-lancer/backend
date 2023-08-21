@@ -75,6 +75,10 @@ public class User extends BaseEntity implements Serializable {
         pend();
     }
 
+    public void setActive() {
+        active();
+    }
+
     public void withdraw() {
         delete();
     }
@@ -91,7 +95,7 @@ public class User extends BaseEntity implements Serializable {
         return getStatusvalue();
     }
 
-    public void isUserActive() {
+    public void isUserStatusEqualsActive() {
         DataStatus status = getStatus();
         String USER_STATUS_ERROR = "user status error";
         switch (status) {

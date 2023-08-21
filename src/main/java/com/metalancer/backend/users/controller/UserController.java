@@ -5,7 +5,6 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
-import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,8 @@ public class UserController {
     }
 
     @PatchMapping("/status/{link}")
-    public BaseResponse<User> approveUserByLink(@PathVariable("link") String link) {
+    public BaseResponse<AuthResponseDTO.userInfo> approveUserByLink(
+        @PathVariable("link") String link) {
         return new BaseResponse<>(userService.approveUserByLink(link));
     }
 

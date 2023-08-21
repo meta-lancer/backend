@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.RandomStringGenerator;
+import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.User;
@@ -14,6 +15,7 @@ import jakarta.mail.MessagingException;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    @Value("${url.base}")
+    private String urlBase;
 
     private final UserRepository userRepository;
     private final ApproveLinkRepository approveLinkRepository;
@@ -39,7 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void createdApproveLink(User foundUser) throws MessagingException {
-        String approveLink = new RandomStringGenerator().generateRandomString(12);
+        String approveLink = getApproveLink();
         ApproveLink createdApproveLink = ApproveLink.builder().email(foundUser.getEmail())
             .approveLink(approveLink).build();
         createdApproveLink = approveLinkRepository.save(createdApproveLink);
@@ -48,6 +53,10 @@ public class UserServiceImpl implements UserService {
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)
             );
         sendApproveEmailToUser(foundUser, foundApproveLink);
+    }
+
+    private String getApproveLink() {
+        return urlBase + new RandomStringGenerator().generateRandomString(12);
     }
 
     private void sendApproveEmailToUser(User foundUser, ApproveLink foundApproveLink)
@@ -69,13 +78,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User approveUserByLink(String link) {
+    public AuthResponseDTO.userInfo approveUserByLink(String link) {
         link = link.replace(ApplicationText.BASE_URL, "");
         ApproveLink foundApproveLink = approveLinkRepository.findByApproveLink(link).orElseThrow(
             () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
         foundApproveLink.approve();
-        return userRepository.findByEmail(foundApproveLink.getEmail())
+        User foundUser = userRepository.findByEmail(foundApproveLink.getEmail())
             .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
+        foundUser.setActive();
+        return new AuthResponseDTO.userInfo(foundUser);
     }
 }

@@ -90,11 +90,7 @@ public class User extends BaseEntity implements Serializable {
     public void setRole(Role role) {
         this.role = role;
     }
-
-    public DataStatus getStatus() {
-        return getStatusvalue();
-    }
-
+    
     public void isUserStatusEqualsActive() {
         DataStatus status = getStatus();
         String USER_STATUS_ERROR = "user status error";

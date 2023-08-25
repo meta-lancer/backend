@@ -54,7 +54,7 @@ public abstract class BaseEntity {
         this.status = DataStatus.PENDING;
     }
 
-    protected DataStatus getStatusvalue() {
+    public DataStatus getStatus() {
         return status;
     }
 }

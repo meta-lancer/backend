@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     public boolean emailLogin(HttpSession session, AuthRequestDTO.LoginRequest dto) {
         User user = userRepository.findByEmail(dto.getEmail())
             .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_NOT_FOUND_ID_PW));
-        user.isUserActive();
+        user.isUserStatusEqualsActive();
         user.isPasswordMatch(passwordEncoder, dto.getPassword());
         session.setAttribute(LOGIN_USER, user);
         return true;

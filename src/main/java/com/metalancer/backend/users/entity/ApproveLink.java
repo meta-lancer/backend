@@ -36,10 +36,6 @@ public class ApproveLink extends BaseEntity {
         this.approveLink = approveLink;
     }
 
-    public DataStatus getStatus() {
-        return getStatusvalue();
-    }
-
     public void isUserActive() {
         DataStatus status = getStatus();
 //        String USER_STATUS_ERROR = "user status error";

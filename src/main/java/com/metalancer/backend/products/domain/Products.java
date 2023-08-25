@@ -3,6 +3,7 @@ package com.metalancer.backend.products.domain;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.StatusException;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -40,9 +42,10 @@ public class Products extends BaseEntity implements Serializable {
     private String sharedLink;
     private String title;
     private int price;
-    private double discount;
+    private double discount = 0;
     private double rate = 5;
     private int ratingCnt = 1;
+    private int viewCnt = 0;
 
     // 이미지
     // 태그
@@ -70,7 +73,43 @@ public class Products extends BaseEntity implements Serializable {
         int length = 10;
         this.sharedLink = RandomStringUtils.randomAlphanumeric(length);
     }
-    
+
+    public void addViewCnt() {
+        this.viewCnt++;
+    }
+
+    private int addRatingCnt() {
+        return ratingCnt++;
+    }
+
+    private int deductRatingCnt() {
+        return ratingCnt--;
+    }
+
+    public void addRate(int newRate) {
+        int currentRatingCnt = this.ratingCnt;
+        int newRatingCnt = addRatingCnt();
+        this.rate = Math.round((rate * currentRatingCnt + newRate) / newRatingCnt * 10 / 10.0);
+        if (rate > 5 || rate < 1) {
+            throw new BaseException(ErrorCode.INVALID_PARAMETER);
+        }
+    }
+
+    public void cancelRate(int pastRate) {
+        int currentRatingCnt = this.ratingCnt;
+        int newRatingCnt = deductRatingCnt();
+        this.rate = Math.round((rate * currentRatingCnt - pastRate) / newRatingCnt * 10 / 10.0);
+        if (rate > 5 || rate < 1) {
+            throw new BaseException(ErrorCode.INVALID_PARAMETER);
+        }
+    }
+
+    public void changeRate(int pastRate, int newRate) {
+        cancelRate(pastRate);
+        addRate(newRate);
+    }
+
+
     public void isProductsStatusEqualsActive() {
         DataStatus status = getStatus();
         String PRODUCTS_STATUS_ERROR = "products status error";
@@ -80,4 +119,11 @@ public class Products extends BaseEntity implements Serializable {
         }
     }
 
+    @Builder
+    public Products(User creator, String sharedLink, String title, int price) {
+        this.creator = creator;
+        this.sharedLink = sharedLink;
+        this.title = title;
+        this.price = price;
+    }
 }

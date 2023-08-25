@@ -43,8 +43,8 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests()
             .requestMatchers("/api/user/**", "/h2-console", "/loginForm", "/login").authenticated()
-            .requestMatchers("/api/auth/test").hasRole("USER")
-            .requestMatchers("/api/sell/**").hasRole("SELLER")
+            .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
+            .requestMatchers("/api/sell/**").hasAnyRole("SELLER", "ADMIN")
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().permitAll()
 

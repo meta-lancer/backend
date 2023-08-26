@@ -28,7 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "member")
+@Entity(name = "users")
 @ToString
 public class User extends BaseEntity implements Serializable {
 
@@ -90,7 +90,7 @@ public class User extends BaseEntity implements Serializable {
     public void setRole(Role role) {
         this.role = role;
     }
-    
+
     public void isUserStatusEqualsActive() {
         DataStatus status = getStatus();
         String USER_STATUS_ERROR = "user status error";

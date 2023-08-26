@@ -2,6 +2,7 @@ package com.metalancer.backend.common.constants;
 
 import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
 import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.FORBIDDEN;
 import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
 import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
 import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
@@ -42,6 +43,7 @@ public enum ErrorCode {
      */
     AUTHORITY_HAVE(SUCCESS, "E001", "수정/삭제 권한이 있습니다"),
     AUTHORITY_NOT_HAVE(NOT_FOUND_VALUE, "E002", "수정/삭제 권한이 없습니다."),
+    INVALID_ROLE_ACCESS(FORBIDDEN, "E003", "올바르지 않은 권한 접근입니다."),
 
     /**
      * 포트원 결제

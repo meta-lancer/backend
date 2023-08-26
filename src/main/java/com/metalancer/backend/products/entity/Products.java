@@ -1,11 +1,11 @@
-package com.metalancer.backend.products.domain;
+package com.metalancer.backend.products.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.StatusException;
-import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.entity.Creator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,12 +37,15 @@ public class Products extends BaseEntity implements Serializable {
     @Column(name = "products_id", nullable = false)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User creator;
+    @JoinColumn(name = "products_category_id", nullable = false)
+    private ProductsCategory category;
+    @ManyToOne
+    @JoinColumn(name = "creator_id", nullable = false)
+    private Creator creator;
     private String sharedLink;
     private String title;
     private int price;
-    private double discount = 0;
+    private double discount = 0.0;
     private double rate = 5;
     private int ratingCnt = 1;
     private int viewCnt = 0;
@@ -74,6 +77,10 @@ public class Products extends BaseEntity implements Serializable {
         this.sharedLink = RandomStringUtils.randomAlphanumeric(length);
     }
 
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
     public void addViewCnt() {
         this.viewCnt++;
     }
@@ -90,7 +97,7 @@ public class Products extends BaseEntity implements Serializable {
         int currentRatingCnt = this.ratingCnt;
         int newRatingCnt = addRatingCnt();
         this.rate = Math.round((rate * currentRatingCnt + newRate) / newRatingCnt * 10 / 10.0);
-        if (rate > 5 || rate < 1) {
+        if (checkRateRange()) {
             throw new BaseException(ErrorCode.INVALID_PARAMETER);
         }
     }
@@ -99,9 +106,13 @@ public class Products extends BaseEntity implements Serializable {
         int currentRatingCnt = this.ratingCnt;
         int newRatingCnt = deductRatingCnt();
         this.rate = Math.round((rate * currentRatingCnt - pastRate) / newRatingCnt * 10 / 10.0);
-        if (rate > 5 || rate < 1) {
+        if (checkRateRange()) {
             throw new BaseException(ErrorCode.INVALID_PARAMETER);
         }
+    }
+
+    private boolean checkRateRange() {
+        return rate > 5 || rate < 1;
     }
 
     public void changeRate(int pastRate, int newRate) {
@@ -120,10 +131,11 @@ public class Products extends BaseEntity implements Serializable {
     }
 
     @Builder
-    public Products(User creator, String sharedLink, String title, int price) {
+    public Products(Creator creator, ProductsCategory productsCategory, String title, int price) {
         this.creator = creator;
-        this.sharedLink = sharedLink;
+        this.category = productsCategory;
         this.title = title;
         this.price = price;
+        setSharedLink();
     }
 }

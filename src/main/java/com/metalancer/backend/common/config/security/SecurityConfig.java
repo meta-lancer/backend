@@ -42,6 +42,7 @@ public class SecurityConfig {
 //            .userService(principalOAuth2UserService);
         http.csrf().disable()
             .authorizeHttpRequests()
+            .requestMatchers("/swagger-ui/index.html").denyAll()
             .requestMatchers("/api/user/**", "/h2-console", "/loginForm", "/login").authenticated()
             .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
             .requestMatchers("/api/sell/**").hasAnyRole("SELLER", "ADMIN")

@@ -27,7 +27,7 @@ public class OpenApiConfig {
     public GroupedOpenApi group1() {
         return GroupedOpenApi.builder()
             .group("유저")
-            .pathsToMatch("/api/users/**")
+            .pathsToMatch("/api/users/**", "/api/auth/**")
             .build();
     }
 

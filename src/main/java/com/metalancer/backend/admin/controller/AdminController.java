@@ -1,4 +1,4 @@
-package com.metalancer.backend.users.controller;
+package com.metalancer.backend.admin.controller;
 
 
 import com.metalancer.backend.common.response.BaseResponse;

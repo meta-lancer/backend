@@ -8,6 +8,7 @@ import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.AccessToken;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Prepare;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "주문", description = "")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -48,6 +50,18 @@ public class OrdersController {
         return new BaseResponse<>(auth_response.getResponse().getToken());
     }
 
+    //    @GetMapping("/payments/{orders-id}")
+//    public BaseResponse<Boolean> getPayment(@PathVariable("orders-id") Long ordersId)
+//        throws Exception {
+//
+//        // id를 통해 해당 주문서의 merchant_uid 불러온다.
+//        IamportClient client = new IamportClient(apiKey, apiSecret, true);
+//        String merchantUid = "";
+//        IamportResponse<Payment> payment_response = client.paymentByImpUid(merchantUid);
+//        log.info("결제내역 단건 조회 응답: {}", payment_response);
+//        return new BaseResponse<>(true);
+//    }
+
     @PostMapping("/prepare")
     public BaseResponse<Boolean> postPreparePayments(
         @RequestBody OrdersRequestDTO.PostPreparePayments dto)
@@ -62,18 +76,6 @@ public class OrdersController {
     }
 
     // 프론트에서 결제완료되면 포트원 결제번호 + 우리의 orderNo 을 수신하는 api 이 안에 결제내역 단건 조회 + 금액 비교까지 하면 된다!
-
-//    @GetMapping("/payments/{orders-id}")
-//    public BaseResponse<Boolean> getPayment(@PathVariable("orders-id") Long ordersId)
-//        throws Exception {
-//
-//        // id를 통해 해당 주문서의 merchant_uid 불러온다.
-//        IamportClient client = new IamportClient(apiKey, apiSecret, true);
-//        String merchantUid = "";
-//        IamportResponse<Payment> payment_response = client.paymentByImpUid(merchantUid);
-//        log.info("결제내역 단건 조회 응답: {}", payment_response);
-//        return new BaseResponse<>(true);
-//    }
 
     // 결제 사후 검증 => 웹훅과 동시에 이루어지도록...?
 //    @GetMapping("/payments/{orders-id}")

@@ -2,6 +2,7 @@ package com.metalancer.backend.users.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
 import com.metalancer.backend.products.entity.Products;
+import com.metalancer.backend.users.domain.Cart;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "cart")
 @ToString
-public class Cart extends BaseTimeEntity implements Serializable {
+public class CartEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 748309177241993156L;
@@ -39,4 +40,8 @@ public class Cart extends BaseTimeEntity implements Serializable {
     @JoinColumn(name = "products_id", nullable = false)
     private Products products;
 
+    public Cart toDomain() {
+        return Cart.builder().cartId(id).title(products.getTitle())
+            .price(products.getPrice()).build();
+    }
 }

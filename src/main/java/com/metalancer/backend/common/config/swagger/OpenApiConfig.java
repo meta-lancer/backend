@@ -16,7 +16,7 @@ public class OpenApiConfig {
         Info info = new Info()
             .version("v1.0.0")
             .title("Metaovis API")
-            .description("API Description")
+            .description("대부분의 api는 @AuthenticationPrincipal PrincipalDetails user(세션)로 유저를 식별합니다.")
             .contact(new Contact().name("메타오비스").email("metaovis@gmail.com"));
 
         return new OpenAPI()
@@ -27,7 +27,7 @@ public class OpenApiConfig {
     public GroupedOpenApi group1() {
         return GroupedOpenApi.builder()
             .group("유저")
-            .pathsToMatch("/api/users/**", "/api/auth/**")
+            .pathsToMatch("/api/users/**", "/api/auth/**", "/api/cart/**")
             .build();
     }
 

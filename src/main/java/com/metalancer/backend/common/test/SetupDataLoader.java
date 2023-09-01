@@ -2,14 +2,18 @@ package com.metalancer.backend.common.test;
 
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
-import com.metalancer.backend.products.entity.Products;
 import com.metalancer.backend.products.entity.ProductsCategory;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.TagEntity;
 import com.metalancer.backend.products.repository.ProductsCategoryRepository;
 import com.metalancer.backend.products.repository.ProductsJpaRepository;
+import com.metalancer.backend.products.repository.TagJpaRepository;
 import com.metalancer.backend.users.entity.Creator;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CreatorRepository;
 import com.metalancer.backend.users.repository.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,6 +34,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final CreatorRepository creatorRepository;
     private final ProductsCategoryRepository productsCategoryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TagJpaRepository tagJpaRepository;
 
     private static AtomicInteger count = new AtomicInteger(0);
 
@@ -54,9 +59,21 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         ProductsCategory productsCategory1 = createProductsCategory("3D 프린팅", "3D printing", 1);
 
-        Products product1 = createProduct(creator1, productsCategory1, "[저축 set] 귀여운 돼지저금통과 통장 지폐",
+        ProductsEntity product1 = createProduct(creator1, productsCategory1,
+            "[저축 set] 귀여운 돼지저금통과 통장 지폐",
             15000);
-        Products product2 = createProduct(creator2, productsCategory1, "디테일한 커피머신 스타벅스 마스트", 7700);
+        ProductsEntity product2 = createProduct(creator2, productsCategory1, "디테일한 커피머신 스타벅스 마스트",
+            7700);
+
+        TagEntity tag1 = TagEntity.builder().productsEntity(product1).name("모델링").build();
+        TagEntity tag2 = TagEntity.builder().productsEntity(product1).name("리깅").build();
+        TagEntity tag3 = TagEntity.builder().productsEntity(product1).name("3D프린팅").build();
+        TagEntity tag4 = TagEntity.builder().productsEntity(product2).name("모델링").build();
+        TagEntity tag5 = TagEntity.builder().productsEntity(product2).name("Blender").build();
+
+        List<TagEntity> tagEntities = new ArrayList<>(
+            List.of(new TagEntity[]{tag1, tag2, tag3, tag4, tag5}));
+        tagJpaRepository.saveAll(tagEntities);
 
         alreadySetup = true;
     }
@@ -96,10 +113,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     @Transactional
-    public Products createProduct(final Creator creator,
+    public ProductsEntity createProduct(final Creator creator,
         final ProductsCategory productsCategory, final String title,
         final int price) {
-        Products newProduct = Products.builder().creator(creator).productsCategory(productsCategory)
+        ProductsEntity newProduct = ProductsEntity.builder().creator(creator)
+            .productsCategory(productsCategory)
             .title(title).price(price).build();
         return productsJpaRepository.save(newProduct);
     }

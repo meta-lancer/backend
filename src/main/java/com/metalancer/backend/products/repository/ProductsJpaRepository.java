@@ -12,4 +12,10 @@ public interface ProductsJpaRepository extends JpaRepository<Products, Long> {
     Page<Products> findAllByCreator(Creator creator, Pageable pageable);
 
     Page<Products> findAllByCreatorAndStatus(Creator creator, DataStatus status, Pageable pageable);
+
+    Page<Products> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    Page<Products> findAllByPriceOrderByViewCntDesc(int price, Pageable pageable);
+
+    Page<Products> findAllByPriceIsGreaterThanOrderByViewCntDesc(int price, Pageable pageable);
 }

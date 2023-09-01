@@ -1,7 +1,9 @@
 package com.metalancer.backend.products.domain;
 
 import java.util.List;
+import lombok.Getter;
 
+@Getter // 부모 클래스의 getter가 없으면 못 받아온다.
 public abstract class Asset {
 
     private Long assetId;

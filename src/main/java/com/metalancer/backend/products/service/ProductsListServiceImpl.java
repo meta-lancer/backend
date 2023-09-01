@@ -6,24 +6,42 @@ import com.metalancer.backend.common.constants.ProperAssetType;
 import com.metalancer.backend.products.controller.Response.ProductsDto.HotPickResponse;
 import com.metalancer.backend.products.controller.Response.ProductsDto.ProperAssetResponse;
 import com.metalancer.backend.products.domain.FilterAsset;
+import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ProductsListImpl implements ProductsListService {
+public class ProductsListServiceImpl implements ProductsListService {
 
     private final ProductsRepository productsRepository;
 
     @Override
     public HotPickResponse getHotPickList(HotPickType type, PeriodType period, Pageable pageable) {
-        return null;
+        Page<HotPickAsset> hotPickAssets = new PageImpl<>(new ArrayList<>(), pageable, 0);
+        switch (type) {
+            case NEW -> {
+                hotPickAssets = productsRepository.findNewProductList(pageable);
+            }
+            case SALE -> {
+                hotPickAssets = productsRepository.findSaleProductList(pageable);
+            }
+            case FREE -> {
+                hotPickAssets = productsRepository.findFreeProductList(period, pageable);
+            }
+            case CHARGE -> {
+                hotPickAssets = productsRepository.findChargeProductList(period, pageable);
+            }
+        }
+        return new HotPickResponse(type, hotPickAssets);
     }
 
     @Override

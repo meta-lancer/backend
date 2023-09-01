@@ -4,6 +4,7 @@ import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.ProperAssetType;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.domain.ProperAsset;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 
@@ -11,16 +12,18 @@ import org.springframework.data.domain.Page;
 public class ProductsDto {
 
     @Data
+    @AllArgsConstructor
     public static class HotPickResponse {
 
-        private HotPickType hotPickType;
-        private Page<HotPickAsset> hotPickAssetList;
+        private final HotPickType hotPickType;
+        private final Page<HotPickAsset> hotPickAssetList;
     }
 
     @Data
+    @AllArgsConstructor
     public static class ProperAssetResponse {
 
-        private ProperAssetType properAssetType;
-        private Page<ProperAsset> properAssetList;
+        private final ProperAssetType properAssetType;
+        private final Page<ProperAsset> properAssetList;
     }
 }

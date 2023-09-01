@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/products/list")
 public class ProductsListController {
 
-    private ProductsListService productsListService;
+    private final ProductsListService productsListService;
 
     @Operation(summary = "에셋 Hot Pick", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))

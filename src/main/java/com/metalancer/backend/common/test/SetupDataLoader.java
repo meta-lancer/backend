@@ -5,7 +5,7 @@ import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.products.entity.Products;
 import com.metalancer.backend.products.entity.ProductsCategory;
 import com.metalancer.backend.products.repository.ProductsCategoryRepository;
-import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsJpaRepository;
 import com.metalancer.backend.users.entity.Creator;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CreatorRepository;
@@ -26,7 +26,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private boolean alreadySetup = false;
     private final UserRepository userRepository;
-    private final ProductsRepository productsRepository;
+    private final ProductsJpaRepository productsJpaRepository;
     private final CreatorRepository creatorRepository;
     private final ProductsCategoryRepository productsCategoryRepository;
     private final PasswordEncoder passwordEncoder;
@@ -54,8 +54,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         ProductsCategory productsCategory1 = createProductsCategory("3D 프린팅", "3D printing", 1);
 
-        createProduct(creator1, productsCategory1, "[저축 set] 귀여운 돼지저금통과 통장 지폐", 15000);
-        createProduct(creator2, productsCategory1, "디테일한 커피머신 스타벅스 마스트", 7700);
+        Products product1 = createProduct(creator1, productsCategory1, "[저축 set] 귀여운 돼지저금통과 통장 지폐",
+            15000);
+        Products product2 = createProduct(creator2, productsCategory1, "디테일한 커피머신 스타벅스 마스트", 7700);
 
         alreadySetup = true;
     }
@@ -100,6 +101,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         final int price) {
         Products newProduct = Products.builder().creator(creator).productsCategory(productsCategory)
             .title(title).price(price).build();
-        return productsRepository.save(newProduct);
+        return productsJpaRepository.save(newProduct);
     }
 }

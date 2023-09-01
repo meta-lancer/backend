@@ -2,7 +2,9 @@ package com.metalancer.backend.products.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.entity.Products;
 import com.metalancer.backend.users.entity.Creator;
 import java.util.Optional;
@@ -58,5 +60,28 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         return productsJpaRepository.findAllByCreatorAndStatus(creator, status, pageable);
     }
 
-    ;;
+    @Override
+    public Page<HotPickAsset> findNewProductList(Pageable pageable) {
+        return productsJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
+            .map(Products::toHotPickAsset);
+    }
+
+    @Override
+    public Page<HotPickAsset> findSaleProductList(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<HotPickAsset> findFreeProductList(PeriodType period, Pageable pageable) {
+        return productsJpaRepository.findAllByPriceOrderByViewCntDesc(0, pageable)
+            .map(Products::toHotPickAsset);
+    }
+
+    @Override
+    public Page<HotPickAsset> findChargeProductList(PeriodType period, Pageable pageable) {
+        return productsJpaRepository.findAllByPriceIsGreaterThanOrderByViewCntDesc(0, pageable)
+            .map(Products::toHotPickAsset);
+    }
+
+    ;
 }

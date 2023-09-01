@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.StatusException;
+import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.users.entity.Creator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -137,5 +138,11 @@ public class Products extends BaseEntity implements Serializable {
         this.title = title;
         this.price = price;
         setSharedLink();
+    }
+
+    public ProductsDetail toProductsDetail() {
+        return ProductsDetail.builder().assetId(id).category(category).creator(creator)
+            .sharedLink(sharedLink).title(title).price(price)
+            .discount(discount).rate(rate).ratingCnt(ratingCnt).build();
     }
 }

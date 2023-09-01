@@ -3,6 +3,7 @@ package com.metalancer.backend.products.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.service.ProductsDetailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,6 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductsDetailController {
 
     private final ProductsDetailService productsDetailService;
+
+    @Operation(summary = "상품 상세 조회", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @GetMapping("/{productId}")
+    public BaseResponse<ProductsDetail> getProductDetail(
+        @PathVariable("productId") Long productId) {
+        log.info("상품 고유번호: {}", productId);
+        return new BaseResponse<>(productsDetailService.getProductDetail(productId));
+    }
 
     @Operation(summary = "상품 링크 공유", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))

@@ -41,7 +41,8 @@ public class ProductsListController {
     public BaseResponse<HotPickResponse> getHotPickList(
         @Parameter(description = "종류") @RequestParam HotPickType type,
         @Parameter(description = "기간") @RequestParam PeriodType period,
-        @Parameter(description = "페이징") @RequestParam Pageable pageable) {
+        @Parameter(description = "페이징") Pageable pageable) {
+        log.info("종류 옵션-{}, 기간 옵션-{}, 페이징-{}", type, period, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(
             productsListService.getHotPickList(type, period, adjustedPageable));
@@ -52,7 +53,8 @@ public class ProductsListController {
     @GetMapping("/proper-asset")
     public BaseResponse<ProperAssetResponse> getProperAssetList(
         @Parameter(description = "종류") @RequestParam ProperAssetType type,
-        @Parameter(description = "페이징") @RequestParam Pageable pageable) {
+        @Parameter(description = "페이징") Pageable pageable) {
+        log.info("종류 옵션-{},  페이징-{}", type, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(productsListService.getProperAssetList(type, adjustedPageable));
     }
@@ -65,7 +67,9 @@ public class ProductsListController {
         @Parameter(description = "유형 옵션") @RequestParam List<Integer> typeOption,
         @Parameter(description = "장르 옵션") @RequestParam List<Integer> genreOption,
         @Parameter(description = "가격 옵션") @RequestParam List<Integer> priceOption,
-        @Parameter(description = "페이징") @RequestParam Pageable pageable) {
+        @Parameter(description = "페이징") Pageable pageable) {
+        log.info("정렬 옵션-{}, 유형 옵션-{}, 장르 옵션-{}, 가격 옵션-{}, 페이징-{}", sortOption, typeOption,
+            genreOption, priceOption, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(
             productsListService.getFilterAssetList(sortOption, typeOption, genreOption, priceOption,

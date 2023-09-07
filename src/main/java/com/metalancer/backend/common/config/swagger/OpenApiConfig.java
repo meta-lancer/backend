@@ -16,7 +16,8 @@ public class OpenApiConfig {
         Info info = new Info()
             .version("v1.0.0")
             .title("Metaovis API")
-            .description("대부분의 api는 @AuthenticationPrincipal PrincipalDetails user(세션)로 유저를 식별합니다.")
+            .description(
+                "대부분의 api는 @AuthenticationPrincipal PrincipalDetails user(세션)로 유저를 식별합니다. \n 그리고 페이징 사용 시, 페이지를 1부터 시작하게끔 설정했습니다")
             .contact(new Contact().name("메타오비스").email("metaovis@gmail.com"));
 
         return new OpenAPI()
@@ -52,6 +53,14 @@ public class OpenApiConfig {
         return GroupedOpenApi.builder()
             .group("주문")
             .pathsToMatch("/api/orders/**")
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi group5() {
+        return GroupedOpenApi.builder()
+            .group("기타")
+            .pathsToMatch("/api/interests/**")
             .build();
     }
 

@@ -1,4 +1,4 @@
-package com.metalancer.backend.users.domain;
+package com.metalancer.backend.interests.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 

@@ -1,7 +1,7 @@
-package com.metalancer.backend.users.entity;
+package com.metalancer.backend.interests.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
-import com.metalancer.backend.users.domain.Interests;
+import com.metalancer.backend.interests.domain.Interests;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

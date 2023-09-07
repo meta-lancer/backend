@@ -42,25 +42,27 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     @Override
     public Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity,
         Pageable pageable) {
-        return productsJpaRepository.findAllByCreator(creatorEntity, pageable);
+        return productsJpaRepository.findAllByCreatorEntity(creatorEntity, pageable);
     }
 
     @Override
     public Page<ProductsEntity> findProductsListByCreatorAndStatus(CreatorEntity creatorEntity,
         DataStatus status,
         Pageable pageable) {
-        return productsJpaRepository.findAllByCreatorAndStatus(creatorEntity, status, pageable);
+        return productsJpaRepository.findAllByCreatorEntityAndStatus(creatorEntity, status,
+            pageable);
     }
 
     public Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable) {
-        return productsJpaRepository.findAllByCreator(creatorEntity, pageable);
+        return productsJpaRepository.findAllByCreatorEntity(creatorEntity, pageable);
     }
 
     @Override
     public Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity,
         DataStatus status,
         Pageable pageable) {
-        return productsJpaRepository.findAllByCreatorAndStatus(creatorEntity, status, pageable);
+        return productsJpaRepository.findAllByCreatorEntityAndStatus(creatorEntity, status,
+            pageable);
     }
 
     @Override

@@ -20,6 +20,7 @@ public class ProductsDetail {
     private final double rate;
     private final int ratingCnt;
     private boolean hasWish;
+    private boolean hasCart;
     private boolean hasOrder;
     private String assetDetail;
     private String assetNotice;
@@ -45,6 +46,10 @@ public class ProductsDetail {
 
     public void setHasWish(boolean hasWish) {
         this.hasWish = hasWish;
+    }
+
+    public void setHasCart(boolean hasCart) {
+        this.hasCart = hasCart;
     }
 
     public void setHasOrder(boolean hasOrder) {

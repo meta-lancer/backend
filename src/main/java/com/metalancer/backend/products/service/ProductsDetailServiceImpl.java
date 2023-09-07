@@ -8,7 +8,9 @@ import com.metalancer.backend.products.entity.ProductsWishEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
 import com.metalancer.backend.products.repository.TagRepository;
+import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.CartRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     private final ProductsRepository productsRepository;
     private final ProductsWishRepository productsWishRepository;
     private final TagRepository tagRepository;
+    private final CartRepository cartRepository;
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
@@ -49,7 +52,10 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
-
+            Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(foundUser,
+                foundProductsEntity);
+            response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
+                .equals(DataStatus.ACTIVE));
             //        response.setHasOrder();
         }
         List<String> tagList = tagRepository.findTagListByProduct(foundProductsEntity);

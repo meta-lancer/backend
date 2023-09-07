@@ -1,7 +1,7 @@
 package com.metalancer.backend.users.entity;
 
-import com.metalancer.backend.common.BaseTimeEntity;
-import com.metalancer.backend.products.entity.Products;
+import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.domain.Cart;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "cart")
 @ToString
-public class CartEntity extends BaseTimeEntity implements Serializable {
+public class CartEntity extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 748309177241993156L;
@@ -38,10 +39,25 @@ public class CartEntity extends BaseTimeEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "products_id", nullable = false)
-    private Products products;
+    private ProductsEntity products;
+
+    @Builder
+    public CartEntity(User user, ProductsEntity products) {
+        this.user = user;
+        this.products = products;
+    }
 
     public Cart toDomain() {
         return Cart.builder().cartId(id).title(products.getTitle())
             .price(products.getPrice()).build();
+    }
+
+    public void restore() {
+        super.restore();
+    }
+
+    public void delete() {
+        super.delete();
+        ;
     }
 }

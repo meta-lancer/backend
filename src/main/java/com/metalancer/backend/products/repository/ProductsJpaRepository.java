@@ -9,9 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Long> {
 
-    Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable);
+    Page<ProductsEntity> findAllByCreatorEntity(CreatorEntity creatorEntity, Pageable pageable);
 
-    Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
+    Page<ProductsEntity> findAllByCreatorEntityAndStatus(CreatorEntity creatorEntity,
+        DataStatus status,
         Pageable pageable);
 
     Page<ProductsEntity> findAllByStatusOrderByCreatedAtDesc(DataStatus status, Pageable pageable);

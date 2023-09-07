@@ -1,12 +1,14 @@
 package com.metalancer.backend.products.domain;
 
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 public class ProductsCategory {
 
-    private Long categoryId;
-    private String categoryName;
-    private String categoryNameEn;
+    private final Long categoryId;
+    private final String categoryName;
+    private final String categoryNameEn;
 
     @Builder
     public ProductsCategory(Long id, String categoryName, String categoryNameEn) {

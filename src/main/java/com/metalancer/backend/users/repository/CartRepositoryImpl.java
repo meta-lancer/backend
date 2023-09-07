@@ -2,10 +2,11 @@ package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
-import com.metalancer.backend.products.entity.Products;
+import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +29,11 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
-    public boolean toggleCart(User user, Long assetId) {
-
-        return false;
+    public boolean createCart(User user, ProductsEntity foundProductsEntity) {
+        CartEntity savedCartEntity = CartEntity.builder().user(user).products(foundProductsEntity)
+            .build();
+        cartJpaRepository.save(savedCartEntity);
+        return cartJpaRepository.findById(savedCartEntity.getId()).isPresent();
     }
 
     @Override
@@ -46,10 +49,8 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
-    public Cart findCartByUserAndAsset(User user, Products asset) {
-        return cartJpaRepository.findByUserAndProducts(user, asset).orElseThrow(
-            () -> new NotFoundException(ErrorCode.NOT_FOUND)
-        ).toDomain();
+    public Optional<CartEntity> findCartByUserAndAsset(User user, ProductsEntity asset) {
+        return cartJpaRepository.findByUserAndProducts(user, asset);
     }
 
     @Override

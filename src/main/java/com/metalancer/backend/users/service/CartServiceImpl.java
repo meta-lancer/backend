@@ -1,8 +1,13 @@
 package com.metalancer.backend.users.service;
 
+import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.users.domain.Cart;
+import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
+    private final ProductsRepository productsRepository;
 
     @Override
     public Page<Cart> getAllCart(User user, Pageable pageable) {
@@ -23,7 +29,25 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public boolean toggleCart(User user, Long assetId) {
-        return false;
+        ProductsEntity foundProductsEntity = productsRepository.findProductById(assetId);
+        Optional<CartEntity> cartEntity = cartRepository.findCartByUserAndAsset(user,
+            foundProductsEntity);
+        boolean result = false;
+        if (cartEntity.isEmpty()) {
+            cartRepository.createCart(user, foundProductsEntity);
+            result = true;
+        } else {
+            CartEntity foundCartEntity = cartEntity.get();
+            if (foundCartEntity.getStatus().equals(DataStatus.DELETED)) {
+                foundCartEntity.restore();
+                result = true;
+            } else {
+                if (foundCartEntity.getStatus().equals(DataStatus.ACTIVE)) {
+                    foundCartEntity.delete();
+                }
+            }
+        }
+        return result;
     }
 
     @Override

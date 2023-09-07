@@ -1,21 +1,25 @@
 package com.metalancer.backend.products.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
-import com.metalancer.backend.products.entity.Products;
-import com.metalancer.backend.users.entity.Creator;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProductsJpaRepository extends JpaRepository<Products, Long> {
+public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Long> {
 
-    Page<Products> findAllByCreator(Creator creator, Pageable pageable);
+    Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
-    Page<Products> findAllByCreatorAndStatus(Creator creator, DataStatus status, Pageable pageable);
+    Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
+        Pageable pageable);
 
-    Page<Products> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<ProductsEntity> findAllByStatusOrderByCreatedAtDesc(DataStatus status, Pageable pageable);
 
-    Page<Products> findAllByPriceOrderByViewCntDesc(int price, Pageable pageable);
+    Page<ProductsEntity> findAllByPriceAndStatusOrderByViewCntDesc(int price, DataStatus status,
+        Pageable pageable);
 
-    Page<Products> findAllByPriceIsGreaterThanOrderByViewCntDesc(int price, Pageable pageable);
+    Page<ProductsEntity> findAllByPriceIsGreaterThanAndStatusOrderByViewCntDesc(int price,
+        DataStatus status,
+        Pageable pageable);
 }

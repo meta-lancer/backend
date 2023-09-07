@@ -39,7 +39,6 @@ public class User extends BaseEntity implements Serializable {
     @Id
     @Column(name = "user_id", nullable = false)
     private Long id;
-
     private String oauthId;
     private String email;
     private String name;
@@ -52,6 +51,8 @@ public class User extends BaseEntity implements Serializable {
     private String password;
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
+    // 프로필 이미지
 
     @Builder
     public User(String email, String oauthId, String mobile, String password,

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "크리에이터 조회", description = "")
+@Tag(name = "크리에이터 조회", description = "크리에이터 조회 시, 윗부분(크리에이터 정보)와 아랫 부분(에셋, 포트폴리오) api를 분리했습니다.")
 @RestController
 @Slf4j
 @RequiredArgsConstructor

@@ -5,8 +5,8 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.HotPickAsset;
-import com.metalancer.backend.products.entity.Products;
-import com.metalancer.backend.users.entity.Creator;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,48 +22,52 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     private final String product = "상품";
 
     @Override
-    public Products findProductById(Long productsId) {
+    public ProductsEntity findProductById(Long productsId) {
         return productsJpaRepository.findById(productsId).orElseThrow(
             () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
     }
 
     @Override
-    public Products findProductByIdAndStatus(Long productsId, DataStatus status) {
-        Optional<Products> foundProducts = productsJpaRepository.findById(productsId);
+    public ProductsEntity findProductByIdAndStatus(Long productsId, DataStatus status) {
+        Optional<ProductsEntity> foundProducts = productsJpaRepository.findById(productsId);
         if (foundProducts.isEmpty()) {
             throw new NotFoundException(ErrorCode.NOT_FOUND);
         }
-        Products product = foundProducts.get();
+        ProductsEntity product = foundProducts.get();
         product.isProductsStatusEqualsActive();
         return product;
     }
 
     @Override
-    public Page<Products> findProductsListByCreator(Creator creator, Pageable pageable) {
-        return productsJpaRepository.findAllByCreator(creator, pageable);
+    public Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity,
+        Pageable pageable) {
+        return productsJpaRepository.findAllByCreator(creatorEntity, pageable);
     }
 
     @Override
-    public Page<Products> findProductsListByCreatorAndStatus(Creator creator, DataStatus status,
+    public Page<ProductsEntity> findProductsListByCreatorAndStatus(CreatorEntity creatorEntity,
+        DataStatus status,
         Pageable pageable) {
-        return productsJpaRepository.findAllByCreatorAndStatus(creator, status, pageable);
+        return productsJpaRepository.findAllByCreatorAndStatus(creatorEntity, status, pageable);
     }
 
-    public Page<Products> findAllByCreator(Creator creator, Pageable pageable) {
-        return productsJpaRepository.findAllByCreator(creator, pageable);
+    public Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable) {
+        return productsJpaRepository.findAllByCreator(creatorEntity, pageable);
     }
 
     @Override
-    public Page<Products> findAllByCreatorAndStatus(Creator creator, DataStatus status,
+    public Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity,
+        DataStatus status,
         Pageable pageable) {
-        return productsJpaRepository.findAllByCreatorAndStatus(creator, status, pageable);
+        return productsJpaRepository.findAllByCreatorAndStatus(creatorEntity, status, pageable);
     }
 
     @Override
     public Page<HotPickAsset> findNewProductList(Pageable pageable) {
-        return productsJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
-            .map(Products::toHotPickAsset);
+        return productsJpaRepository.findAllByStatusOrderByCreatedAtDesc(DataStatus.ACTIVE,
+                pageable)
+            .map(ProductsEntity::toHotPickAsset);
     }
 
     @Override
@@ -73,14 +77,16 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public Page<HotPickAsset> findFreeProductList(PeriodType period, Pageable pageable) {
-        return productsJpaRepository.findAllByPriceOrderByViewCntDesc(0, pageable)
-            .map(Products::toHotPickAsset);
+        return productsJpaRepository.findAllByPriceAndStatusOrderByViewCntDesc(0, DataStatus.ACTIVE,
+                pageable)
+            .map(ProductsEntity::toHotPickAsset);
     }
 
     @Override
     public Page<HotPickAsset> findChargeProductList(PeriodType period, Pageable pageable) {
-        return productsJpaRepository.findAllByPriceIsGreaterThanOrderByViewCntDesc(0, pageable)
-            .map(Products::toHotPickAsset);
+        return productsJpaRepository.findAllByPriceIsGreaterThanAndStatusOrderByViewCntDesc(0,
+                DataStatus.ACTIVE, pageable)
+            .map(ProductsEntity::toHotPickAsset);
     }
 
     ;

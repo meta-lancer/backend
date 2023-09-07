@@ -7,7 +7,7 @@ import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.StatusException;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.domain.ProductsDetail;
-import com.metalancer.backend.users.entity.Creator;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +29,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "products")
 @ToString
-public class Products extends BaseEntity implements Serializable {
+public class ProductsEntity extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 748309881533993156L;
@@ -40,13 +40,14 @@ public class Products extends BaseEntity implements Serializable {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "products_category_id", nullable = false)
-    private ProductsCategory category;
+    private ProductsCategoryEntity category;
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
-    private Creator creator;
+    private CreatorEntity creatorEntity;
     private String sharedLink;
     private String title;
     private int price;
+    private Integer salePrice = null;
     private double discount = 0.0;
     private double rate = 5;
     private int ratingCnt = 1;
@@ -133,21 +134,31 @@ public class Products extends BaseEntity implements Serializable {
     }
 
     @Builder
-    public Products(Creator creator, ProductsCategory productsCategory, String title, int price) {
-        this.creator = creator;
-        this.category = productsCategory;
+    public ProductsEntity(CreatorEntity creatorEntity,
+        ProductsCategoryEntity productsCategoryEntity,
+        String title,
+        int price) {
+        this.creatorEntity = creatorEntity;
+        this.category = productsCategoryEntity;
         this.title = title;
         this.price = price;
         setSharedLink();
     }
 
     public ProductsDetail toProductsDetail() {
-        return ProductsDetail.builder().assetId(id).category(category).creator(creator)
-            .sharedLink(sharedLink).title(title).price(price)
+        return ProductsDetail.builder().assetId(id).category(category.toDomain()).creator(
+                creatorEntity.toDamain())
+            .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt).build();
     }
 
     public HotPickAsset toHotPickAsset() {
         return HotPickAsset.builder().assetId(id).title(title).price(price).assetUrl("").build();
+    }
+
+    public void setSalePrice(int salePrice) {
+        if (salePrice < price) {
+            this.salePrice = salePrice;
+        }
     }
 }

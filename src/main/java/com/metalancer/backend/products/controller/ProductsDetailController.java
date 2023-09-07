@@ -32,9 +32,12 @@ public class ProductsDetailController {
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/{productId}")
     public BaseResponse<ProductsDetail> getProductDetail(
-        @PathVariable("productId") Long productId) {
+        @AuthenticationPrincipal
+        PrincipalDetails user,
+        @PathVariable("productId") Long productId
+    ) {
         log.info("상품 고유번호: {}", productId);
-        return new BaseResponse<>(productsDetailService.getProductDetail(productId));
+        return new BaseResponse<>(productsDetailService.getProductDetail(user, productId));
     }
 
     @Operation(summary = "상품 링크 공유", description = "")

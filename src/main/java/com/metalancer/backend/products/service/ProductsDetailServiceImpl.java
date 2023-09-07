@@ -3,8 +3,14 @@ package com.metalancer.backend.products.service;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.products.domain.ProductsDetail;
-import com.metalancer.backend.products.entity.Products;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsWishEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsWishRepository;
+import com.metalancer.backend.products.repository.TagRepository;
+import com.metalancer.backend.users.entity.User;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +21,8 @@ import org.springframework.stereotype.Service;
 public class ProductsDetailServiceImpl implements ProductsDetailService {
 
     private final ProductsRepository productsRepository;
+    private final ProductsWishRepository productsWishRepository;
+    private final TagRepository tagRepository;
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
@@ -32,9 +40,21 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     }
 
     @Override
-    public ProductsDetail getProductDetail(Long productId) {
-        Products foundProducts = productsRepository.findProductByIdAndStatus(productId,
+    public ProductsDetail getProductDetail(PrincipalDetails user, Long productId) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
             DataStatus.ACTIVE);
-        return foundProducts.toProductsDetail();
+        ProductsDetail response = foundProductsEntity.toProductsDetail();
+        if (user != null) {
+            User foundUser = user.getUser();
+            Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
+                foundUser, foundProductsEntity);
+            response.setHasWish(foundProductsWishEntity.isPresent());
+
+            //        response.setHasOrder();
+        }
+        List<String> tagList = tagRepository.findTagListByProduct(foundProductsEntity);
+        response.setTagList(tagList);
+//        response.setAssetFile();
+        return response;
     }
 }

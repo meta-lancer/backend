@@ -2,6 +2,7 @@ package com.metalancer.backend.products.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
 import com.metalancer.backend.common.constants.USE_YN;
+import com.metalancer.backend.products.domain.ProductsCategory;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "products_category")
 @ToString
-public class ProductsCategory extends BaseTimeEntity implements Serializable {
+public class ProductsCategoryEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 748309862541993156L;
@@ -47,9 +48,14 @@ public class ProductsCategory extends BaseTimeEntity implements Serializable {
     }
 
     @Builder
-    public ProductsCategory(String categoryName, String categoryNameEn, int seq) {
+    public ProductsCategoryEntity(String categoryName, String categoryNameEn, int seq) {
         this.categoryName = categoryName;
         this.categoryNameEn = categoryNameEn;
         this.seq = seq;
+    }
+
+    public ProductsCategory toDomain() {
+        return ProductsCategory.builder().id(id).categoryName(categoryName)
+            .categoryNameEn(categoryNameEn).build();
     }
 }

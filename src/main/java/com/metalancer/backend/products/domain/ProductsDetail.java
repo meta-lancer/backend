@@ -1,7 +1,7 @@
 package com.metalancer.backend.products.domain;
 
-import com.metalancer.backend.products.entity.ProductsCategory;
-import com.metalancer.backend.users.entity.Creator;
+import com.metalancer.backend.users.domain.Creator;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,27 +15,47 @@ public class ProductsDetail {
     private final String sharedLink;
     private final String title;
     private final int price;
+    private final Integer salePrice;
     private final double discount;
     private final double rate;
     private final int ratingCnt;
-    private String thumbnail;
+    private boolean hasWish;
+    private boolean hasOrder;
+    private String assetDetail;
+    private String assetNotice;
+    private String assetCopyRight;
+    private List<String> tagList;
+    private AssetFile assetFile;
 
     @Builder
     public ProductsDetail(Long assetId, ProductsCategory category, Creator creator,
         String sharedLink,
-        String title, int price, double discount, double rate, int ratingCnt) {
+        String title, int price, Integer salePrice, double discount, double rate, int ratingCnt) {
         this.assetId = assetId;
         this.category = category;
         this.creator = creator;
         this.sharedLink = sharedLink;
         this.title = title;
         this.price = price;
+        this.salePrice = salePrice;
         this.discount = discount;
         this.rate = rate;
         this.ratingCnt = ratingCnt;
     }
 
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setHasWish(boolean hasWish) {
+        this.hasWish = hasWish;
+    }
+
+    public void setHasOrder(boolean hasOrder) {
+        this.hasOrder = hasOrder;
+    }
+
+    public void setTagList(List<String> tagList) {
+        this.tagList = tagList;
+    }
+
+    public void setAssetFile(AssetFile assetFile) {
+        this.assetFile = assetFile;
     }
 }

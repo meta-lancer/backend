@@ -4,6 +4,7 @@ import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.InvalidRoleException;
+import com.metalancer.backend.users.domain.Creator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "creators")
 @ToString
-public class Creator extends BaseEntity implements Serializable {
+public class CreatorEntity extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 741101677241993156L;
@@ -46,7 +47,7 @@ public class Creator extends BaseEntity implements Serializable {
     private String introductionShort;
 
     @Builder
-    public Creator(User user, String location, String address, String company, String email,
+    public CreatorEntity(User user, String location, String address, String company, String email,
         String introduction, String introductionShort) {
         checkIfUserHasSellerAuthority(user);
         this.user = user;
@@ -62,5 +63,11 @@ public class Creator extends BaseEntity implements Serializable {
         if (!(user.getRole().equals(Role.ROLE_SELLER) || user.getRole().equals(Role.ROLE_ADMIN))) {
             throw new InvalidRoleException(ErrorCode.INVALID_ROLE_ACCESS);
         }
+    }
+
+    public Creator toDamain() {
+        return Creator.builder().creatorId(id).nickName(user.getName()).profileImg("").email(email)
+            .introduction(introduction).introductionShort(introductionShort).satisficationRate(0.0)
+            .userType("일반회원").cnt(0).build();
     }
 }

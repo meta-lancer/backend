@@ -3,25 +3,27 @@ package com.metalancer.backend.products.repository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.products.domain.HotPickAsset;
-import com.metalancer.backend.products.entity.Products;
-import com.metalancer.backend.users.entity.Creator;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductsRepository {
 
-    Products findProductById(Long productsId);
+    ProductsEntity findProductById(Long productsId);
 
-    Products findProductByIdAndStatus(Long productsId, DataStatus status);
+    ProductsEntity findProductByIdAndStatus(Long productsId, DataStatus status);
 
-    Page<Products> findProductsListByCreator(Creator creator, Pageable pageable);
+    Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
-    Page<Products> findProductsListByCreatorAndStatus(Creator creator, DataStatus status,
+    Page<ProductsEntity> findProductsListByCreatorAndStatus(CreatorEntity creatorEntity,
+        DataStatus status,
         Pageable pageable);
 
-    Page<Products> findAllByCreator(Creator creator, Pageable pageable);
+    Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
-    Page<Products> findAllByCreatorAndStatus(Creator creator, DataStatus status, Pageable pageable);
+    Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
+        Pageable pageable);
 
     Page<HotPickAsset> findNewProductList(Pageable pageable);
 

@@ -11,5 +11,5 @@ public interface ProductsDetailService {
     boolean toggleProductWish(@AuthenticationPrincipal
     PrincipalDetails user, Long productId);
 
-    ProductsDetail getProductDetail(Long productId);
+    ProductsDetail getProductDetail(PrincipalDetails user, Long productId);
 }

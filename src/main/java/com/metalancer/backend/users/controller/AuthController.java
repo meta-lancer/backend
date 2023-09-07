@@ -50,7 +50,7 @@ public class AuthController {
         @PathVariable("link") String link) {
         return new BaseResponse<>(authService.approveUserByLink(link));
     }
-    
+
     @Hidden
     @GetMapping("/test")
     public Object testValue(HttpSession session, @RequestParam String key,
@@ -74,4 +74,6 @@ public class AuthController {
     public BaseResponse<Boolean> emailLogout(HttpSession session) {
         return new BaseResponse<Boolean>(authService.emailLogout(session));
     }
+
+
 }

@@ -10,13 +10,20 @@ import com.metalancer.backend.common.utils.RandomStringGenerator;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
+import com.metalancer.backend.users.dto.UserRequestDTO.CreateRequest;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.entity.UserAgreementEntity;
+import com.metalancer.backend.users.entity.UserInterestsEntity;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
+import com.metalancer.backend.users.repository.UserAgreementRepository;
+import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +34,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    
+
     @Value("${url.base}")
     private String urlBase;
 
@@ -35,6 +42,8 @@ public class AuthServiceImpl implements AuthService {
     private final ApproveLinkRepository approveLinkRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final UserInterestsRepository userInterestsRepository;
+    private final UserAgreementRepository userAgreementRepository;
 
     @Override
     public Long createUser(UserRequestDTO.CreateRequest dto) throws MessagingException {
@@ -43,8 +52,33 @@ public class AuthServiceImpl implements AuthService {
         User foundUser = userRepository.findById(createdUser.getId()).orElseThrow(
             () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
+        setUserInterests(foundUser, dto);
+        setAgreement(foundUser, dto);
         createdApproveLink(foundUser);
         return foundUser.getId();
+    }
+
+    private void setAgreement(User foundUser, CreateRequest dto) {
+        UserAgreementEntity savedUserAgreementEntity = UserAgreementEntity.builder().user(foundUser)
+            .ageAgree(dto.isAgeAgree())
+            .serviceAgree(dto.isServiceAgree()).infoAgree(dto.isInfoAgree())
+            .marketingAgree(dto.isMarketingAgree()).statusAgree(
+                dto.isStatusAgree()).build();
+        userAgreementRepository.save(savedUserAgreementEntity);
+    }
+
+    private void setUserInterests(User foundUser, CreateRequest dto) {
+        List<UserInterestsEntity> userInterestsEntities = new ArrayList<>();
+        for (String interests : dto.getInterests()) {
+            UserInterestsEntity savedUserInterestsEntity = UserInterestsEntity.builder()
+                .user(foundUser)
+                .interestsName(interests).build();
+            userInterestsEntities.add(savedUserInterestsEntity);
+        }
+        if (userInterestsEntities.size() > 0) {
+            userInterestsRepository.saveAll(userInterestsEntities);
+        }
+
     }
 
     private void createdApproveLink(User foundUser) throws MessagingException {
@@ -75,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
     private User createEmailUser(UserRequestDTO.CreateRequest dto) {
         String encryptedPassword = dto.setPasswordEncrypted(passwordEncoder);
         User createdUser = User.builder().email(dto.getEmail()).password(encryptedPassword)
-            .loginType(LoginType.NORMAL).build();
+            .loginType(LoginType.NORMAL).job(dto.getJob()).build();
         createdUser.setNormalUsername();
         createdUser.setPending();
         return createdUser;

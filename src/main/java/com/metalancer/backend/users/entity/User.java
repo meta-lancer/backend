@@ -45,6 +45,7 @@ public class User extends BaseEntity implements Serializable {
     private String name;
     private String username;
     private String mobile;
+    private String job;
     @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER;
     @JsonIgnore
@@ -54,7 +55,7 @@ public class User extends BaseEntity implements Serializable {
 
     @Builder
     public User(String email, String oauthId, String mobile, String password,
-        LoginType loginType, String name, String username) {
+        LoginType loginType, String name, String username, String job) {
         this.email = email;
         this.oauthId = oauthId;
         this.mobile = mobile;
@@ -62,13 +63,12 @@ public class User extends BaseEntity implements Serializable {
         this.loginType = loginType;
         this.name = name;
         this.username = username;
+        this.job = job;
     }
 
     public void setNormalUsername() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(loginType.getProvider()).append("_")
-            .append(UUID.randomUUID().toString(), 0, 10);
-        this.username = stringBuilder.toString();
+        this.username = loginType.getProvider() + "_"
+            + UUID.randomUUID().toString().substring(0, 10);
     }
 
     public void setPending() {
@@ -89,6 +89,15 @@ public class User extends BaseEntity implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void changeToCreator() {
+        if (this.role.equals(Role.ROLE_USER)) {
+            setRole(Role.ROLE_SELLER);
+        } else {
+            String USER_ROLE_ERROR = "user role error";
+            throw new StatusException(USER_ROLE_ERROR, ErrorCode.ROLE_INVALID);
+        }
     }
 
     public void isUserStatusEqualsActive() {

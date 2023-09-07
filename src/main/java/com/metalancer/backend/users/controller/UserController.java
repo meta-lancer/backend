@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +36,13 @@ public class UserController {
         return new BaseResponse<>(new AuthResponseDTO.userInfo(user.getUser()));
     }
 
+    @Operation(summary = "판매자 전환", description = "")
+    @ApiResponse(responseCode = "200", description = "전환 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PatchMapping("/creator")
+    public BaseResponse<Boolean> updateToCreator(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("로그인되어있는 유저: {}", user);
+        return new BaseResponse<>(userService.updateToCreator(user));
+    }
 
 }

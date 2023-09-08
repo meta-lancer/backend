@@ -1,8 +1,11 @@
 package com.metalancer.backend.orders.controller;
 
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO;
+import com.metalancer.backend.orders.service.OrdersService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.AccessToken;
@@ -15,6 +18,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +36,7 @@ public class OrdersController {
     private String apiKey;
     @Value("${iamport.api.secret}")
     private String apiSecret;
+    private final OrdersService ordersService;
 
     // 토큰 발행
     // 주문서 생성 => 도중에 사전 등록
@@ -42,6 +47,15 @@ public class OrdersController {
 //    호출은 콜백과 웹훅이 동시에 병렬적으로 진행되게 됩니다.
 //    만약 순서를 보장하고자 하실 경우 아래와 같이 웹훅을 우선적으로 호출할 수 있도록 설정해드릴 수 있습니다.
 //        (https://guide.portone.io/74c9f8b4-e181-47bb-bfdb-7ca20a6e2466)
+
+    @PostMapping("/order")
+    public BaseResponse<CreatedOrder> createOrder(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody OrdersRequestDTO.CreateOrder dto) {
+        log.info("주문서 만들기: {}", dto);
+        return new BaseResponse<>(ordersService.createOrder(user.getUser(), dto));
+    }
+
 
     @GetMapping("/token")
     public BaseResponse<String> getPortOneAccessToken() throws Exception {

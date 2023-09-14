@@ -60,6 +60,13 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     // 호환 프로그램
     // 상품 저작권 안내
 
+    private String assetDetail;
+    private String assetNotice;
+    private String assetCopyRight;
+    private String website;
+    private String productionProgram;
+    private String compatibleProgram;
+
     public void setActive() {
         active();
     }
@@ -137,11 +144,18 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     public ProductsEntity(CreatorEntity creatorEntity,
         ProductsCategoryEntity productsCategoryEntity,
         String title,
-        int price) {
+        int price, String assetDetail, String assetNotice, String assetCopyRight, String website,
+        String productionProgram, String compatibleProgram) {
         this.creatorEntity = creatorEntity;
         this.category = productsCategoryEntity;
         this.title = title;
         this.price = price;
+        this.assetDetail = assetDetail;
+        this.assetNotice = assetNotice;
+        this.assetCopyRight = assetCopyRight;
+        this.website = website;
+        this.productionProgram = productionProgram;
+        this.compatibleProgram = compatibleProgram;
         setSharedLink();
     }
 

@@ -37,22 +37,17 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
 
     @Column(nullable = false)
     private String url;
-    @Column(nullable = false)
-    private String fileSize;
-    private String version;
-    private String extList;
-    private boolean hasRigging;
-    private boolean hasAnimation;
+//    @Column(nullable = false)
+//    private String fileSize;
+//    private String version;
+//    private String extList;
+//    private boolean hasRigging;
+//    private boolean hasAnimation;
 
     @Builder
-    public ProductsAssetFileEntity(ProductsEntity productsEntity, String url, String fileSize,
-        String version, String extList, boolean hasRigging, boolean hasAnimation) {
+
+    public ProductsAssetFileEntity(ProductsEntity productsEntity, String url) {
         this.productsEntity = productsEntity;
         this.url = url;
-        this.fileSize = fileSize;
-        this.version = version;
-        this.extList = extList;
-        this.hasRigging = hasRigging;
-        this.hasAnimation = hasAnimation;
     }
 }

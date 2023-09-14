@@ -10,7 +10,7 @@ import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
-import com.metalancer.backend.products.repository.TagRepository;
+import com.metalancer.backend.products.repository.ProductsTagRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class ProductsListServiceImpl implements ProductsListService {
 
     private final ProductsRepository productsRepository;
-    private final TagRepository tagRepository;
+    private final ProductsTagRepository productsTagRepository;
 
     @Override
     public HotPickResponse getHotPickList(HotPickType type, PeriodType period, Pageable pageable) {
@@ -56,7 +56,7 @@ public class ProductsListServiceImpl implements ProductsListService {
     private void setTagList(Asset hotPickAsset) {
         ProductsEntity productsEntity = productsRepository.findProductById(
             hotPickAsset.getAssetId());
-        List<String> tagList = tagRepository.findTagListByProduct(productsEntity);
+        List<String> tagList = productsTagRepository.findTagListByProduct(productsEntity);
         hotPickAsset.setTagList(tagList);
     }
 

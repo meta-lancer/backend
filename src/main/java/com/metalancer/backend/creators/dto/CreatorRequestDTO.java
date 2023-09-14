@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.dto;
 
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,13 +14,13 @@ public class CreatorRequestDTO {
         private String productsCategory;
         private String title;
         private int price;
-//        private String productionProgram;
-//        private String compatibleProgram;
-//        private List<String> tagList;
-//        private String assetDetail;
-//        private String assetNotice;
-//        private String assetCopyRight;
-//        private String website;
+        private String productionProgram;
+        private String compatibleProgram;
+        private List<String> tagList;
+        private String assetDetail;
+        private String assetNotice;
+        private String assetCopyRight;
+        private String website;
     }
 
 }

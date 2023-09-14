@@ -1,5 +1,7 @@
 package com.metalancer.backend.creators.dto;
 
+import com.metalancer.backend.products.domain.ProductsDetail;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +12,12 @@ public class CreatorResponseDTO {
     @NoArgsConstructor
     public static class AssetCreatedResponse {
 
+        ProductsDetail productsDetail;
+
+        @Builder
+        public AssetCreatedResponse(ProductsDetail productsDetail) {
+            this.productsDetail = productsDetail;
+        }
     }
 
 }

@@ -6,8 +6,8 @@ import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsWishEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
-import com.metalancer.backend.products.repository.TagRepository;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
@@ -24,7 +24,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
 
     private final ProductsRepository productsRepository;
     private final ProductsWishRepository productsWishRepository;
-    private final TagRepository tagRepository;
+    private final ProductsTagRepository productsTagRepository;
     private final CartRepository cartRepository;
 
     @Override
@@ -46,6 +46,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     public ProductsDetail getProductDetail(PrincipalDetails user, Long productId) {
         ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
             DataStatus.ACTIVE);
+        foundProductsEntity.addViewCnt();
         ProductsDetail response = foundProductsEntity.toProductsDetail();
         if (user != null) {
             User foundUser = user.getUser();
@@ -58,7 +59,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
                 .equals(DataStatus.ACTIVE));
             //        response.setHasOrder();
         }
-        List<String> tagList = tagRepository.findTagListByProduct(foundProductsEntity);
+        List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
 //        response.setAssetFile();
         return response;

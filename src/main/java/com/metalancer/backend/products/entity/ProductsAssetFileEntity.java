@@ -19,16 +19,16 @@ import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "tag")
+@Entity(name = "products_asset_file")
 @ToString
-public class TagEntity extends BaseTimeEntity implements Serializable {
+public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 748309177241999515L;
+    private static final long serialVersionUID = 748309177241999615L;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "tag_id", nullable = false)
+    @Column(name = "products_asset_file_id", nullable = false)
     private Long id;
 
     @ManyToOne
@@ -36,11 +36,23 @@ public class TagEntity extends BaseTimeEntity implements Serializable {
     private ProductsEntity productsEntity;
 
     @Column(nullable = false)
-    private String name;
+    private String url;
+    @Column(nullable = false)
+    private String fileSize;
+    private String version;
+    private String extList;
+    private boolean hasRigging;
+    private boolean hasAnimation;
 
     @Builder
-    public TagEntity(ProductsEntity productsEntity, String name) {
+    public ProductsAssetFileEntity(ProductsEntity productsEntity, String url, String fileSize,
+        String version, String extList, boolean hasRigging, boolean hasAnimation) {
         this.productsEntity = productsEntity;
-        this.name = name;
+        this.url = url;
+        this.fileSize = fileSize;
+        this.version = version;
+        this.extList = extList;
+        this.hasRigging = hasRigging;
+        this.hasAnimation = hasAnimation;
     }
 }

@@ -51,6 +51,12 @@ public enum ErrorCode {
     PORTONE_ERROR(NOT_FOUND_VALUE, "F002", "포트원 api 호출에 실패했습니다."),
 
     /**
+     * 이미지
+     */
+    IMAGES_UPLOAD_FAILED(UNEXPECTED_ERROR, "G002", "이미지 업로드에 실패했습니다"),
+    FILES_UPLOAD_FAILED(UNEXPECTED_ERROR, "G003", "파일 업로드에 실패했습니다"),
+
+    /**
      * 토큰
      */
     REISSUE_TOKEN(SUCCESS, "H001", "reissued token"),
@@ -68,6 +74,7 @@ public enum ErrorCode {
     STATUS_DELETED(INVALID_VALUE, "Z101", "삭제된 상태입니다."),
     STATUS_PENDING(INVALID_VALUE, "Z102", "승인대기 상태입니다."),
     STATUS_BANNED(INVALID_VALUE, "Z103", "정지된 상태입니다."),
+    ROLE_INVALID(INVALID_VALUE, "Z104", "올바르지않은 권한입니다."),
     /**
      * 잘못된 ExceptionCode
      */

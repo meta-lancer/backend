@@ -91,5 +91,10 @@ public class ProductsRepositoryImpl implements ProductsRepository {
             .map(ProductsEntity::toHotPickAsset);
     }
 
+    @Override
+    public void save(ProductsEntity createdProductsEntity) {
+        productsJpaRepository.save(createdProductsEntity);
+    }
+
     ;
 }

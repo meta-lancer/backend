@@ -32,4 +32,6 @@ public interface ProductsRepository {
     Page<HotPickAsset> findFreeProductList(PeriodType period, Pageable pageable);
 
     Page<HotPickAsset> findChargeProductList(PeriodType period, Pageable pageable);
+
+    void save(ProductsEntity createdProductsEntity);
 }

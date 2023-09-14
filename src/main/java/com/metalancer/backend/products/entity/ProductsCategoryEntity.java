@@ -1,7 +1,7 @@
 package com.metalancer.backend.products.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
-import com.metalancer.backend.common.constants.USE_YN;
+import com.metalancer.backend.common.constants.Use_YN;
 import com.metalancer.backend.products.domain.ProductsCategory;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,10 +37,10 @@ public class ProductsCategoryEntity extends BaseTimeEntity implements Serializab
     @Column(nullable = false)
     private String categoryNameEn;
     @Enumerated(EnumType.STRING)
-    private USE_YN useYn = USE_YN.YES;
+    private Use_YN useYn = Use_YN.YES;
     private int seq;
 
-    public void update(String categoryName, String categoryNameEn, USE_YN useYn, int seq) {
+    public void update(String categoryName, String categoryNameEn, Use_YN useYn, int seq) {
         this.categoryName = categoryName;
         this.categoryNameEn = categoryNameEn;
         this.useYn = useYn;

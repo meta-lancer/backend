@@ -1,5 +1,5 @@
 package com.metalancer.backend.common.constants;
 
-public enum USE_YN {
+public enum Use_YN {
     YES, NO
 }

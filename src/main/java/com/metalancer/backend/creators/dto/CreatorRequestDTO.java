@@ -10,7 +10,7 @@ public class CreatorRequestDTO {
     @Data
     @NoArgsConstructor
     public static class AssetRequest {
-
+    
         private String productsCategory;
         private String title;
         private int price;

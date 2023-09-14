@@ -10,4 +10,6 @@ public interface CreatorService {
     AssetCreatedResponse createAsset(User user, MultipartFile[] thumbnails,
         MultipartFile[] views,
         MultipartFile zipFile, AssetRequest dto);
+
+    String getAssetFilePreSignedUrl(Long productsId);
 }

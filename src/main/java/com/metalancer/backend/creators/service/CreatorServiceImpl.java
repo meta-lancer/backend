@@ -25,6 +25,7 @@ import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,8 @@ public class CreatorServiceImpl implements CreatorService {
     private final ProductsAssetFileRepository productsAssetFileRepository;
 
     @Override
-    public AssetCreatedResponse createAsset(User user, MultipartFile[] thumbnails,
-        MultipartFile[] views, MultipartFile zipFile, AssetRequest dto) {
+    public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
+        @NotNull MultipartFile[] views, @NotNull MultipartFile zipFile, AssetRequest dto) {
         try {
             ProductsCategoryEntity categoryEntity = productsCategoryRepository.findByCategoryNameAndUseYN(
                 dto.getProductsCategory(),
@@ -78,9 +79,15 @@ public class CreatorServiceImpl implements CreatorService {
             return AssetCreatedResponse.builder().productsDetail(productsDetail)
                 .build();
         } catch (Exception e) {
+            e.printStackTrace();
             log.info(e.getMessage());
             throw new BaseException(ErrorCode.IMAGES_UPLOAD_FAILED);
         }
+    }
+
+    @Override
+    public String getAssetFilePreSignedUrl(Long productsId) {
+        return uploadService.getAssetFilePresignedUrl(productsId);
     }
 
     private void saveTagList(AssetRequest dto, ProductsEntity savedProductsEntity) {

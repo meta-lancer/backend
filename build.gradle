@@ -65,6 +65,9 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    testImplementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.145'
+    implementation 'commons-io:commons-io:2.11.0'
 }
 
 tasks.named('test') {

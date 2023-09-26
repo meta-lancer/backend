@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,6 +108,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private User createEmailUser(UserRequestDTO.CreateRequest dto) {
+        Optional<User> foundUser = userRepository.findByEmail(dto.getEmail());
+        if (foundUser.isPresent()) {
+            throw new BaseException(ErrorCode.SIGNUP_DUPLICATED);
+        }
         String encryptedPassword = dto.setPasswordEncrypted(passwordEncoder);
         User createdUser = User.builder().email(dto.getEmail()).password(encryptedPassword)
             .loginType(LoginType.NORMAL).job(dto.getJob()).build();

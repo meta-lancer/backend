@@ -2,6 +2,7 @@ package com.metalancer.backend.orders.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,7 @@ public class OrdersRequestDTO {
     }
 
     @Data
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class CompleteOrder {
 

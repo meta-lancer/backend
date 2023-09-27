@@ -42,6 +42,8 @@ public class OrdersServiceImpl implements OrdersService {
     private String apiKey;
     @Value("${iamport.api.secret}")
     private String apiSecret;
+    @Value("${iamport.imp_uid}")
+    private String impUid;
     private final UserRepository userRepository;
     private final OrdersRepository ordersRepository;
     private final OrderProductsRepository orderProductsRepository;
@@ -137,7 +139,18 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public PaymentResponse completePaymentByWebhook(CompleteOrderWebhook dto) {
+    public PaymentResponse completePaymentByWebhook(CompleteOrderWebhook dto)
+        throws IamportResponseException, IOException {
+        if (!dto.getImp_uid().equals(impUid)) {
+            // 예외 처리
+        }
+        if (dto.getStatus().equals("paid")) {
+            OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(
+                dto.getMerchant_uid());
+            CompleteOrder completeOrder = new CompleteOrder(foundOrdersEntity.getTotalPrice(),
+                dto.getMerchant_uid());
+            completePayment(null, completeOrder);
+        }
         return null;
     }
 

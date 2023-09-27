@@ -16,5 +16,6 @@ public interface OrdersService {
     PaymentResponse completePayment(User user, CompleteOrder dto)
         throws IamportResponseException, IOException;
 
-    PaymentResponse completePaymentByWebhook(CompleteOrderWebhook dto);
+    PaymentResponse completePaymentByWebhook(CompleteOrderWebhook dto)
+        throws IamportResponseException, IOException;
 }

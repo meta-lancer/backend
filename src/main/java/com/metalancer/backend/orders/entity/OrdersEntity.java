@@ -1,7 +1,9 @@
 package com.metalancer.backend.orders.entity;
 
 import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.exception.StatusException;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
@@ -55,7 +57,27 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     }
 
     public CreatedOrder toCreatedOrderDomain() {
-        return CreatedOrder.builder().orderId(id).ordererId(orderer.getId()).orderNo(orderNo)
+        return CreatedOrder.builder().ordererId(orderer.getId()).orderNo(orderNo)
             .totalPrice(totalPrice).orderStatus(orderStatus.getKorName()).build();
+    }
+
+    public void completeOrder() {
+        if (this.orderStatus.equals(OrderStatus.PAY_ING)) {
+            this.orderStatus = OrderStatus.PAY_DONE;
+        } else {
+            throw new StatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_STATUS);
+        }
+    }
+
+    public void confirmOrder() {
+        if (this.orderStatus.equals(OrderStatus.PAY_DONE)) {
+            this.orderStatus = OrderStatus.PAY_CONFIRM;
+        } else {
+            throw new StatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_STATUS);
+        }
+    }
+
+    public void deleteOrder() {
+        delete();
     }
 }

@@ -1,6 +1,7 @@
 package com.metalancer.backend.orders.entity;
 
 import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.common.constants.ClaimStatus;
 import com.metalancer.backend.common.constants.ClaimType;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.products.entity.ProductsEntity;
@@ -53,7 +54,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private ClaimType claimType;
     @Enumerated(EnumType.STRING)
-    private String claimStatus;
+    private ClaimStatus claimStatus;
 
     @Builder
     public OrderProductsEntity(User orderer, OrdersEntity ordersEntity,

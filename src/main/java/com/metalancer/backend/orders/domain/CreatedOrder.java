@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 public class CreatedOrder {
 
-    private Long orderId;
     private Long ordererId;
     private String orderNo;
     private Integer totalPrice;
@@ -16,9 +15,8 @@ public class CreatedOrder {
     private String orderProductList;
 
     @Builder
-    public CreatedOrder(Long orderId, Long ordererId, String orderNo, Integer totalPrice,
+    public CreatedOrder(Long ordererId, String orderNo, Integer totalPrice,
         String orderStatus) {
-        this.orderId = orderId;
         this.ordererId = ordererId;
         this.orderNo = orderNo;
         this.totalPrice = totalPrice;

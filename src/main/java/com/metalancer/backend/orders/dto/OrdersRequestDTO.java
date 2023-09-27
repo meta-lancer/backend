@@ -13,7 +13,7 @@ public class OrdersRequestDTO {
     public static class CreateOrder {
 
         private int totalPrice;
-        private List<Long> productsId;
+        private List<Long> productsIdList;
     }
 
     @Data
@@ -24,4 +24,21 @@ public class OrdersRequestDTO {
         private BigDecimal amount;
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class CompleteOrder {
+
+        private int totalPrice;
+        private String merchantUid;
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class CompleteOrderWebhook {
+
+        private String imp_uid;
+        private String merchant_uid;
+        private String status;
+    }
 }

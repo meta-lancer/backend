@@ -4,13 +4,16 @@ package com.metalancer.backend.orders.controller;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.orders.domain.CreatedOrder;
+import com.metalancer.backend.orders.domain.PaymentResponse;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO;
+import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.orders.service.OrdersService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.AccessToken;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Prepare;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,6 +40,7 @@ public class OrdersController {
     @Value("${iamport.api.secret}")
     private String apiSecret;
     private final OrdersService ordersService;
+    private final OrdersRepository ordersRepository;
 
     // 토큰 발행
     // 주문서 생성 => 도중에 사전 등록
@@ -48,15 +52,23 @@ public class OrdersController {
 //    만약 순서를 보장하고자 하실 경우 아래와 같이 웹훅을 우선적으로 호출할 수 있도록 설정해드릴 수 있습니다.
 //        (https://guide.portone.io/74c9f8b4-e181-47bb-bfdb-7ca20a6e2466)
 
-    @PostMapping("/order")
+    /// 구매하기를 누르면 장바구니 담기와 같이! 대신 response가 결제하기 페이지를 위한 게 있어야겠지???
+
+
+    @Operation(summary = "주문서 만들기", description = "결제하기를 누르면 결제완료 이전의 주문서가 만들어집니다. \n\n " +
+        "여기서 결제모듈에 사용될 orderNo가 생성됩니다. \n\n " +
+        "로그인 후, Session값이 제대로 설정될 때까지 유저1로 진행됩니다.")
+    @PostMapping
     public BaseResponse<CreatedOrder> createOrder(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody OrdersRequestDTO.CreateOrder dto) {
         log.info("주문서 만들기: {}", dto);
-        return new BaseResponse<>(ordersService.createOrder(user.getUser(), dto));
+        return new BaseResponse<>(
+            ordersService.createOrder(user != null ? user.getUser() : null, dto));
     }
 
 
+    @Operation(summary = "포트원 결제에 필요한 토큰 발행", description = "프론트엔드에서 포트원 api 호출 시 필요할 수도 있다.")
     @GetMapping("/token")
     public BaseResponse<String> getPortOneAccessToken() throws Exception {
         IamportClient client = new IamportClient(apiKey, apiSecret, true);
@@ -64,18 +76,7 @@ public class OrdersController {
         return new BaseResponse<>(auth_response.getResponse().getToken());
     }
 
-    //    @GetMapping("/payments/{orders-id}")
-//    public BaseResponse<Boolean> getPayment(@PathVariable("orders-id") Long ordersId)
-//        throws Exception {
-//
-//        // id를 통해 해당 주문서의 merchant_uid 불러온다.
-//        IamportClient client = new IamportClient(apiKey, apiSecret, true);
-//        String merchantUid = "";
-//        IamportResponse<Payment> payment_response = client.paymentByImpUid(merchantUid);
-//        log.info("결제내역 단건 조회 응답: {}", payment_response);
-//        return new BaseResponse<>(true);
-//    }
-
+    @Operation(summary = "결제정보 사전 등록 요청", description = "가맹점 고유번호와 결제금액만으로 미리 등록")
     @PostMapping("/prepare")
     public BaseResponse<Boolean> postPreparePayments(
         @RequestBody OrdersRequestDTO.PostPreparePayments dto)
@@ -89,30 +90,25 @@ public class OrdersController {
         return new BaseResponse<>(true);
     }
 
-    // 프론트에서 결제완료되면 포트원 결제번호 + 우리의 orderNo 을 수신하는 api 이 안에 결제내역 단건 조회 + 금액 비교까지 하면 된다!
+    // 결제 처리 => 웹훅과 동시에 이루어지도록...?
+    @PostMapping("/payments")
+    public BaseResponse<PaymentResponse> completePayment(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody OrdersRequestDTO.CompleteOrder dto
+    ) throws Exception {
+        log.info("결제 처리 완료 요청 객체: {}", dto);
+        return new BaseResponse<>(
+            ordersService.completePayment(user != null ? user.getUser() : null, dto));
+    }
 
-    // 결제 사후 검증 => 웹훅과 동시에 이루어지도록...?
-//    @GetMapping("/payments/{orders-id}")
-//    public BaseResponse<Boolean> getPayment(@PathVariable("orders-id") Long ordersId)
-//        throws Exception {
-//
-//        // 포트원 결제고유번호(imp_uid), 가맹점 주문번호(merchant_uid) 수신
-//
-//        // id를 통해 해당 주문서의 merchant_uid 대조해본다.
-//
-//
-//        IamportClient client = new IamportClient(apiKey, apiSecret, true);
-//        String merchantUid = "";
-//
-//        // 결제내역 단건 조회
-//        IamportResponse<Payment> payment_response = client.paymentByImpUid(merchantUid);
-//        log.info("결제내역 단건 조회 응답: {}", payment_response);
-//
-//        // 금액 비교
-//        client.paymentBalanceByImpUid()
-//
-//        return new BaseResponse<>(true);
-//    }
+    @PostMapping("/payments/webhook")
+    public BaseResponse<PaymentResponse> completePaymentByWebhook(
+        @RequestBody OrdersRequestDTO.CompleteOrderWebhook dto
+    ) throws Exception {
+        log.info("결제 처리 완료 웹 훅 객체: {}", dto);
+        return new BaseResponse<>(
+            ordersService.completePaymentByWebhook(dto));
+    }
 
 //    @PostMapping("/cancel")
 //    public BaseResponse<Boolean> cancelPayments(

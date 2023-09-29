@@ -94,6 +94,7 @@ public class OrdersController {
         return new BaseResponse<>(true);
     }
 
+    @Operation(summary = "결제내역 단건 조회", description = "")
     @PostMapping("/payments/validation")
     public BaseResponse<Boolean> checkPayment(@RequestBody OrdersRequestDTO.CheckPayment dto)
         throws IamportResponseException, IOException {
@@ -101,6 +102,7 @@ public class OrdersController {
     }
 
 
+    @Operation(summary = "결제 완료 처리", description = "")
     @PostMapping("/payments")
     public BaseResponse<PaymentResponse> completePayment(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -111,6 +113,7 @@ public class OrdersController {
             ordersService.completePayment(user != null ? user.getUser() : null, dto));
     }
 
+    @Operation(summary = "결제 완료 처리 웹훅(포트원으로부터)", description = "")
     @PostMapping("/payments/webhook")
     public BaseResponse<PaymentResponse> completePaymentByWebhook(
         @RequestBody OrdersRequestDTO.CompleteOrderWebhook dto
@@ -120,6 +123,7 @@ public class OrdersController {
             ordersService.completePaymentByWebhook(dto));
     }
 
+    @Operation(summary = "결제 전체 취소 요청", description = "")
     @PatchMapping("/payments/cancellation/all")
     public BaseResponse<PaymentResponse> cancelAllPayment(
         @AuthenticationPrincipal PrincipalDetails user,

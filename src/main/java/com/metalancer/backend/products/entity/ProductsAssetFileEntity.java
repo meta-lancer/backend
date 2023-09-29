@@ -45,7 +45,6 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
 //    private boolean hasAnimation;
 
     @Builder
-
     public ProductsAssetFileEntity(ProductsEntity productsEntity, String url) {
         this.productsEntity = productsEntity;
         this.url = url;

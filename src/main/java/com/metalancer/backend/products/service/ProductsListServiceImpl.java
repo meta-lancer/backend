@@ -3,6 +3,7 @@ package com.metalancer.backend.products.service;
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.constants.ProperAssetType;
+import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.products.controller.Response.ProductsDto.HotPickResponse;
 import com.metalancer.backend.products.controller.Response.ProductsDto.ProperAssetResponse;
 import com.metalancer.backend.products.domain.Asset;
@@ -19,10 +20,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(rollbackFor = {Exception.class, RuntimeException.class, BaseException.class})
 public class ProductsListServiceImpl implements ProductsListService {
 
     private final ProductsRepository productsRepository;

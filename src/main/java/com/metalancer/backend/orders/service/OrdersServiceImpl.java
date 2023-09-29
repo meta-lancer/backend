@@ -3,6 +3,7 @@ package com.metalancer.backend.orders.service;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.exception.OrderStatusException;
@@ -21,9 +22,12 @@ import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
+import com.metalancer.backend.users.repository.PayedAssetsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -39,10 +43,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(rollbackFor = {Exception.class, RuntimeException.class, BaseException.class})
 public class OrdersServiceImpl implements OrdersService {
 
     @Value("${iamport.api.key}")
@@ -57,6 +63,8 @@ public class OrdersServiceImpl implements OrdersService {
     private final ProductsRepository productsRepository;
     private final CartRepository cartRepository;
     private final OrderPaymentRepository orderPaymentRepository;
+    private final PayedAssetsRepository payedAssetsRepository;
+    private final ProductsAssetFileRepository productsAssetFileRepository;
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
@@ -168,6 +176,31 @@ public class OrdersServiceImpl implements OrdersService {
         // 결제 처리 완료
         completeOrder(foundOrdersEntity, orderProductsEntityList);
         // 결제 완료 저장 => 일부 데이터는 결제 완료 받은 값이 필요
+        OrderPaymentEntity savedOrderPaymentEntity = createOrderPaymentEntity(orderNo,
+            foundOrdersEntity, paymentResponse);
+        // 장바구니에서 삭제
+        for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
+            cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity());
+            // 다운로드 허용
+            ProductsEntity foundProductEntity = orderProductsEntity.getProductsEntity();
+            String assetUrl = productsAssetFileRepository.findUrlByProduct(foundProductEntity);
+            PayedAssetsEntity createdPayedAssetsEntity = PayedAssetsEntity.builder().user(user)
+                .orderProductsEntity(orderProductsEntity)
+                .products(foundProductEntity)
+                .orderPaymentEntity(savedOrderPaymentEntity)
+                .downloadLink(assetUrl).build();
+            payedAssetsRepository.save(createdPayedAssetsEntity);
+        }
+
+        PaymentResponse response = getPaymentResponse(user,
+            foundOrdersEntity, orderStatus, paymentResponse);
+        log.info("결제처리 응답: {}", response);
+        return response;
+    }
+
+    private OrderPaymentEntity createOrderPaymentEntity(String orderNo,
+        OrdersEntity foundOrdersEntity,
+        Payment paymentResponse) {
         OrderPaymentEntity createdOrderPaymentEntity = OrderPaymentEntity.builder()
             .ordersEntity(foundOrdersEntity).impUid(paymentResponse.getImpUid())
             .orderNo(orderNo).paymentPrice(foundOrdersEntity.getTotalPaymentPrice())
@@ -175,17 +208,7 @@ public class OrdersServiceImpl implements OrdersService {
             .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
             .purchasedAt(paymentResponse.getPaidAt()).build();
         orderPaymentRepository.save(createdOrderPaymentEntity);
-        // 장바구니에서 삭제
-        for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
-            cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity());
-        }
-        // 다운로드 허용
-        // 다운로드 entity 생성 - 접근할 수 있는 링크 + 접근가능한 횟수 제한 + 아니면... 새로운 버킷에? 그리고 접근가능한 횟수 넘어가면 삭제?
-
-        PaymentResponse response = getPaymentResponse(user,
-            foundOrdersEntity, orderStatus, paymentResponse);
-        log.info("결제처리 응답: {}", response);
-        return response;
+        return orderPaymentRepository.findByOrderNo(orderNo);
     }
 
     private PaymentResponse getPaymentResponse(User user, OrdersEntity foundOrdersEntity,
@@ -224,6 +247,7 @@ public class OrdersServiceImpl implements OrdersService {
         if (dto.getStatus().equals("paid")) {
             CompleteOrder completeOrder = new CompleteOrder(dto.getImp_uid(),
                 dto.getMerchant_uid());
+            // 가격이 맞는지, 고유번호가 맞는 지 등
             completePayment(null, completeOrder);
         }
         return null;
@@ -259,7 +283,7 @@ public class OrdersServiceImpl implements OrdersService {
         return canceledPayment;
     }
 
-    private void cancelOrder(OrdersEntity foundOrdersEntity) {
+    void cancelOrder(OrdersEntity foundOrdersEntity) {
         foundOrdersEntity.deleteOrder();
         if (!foundOrdersEntity.getStatus().equals(DataStatus.DELETED)) {
             throw new DataStatusException("fail to delete order", ErrorCode.ILLEGAL_DATA_STATUS);

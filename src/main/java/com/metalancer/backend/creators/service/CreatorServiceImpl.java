@@ -32,11 +32,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(rollbackFor = {Exception.class, RuntimeException.class, BaseException.class})
 public class CreatorServiceImpl implements CreatorService {
 
     private final CreatorRepository creatorRepository;
@@ -69,6 +71,9 @@ public class CreatorServiceImpl implements CreatorService {
             productsDetail.setTagList(tagList);
             List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
                 savedProductsEntity);
+            if (thumbnailUrlList != null && thumbnailUrlList.size() > 0) {
+                savedProductsEntity.setThumbnail(thumbnailUrlList.get(0));
+            }
             List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
                 savedProductsEntity);
             String zipFileUrl = productsAssetFileRepository.findUrlByProduct(savedProductsEntity);

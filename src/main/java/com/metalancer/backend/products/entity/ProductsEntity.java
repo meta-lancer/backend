@@ -54,6 +54,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private int viewCnt = 0;
 
     // 이미지
+    private String thumbnail;
     // 태그
     // 확장자
     // 제작 프로그램
@@ -144,12 +145,14 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     public ProductsEntity(CreatorEntity creatorEntity,
         ProductsCategoryEntity productsCategoryEntity,
         String title,
-        int price, String assetDetail, String assetNotice, String assetCopyRight, String website,
+        int price, String thumbnail, String assetDetail, String assetNotice, String assetCopyRight,
+        String website,
         String productionProgram, String compatibleProgram) {
         this.creatorEntity = creatorEntity;
         this.category = productsCategoryEntity;
         this.title = title;
         this.price = price;
+        this.thumbnail = thumbnail;
         this.assetDetail = assetDetail;
         this.assetNotice = assetNotice;
         this.assetCopyRight = assetCopyRight;
@@ -174,5 +177,9 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         if (salePrice < price) {
             this.salePrice = salePrice;
         }
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

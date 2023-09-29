@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.domain;
 
+import com.metalancer.backend.common.constants.OrderStatus;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -15,7 +16,7 @@ public class PaymentResponse {
     private final Integer totalPrice;
     private final Integer totalPayment;
     private final Integer totalPoint;
-    private final String orderStatus;
+    private final OrderStatus orderStatus;
     private final String ordererNm;
     private final String ordererPhone;
     private final String ordererEmail;
@@ -24,7 +25,7 @@ public class PaymentResponse {
 
     @Builder
     public PaymentResponse(Long ordererId, String orderNo, Integer totalPrice,
-        Integer totalPayment, Integer totalPoint, String orderStatus, String ordererNm,
+        Integer totalPayment, Integer totalPoint, OrderStatus orderStatus, String ordererNm,
         String ordererPhone, String ordererEmail,
         Date purchasedAt) {
         this.ordererId = ordererId;

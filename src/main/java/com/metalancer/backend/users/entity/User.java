@@ -7,7 +7,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
-import com.metalancer.backend.common.exception.StatusException;
+import com.metalancer.backend.common.exception.DataStatusException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -97,7 +97,7 @@ public class User extends BaseEntity implements Serializable {
             setRole(Role.ROLE_SELLER);
         } else {
             String USER_ROLE_ERROR = "user role error";
-            throw new StatusException(USER_ROLE_ERROR, ErrorCode.ROLE_INVALID);
+            throw new DataStatusException(USER_ROLE_ERROR, ErrorCode.ROLE_INVALID);
         }
     }
 
@@ -105,9 +105,12 @@ public class User extends BaseEntity implements Serializable {
         DataStatus status = getStatus();
         String USER_STATUS_ERROR = "user status error";
         switch (status) {
-            case DELETED -> throw new StatusException(USER_STATUS_ERROR, ErrorCode.STATUS_DELETED);
-            case PENDING -> throw new StatusException(USER_STATUS_ERROR, ErrorCode.STATUS_PENDING);
-            case BANNED -> throw new StatusException(USER_STATUS_ERROR, ErrorCode.STATUS_BANNED);
+            case DELETED ->
+                throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_DELETED);
+            case PENDING ->
+                throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_PENDING);
+            case BANNED ->
+                throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_BANNED);
         }
     }
 

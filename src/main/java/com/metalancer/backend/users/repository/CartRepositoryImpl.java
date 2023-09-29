@@ -9,10 +9,12 @@ import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class CartRepositoryImpl implements CartRepository {
@@ -63,6 +65,6 @@ public class CartRepositoryImpl implements CartRepository {
     public void deleteCart(User user, ProductsEntity productsEntity) {
         Optional<CartEntity> foundCartEntity = cartJpaRepository.findByUserAndProductsAndStatus(
             user, productsEntity, DataStatus.ACTIVE);
-        foundCartEntity.ifPresent(CartEntity::delete);
+        foundCartEntity.ifPresent(CartEntity::deleteCart);
     }
 }

@@ -52,12 +52,11 @@ public class CartEntity extends BaseEntity implements Serializable {
             .price(products.getPrice()).build();
     }
 
-    public void restore() {
-        super.restore();
+    public void restoreCart() {
+        restore();
     }
 
-    public void delete() {
-        super.delete();
-        ;
+    public void deleteCart() {
+        delete();
     }
 }

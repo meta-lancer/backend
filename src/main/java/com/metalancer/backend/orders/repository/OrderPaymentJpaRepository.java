@@ -10,4 +10,6 @@ public interface OrderPaymentJpaRepository extends JpaRepository<OrderPaymentEnt
 
     Optional<OrderPaymentEntity> findByOrdersEntityAndStatus(OrdersEntity ordersEntity,
         DataStatus status);
+
+    Optional<OrderPaymentEntity> findByOrderNo(String orderNo);
 }

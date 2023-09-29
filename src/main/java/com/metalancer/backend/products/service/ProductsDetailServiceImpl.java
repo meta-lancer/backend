@@ -2,11 +2,16 @@ package com.metalancer.backend.products.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsWishEntity;
+import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
+import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
+import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
@@ -16,16 +21,21 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(rollbackFor = {Exception.class, RuntimeException.class, BaseException.class})
 public class ProductsDetailServiceImpl implements ProductsDetailService {
 
     private final ProductsRepository productsRepository;
     private final ProductsWishRepository productsWishRepository;
     private final ProductsTagRepository productsTagRepository;
     private final CartRepository cartRepository;
+    private final ProductsThumbnailRepository productsThumbnailRepository;
+    private final ProductsViewsRepository productsViewsRepository;
+    private final ProductsAssetFileRepository productsAssetFileRepository;
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
@@ -61,7 +71,16 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
-//        response.setAssetFile();
+
+        List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
+            foundProductsEntity);
+        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
+            foundProductsEntity);
+        String zipFileUrl = productsAssetFileRepository.findUrlByProduct(foundProductsEntity);
+        AssetFile assetFile = AssetFile.builder().thumbnailUrlList(thumbnailUrlList)
+            .viewUrlList(viewUrlList).zipFileUrl(zipFileUrl)
+            .build();
+        response.setAssetFile(assetFile);
         return response;
     }
 }

@@ -52,7 +52,8 @@ public class CartController {
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
-        return new BaseResponse<>(cartService.createCart(user.getUser(), assetId));
+        return new BaseResponse<>(
+            cartService.createCart(user != null ? user.getUser() : null, assetId));
     }
 
     @Operation(summary = "장바구니 삭제", description = "")
@@ -62,7 +63,8 @@ public class CartController {
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
-        return new BaseResponse<>(cartService.deleteCart(user.getUser(), assetId));
+        return new BaseResponse<>(
+            cartService.deleteCart(user != null ? user.getUser() : null, assetId));
     }
 
     @Operation(summary = "장바구니 전체 삭제", description = "")

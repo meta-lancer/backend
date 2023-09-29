@@ -2,19 +2,19 @@ package com.metalancer.backend.common.test;
 
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
-import com.metalancer.backend.products.entity.ProductsCategory;
+import com.metalancer.backend.creators.repository.CreatorJpaRepository;
+import com.metalancer.backend.interests.entity.InterestsEntity;
+import com.metalancer.backend.interests.repository.InterestsJpaRepository;
+import com.metalancer.backend.products.entity.ProductsCategoryEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
-import com.metalancer.backend.products.entity.TagEntity;
+import com.metalancer.backend.products.entity.ProductsTagEntity;
 import com.metalancer.backend.products.repository.ProductsCategoryRepository;
 import com.metalancer.backend.products.repository.ProductsJpaRepository;
-import com.metalancer.backend.products.repository.TagJpaRepository;
-import com.metalancer.backend.users.entity.Creator;
-import com.metalancer.backend.users.entity.InterestsEntity;
+import com.metalancer.backend.products.repository.ProductsTagJpaRepository;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserAgreementEntity;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
-import com.metalancer.backend.users.repository.CreatorRepository;
-import com.metalancer.backend.users.repository.InterestsJpaRepository;
 import com.metalancer.backend.users.repository.UserAgreementJpaRepository;
 import com.metalancer.backend.users.repository.UserInterestsJpaRepository;
 import com.metalancer.backend.users.repository.UserRepository;
@@ -37,10 +37,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private boolean alreadySetup = false;
     private final UserRepository userRepository;
     private final ProductsJpaRepository productsJpaRepository;
-    private final CreatorRepository creatorRepository;
+    private final CreatorJpaRepository creatorJpaRepository;
     private final ProductsCategoryRepository productsCategoryRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TagJpaRepository tagJpaRepository;
+    private final ProductsTagJpaRepository productsTagJpaRepository;
     private final InterestsJpaRepository interestsJpaRepository;
     private final UserInterestsJpaRepository userInterestsJpaRepository;
     private final UserAgreementJpaRepository userAgreementJpaRepository;
@@ -110,26 +110,33 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 userAgreementEntity3}));
         userAgreementJpaRepository.saveAll(userAgreementEntities);
 
-        Creator creator1 = createCreator(user2);
-        Creator creator2 = createCreator(user3);
+        CreatorEntity creatorEntity1 = createCreator(user2);
+        CreatorEntity creatorEntity2 = createCreator(user3);
 
-        ProductsCategory productsCategory1 = createProductsCategory("3D 프린팅", "3D printing", 1);
+        ProductsCategoryEntity productsCategoryEntity1 = createProductsCategory("3D 프린팅",
+            "3D printing", 1);
 
-        ProductsEntity product1 = createProduct(creator1, productsCategory1,
+        ProductsEntity product1 = createProduct(creatorEntity1, productsCategoryEntity1,
             "[저축 set] 귀여운 돼지저금통과 통장 지폐",
             15000);
-        ProductsEntity product2 = createProduct(creator2, productsCategory1, "디테일한 커피머신 스타벅스 마스트",
+        ProductsEntity product2 = createProduct(creatorEntity2, productsCategoryEntity1,
+            "디테일한 커피머신 스타벅스 마스트",
             7700);
 
-        TagEntity tag1 = TagEntity.builder().productsEntity(product1).name("모델링").build();
-        TagEntity tag2 = TagEntity.builder().productsEntity(product1).name("리깅").build();
-        TagEntity tag3 = TagEntity.builder().productsEntity(product1).name("3D프린팅").build();
-        TagEntity tag4 = TagEntity.builder().productsEntity(product2).name("모델링").build();
-        TagEntity tag5 = TagEntity.builder().productsEntity(product2).name("Blender").build();
+        ProductsTagEntity tag1 = ProductsTagEntity.builder().productsEntity(product1).name("모델링")
+            .build();
+        ProductsTagEntity tag2 = ProductsTagEntity.builder().productsEntity(product1).name("리깅")
+            .build();
+        ProductsTagEntity tag3 = ProductsTagEntity.builder().productsEntity(product1).name("3D프린팅")
+            .build();
+        ProductsTagEntity tag4 = ProductsTagEntity.builder().productsEntity(product2).name("모델링")
+            .build();
+        ProductsTagEntity tag5 = ProductsTagEntity.builder().productsEntity(product2)
+            .name("Blender").build();
 
-        List<TagEntity> tagEntities = new ArrayList<>(
-            List.of(new TagEntity[]{tag1, tag2, tag3, tag4, tag5}));
-        tagJpaRepository.saveAll(tagEntities);
+        List<ProductsTagEntity> tagEntities = new ArrayList<>(
+            List.of(new ProductsTagEntity[]{tag1, tag2, tag3, tag4, tag5}));
+        productsTagJpaRepository.saveAll(tagEntities);
 
         alreadySetup = true;
     }
@@ -155,25 +162,26 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     @Transactional
-    public Creator createCreator(final User user) {
-        Creator newCreator = Creator.builder().user(user).build();
-        return creatorRepository.save(newCreator);
+    public CreatorEntity createCreator(final User user) {
+        CreatorEntity newCreatorEntity = CreatorEntity.builder().user(user).build();
+        return creatorJpaRepository.save(newCreatorEntity);
     }
 
     @Transactional
-    public ProductsCategory createProductsCategory(final String categoryName,
+    public ProductsCategoryEntity createProductsCategory(final String categoryName,
         final String categoryNameEn, final int seq) {
-        ProductsCategory newProductsCategory = ProductsCategory.builder().categoryName(categoryName)
+        ProductsCategoryEntity newProductsCategoryEntity = ProductsCategoryEntity.builder()
+            .categoryName(categoryName)
             .categoryNameEn(categoryNameEn).seq(seq).build();
-        return productsCategoryRepository.save(newProductsCategory);
+        return productsCategoryRepository.save(newProductsCategoryEntity);
     }
 
     @Transactional
-    public ProductsEntity createProduct(final Creator creator,
-        final ProductsCategory productsCategory, final String title,
+    public ProductsEntity createProduct(final CreatorEntity creatorEntity,
+        final ProductsCategoryEntity productsCategoryEntity, final String title,
         final int price) {
-        ProductsEntity newProduct = ProductsEntity.builder().creator(creator)
-            .productsCategory(productsCategory)
+        ProductsEntity newProduct = ProductsEntity.builder().creatorEntity(creatorEntity)
+            .productsCategoryEntity(productsCategoryEntity)
             .title(title).price(price).build();
         return productsJpaRepository.save(newProduct);
     }

@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,12 +32,10 @@ public class OrderPaymentEntity extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "order_id", nullable = false)
     private OrdersEntity ordersEntity;
-
+    @Column(nullable = false)
+    private String impUid;
     @Column(nullable = false)
     private String orderNo;
-
-    @Column(name = "RECEIPT_ID", nullable = false)
-    private String receiptId;
 
     @Column(nullable = false)
     private String type;
@@ -44,21 +44,28 @@ public class OrderPaymentEntity extends BaseEntity {
     private String method;
 
     @Column(nullable = false)
+    private String currency;
+
+    @Column(nullable = false)
     private int paymentPrice;
 
     @Column(nullable = false)
-    private Date purchasedAt;
+    private LocalDateTime purchasedAt;
 
     @Builder
-    public OrderPaymentEntity(OrdersEntity ordersEntity, String orderNo, String receiptId,
+    public OrderPaymentEntity(OrdersEntity ordersEntity, String impUid, String orderNo,
         String type,
-        String method, int paymentPrice, Date purchasedAt) {
+        String method, int paymentPrice, String currency, Date purchasedAt) {
         this.ordersEntity = ordersEntity;
+        this.impUid = impUid;
         this.orderNo = orderNo;
-        this.receiptId = receiptId;
         this.type = type;
         this.method = method;
         this.paymentPrice = paymentPrice;
-        this.purchasedAt = purchasedAt;
+        this.currency = currency;
+        this.purchasedAt = purchasedAt.toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
+        ;
     }
 }

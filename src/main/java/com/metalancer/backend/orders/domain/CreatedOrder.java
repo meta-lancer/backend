@@ -8,19 +8,25 @@ import lombok.Getter;
 @Getter
 public class CreatedOrder {
 
-    private Long ordererId;
-    private String orderNo;
-    private Integer totalPrice;
-    private String orderStatus;
+    private final Long ordererId;
+    private final String orderNo;
+    private final Integer totalPrice;
+    private final String orderStatus;
     private String orderProductList;
+    private final String buyerNm;
+    private final String buyerPhone;
+    private final String buyerEmail;
 
     @Builder
     public CreatedOrder(Long ordererId, String orderNo, Integer totalPrice,
-        String orderStatus) {
+        String orderStatus, String buyerNm, String buyerPhone, String buyerEmail) {
         this.ordererId = ordererId;
         this.orderNo = orderNo;
         this.totalPrice = totalPrice;
         this.orderStatus = orderStatus;
+        this.buyerNm = buyerNm;
+        this.buyerPhone = buyerPhone;
+        this.buyerEmail = buyerEmail;
     }
 
     public void setOrderProductList(List<OrderProductsEntity> orderProductList) {

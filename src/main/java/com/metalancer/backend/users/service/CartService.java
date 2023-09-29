@@ -12,4 +12,8 @@ public interface CartService {
     boolean toggleCart(User user, Long assetId);
 
     boolean deleteAllCart(User user);
+
+    boolean createCart(User user, Long assetId);
+
+    boolean deleteCart(User user, Long assetId);
 }

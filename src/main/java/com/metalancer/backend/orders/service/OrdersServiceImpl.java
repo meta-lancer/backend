@@ -193,7 +193,7 @@ public class OrdersServiceImpl implements OrdersService {
         PaymentResponse response = PaymentResponse.builder().ordererId(user.getId())
             .ordererNm(user.getName())
             .ordererPhone(user.getMobile()).ordererEmail(user.getEmail())
-            .orderNo(foundOrdersEntity.getOrderNo()).orderStatus(orderStatus.getKorName())
+            .orderNo(foundOrdersEntity.getOrderNo()).orderStatus(orderStatus)
             .totalPrice(
                 foundOrdersEntity.getTotalPrice())
             .totalPayment(foundOrdersEntity.getTotalPaymentPrice())

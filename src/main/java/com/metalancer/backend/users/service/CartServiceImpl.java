@@ -55,4 +55,32 @@ public class CartServiceImpl implements CartService {
         cartRepository.deleteAllCart(user);
         return cartRepository.countCartCnt(user) == 0;
     }
+
+    @Override
+    public boolean createCart(User user, Long assetId) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductById(assetId);
+        Optional<CartEntity> cartEntity = cartRepository.findCartByUserAndAsset(user,
+            foundProductsEntity);
+        if (cartEntity.isEmpty()) {
+            cartRepository.createCart(user, foundProductsEntity);
+            return true;
+        }
+        if (cartEntity.get().getStatus().equals(DataStatus.DELETED)) {
+            cartEntity.get().restore();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteCart(User user, Long assetId) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductById(assetId);
+        Optional<CartEntity> cartEntity = cartRepository.findCartByUserAndAsset(user,
+            foundProductsEntity);
+        if (cartEntity.isPresent() && cartEntity.get().getStatus().equals(DataStatus.ACTIVE)) {
+            cartEntity.get().delete();
+            return true;
+        }
+        return false;
+    }
 }

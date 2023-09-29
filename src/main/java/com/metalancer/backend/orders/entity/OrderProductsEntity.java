@@ -3,7 +3,10 @@ package com.metalancer.backend.orders.entity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ClaimStatus;
 import com.metalancer.backend.common.constants.ClaimType;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.exception.OrderStatusException;
+import com.metalancer.backend.orders.domain.OrderProducts;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
@@ -49,6 +52,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
+    private Integer price;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderProductStatus = OrderStatus.PAY_ING;
     @Enumerated(EnumType.STRING)
@@ -59,11 +63,35 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @Builder
     public OrderProductsEntity(User orderer, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, String orderNo,
-        String orderProductNo) {
+        String orderProductNo,
+        Integer price) {
         this.orderer = orderer;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
+        this.price = price;
+    }
+
+    public void completeOrder() {
+        if (this.orderProductStatus.equals(OrderStatus.PAY_ING)) {
+            this.orderProductStatus = OrderStatus.PAY_DONE;
+        } else {
+            throw new OrderStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_ORDER_STATUS);
+        }
+    }
+
+    public void confirmOrder() {
+        if (this.orderProductStatus.equals(OrderStatus.PAY_DONE)) {
+            this.orderProductStatus = OrderStatus.PAY_CONFIRM;
+        } else {
+            throw new OrderStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_ORDER_STATUS);
+        }
+    }
+
+    public OrderProducts toOrderProducts() {
+        return OrderProducts.builder().productsDetail(productsEntity.toProductsDetail())
+            .orderProductNo(orderProductNo).orderProductStatus(orderProductStatus).price(price)
+            .claimType(claimType).claimStatus(claimStatus).build();
     }
 }

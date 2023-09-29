@@ -6,15 +6,18 @@ import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.PaymentResponse;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO;
+import com.metalancer.backend.orders.dto.OrdersRequestDTO.CancelAllPayment;
 import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.orders.service.OrdersService;
 import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.PrepareData;
 import com.siot.IamportRestClient.response.AccessToken;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Prepare;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,14 +94,20 @@ public class OrdersController {
         return new BaseResponse<>(true);
     }
 
-    // 결제 처리 => 웹훅과 동시에 이루어지도록...?
+    @PostMapping("/payments/validation")
+    public BaseResponse<Boolean> checkPayment(@RequestBody OrdersRequestDTO.CheckPayment dto)
+        throws IamportResponseException, IOException {
+        return new BaseResponse<>(ordersService.checkPayment(dto));
+    }
+
+
     @PostMapping("/payments")
     public BaseResponse<PaymentResponse> completePayment(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody OrdersRequestDTO.CompleteOrder dto
     ) throws Exception {
         log.info("결제 처리 완료 요청 객체: {}", dto);
-        return new BaseResponse<>(
+        return new BaseResponse<PaymentResponse>(
             ordersService.completePayment(user != null ? user.getUser() : null, dto));
     }
 
@@ -106,8 +116,18 @@ public class OrdersController {
         @RequestBody OrdersRequestDTO.CompleteOrderWebhook dto
     ) throws Exception {
         log.info("결제 처리 완료 웹 훅 객체: {}", dto);
-        return new BaseResponse<>(
+        return new BaseResponse<PaymentResponse>(
             ordersService.completePaymentByWebhook(dto));
+    }
+
+    @PatchMapping("/payments/cancellation/all")
+    public BaseResponse<PaymentResponse> cancelAllPayment(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody CancelAllPayment dto
+    ) throws Exception {
+        log.info("결제 전체 취소 요청 객체: {}", dto);
+        return new BaseResponse<PaymentResponse>(
+            ordersService.cancelAllPayment(user != null ? user.getUser() : null, dto));
     }
 
 //    @PostMapping("/cancel")

@@ -3,7 +3,8 @@ package com.metalancer.backend.orders.entity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
-import com.metalancer.backend.common.exception.StatusException;
+import com.metalancer.backend.common.exception.DataStatusException;
+import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
@@ -42,30 +43,43 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     private User orderer;
     @Column(nullable = false)
     private String orderNo;
-    private Integer totalPoint;
+    @Column(nullable = false)
+    private Integer totalPoint = 0;
     @Column(nullable = false)
     private Integer totalPrice;
+    @Column(nullable = false)
     private Integer totalPaymentPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PAY_ING;
 
     @Builder
-    public OrdersEntity(User orderer, String orderNo, Integer totalPrice) {
+    public OrdersEntity(User orderer, String orderNo, Integer totalPoint, Integer totalPrice,
+        Integer totalPaymentPrice) {
         this.orderer = orderer;
         this.orderNo = orderNo;
+        this.totalPoint = totalPoint;
         this.totalPrice = totalPrice;
+        if (totalPrice - totalPoint == totalPaymentPrice) {
+            this.totalPaymentPrice = totalPaymentPrice;
+        } else {
+            throw new InvalidParamException("check totalPrice, totalPaymentPrice, totalPoint",
+                ErrorCode.INVALID_PARAMETER);
+        }
     }
 
     public CreatedOrder toCreatedOrderDomain() {
         return CreatedOrder.builder().ordererId(orderer.getId()).orderNo(orderNo)
-            .totalPrice(totalPrice).orderStatus(orderStatus.getKorName()).build();
+            .totalPrice(totalPrice).orderStatus(orderStatus.getKorName())
+            .buyerNm(orderer.getName()).buyerPhone(orderer.getMobile())
+            .buyerEmail(orderer.getEmail())
+            .build();
     }
 
     public void completeOrder() {
         if (this.orderStatus.equals(OrderStatus.PAY_ING)) {
             this.orderStatus = OrderStatus.PAY_DONE;
         } else {
-            throw new StatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_STATUS);
+            throw new DataStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_DATA_STATUS);
         }
     }
 
@@ -73,7 +87,7 @@ public class OrdersEntity extends BaseEntity implements Serializable {
         if (this.orderStatus.equals(OrderStatus.PAY_DONE)) {
             this.orderStatus = OrderStatus.PAY_CONFIRM;
         } else {
-            throw new StatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_STATUS);
+            throw new DataStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_DATA_STATUS);
         }
     }
 

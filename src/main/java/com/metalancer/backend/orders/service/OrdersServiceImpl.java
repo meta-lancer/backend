@@ -3,20 +3,27 @@ package com.metalancer.backend.orders.service;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.common.exception.NotFoundException;
-import com.metalancer.backend.common.exception.StatusException;
+import com.metalancer.backend.common.exception.OrderStatusException;
 import com.metalancer.backend.orders.domain.CreatedOrder;
+import com.metalancer.backend.orders.domain.OrderProducts;
 import com.metalancer.backend.orders.domain.PaymentResponse;
+import com.metalancer.backend.orders.dto.OrdersRequestDTO;
+import com.metalancer.backend.orders.dto.OrdersRequestDTO.CancelAllPayment;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO.CompleteOrder;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO.CompleteOrderWebhook;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO.CreateOrder;
+import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
 import com.metalancer.backend.orders.entity.OrdersEntity;
+import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.CartRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -48,6 +55,8 @@ public class OrdersServiceImpl implements OrdersService {
     private final OrdersRepository ordersRepository;
     private final OrderProductsRepository orderProductsRepository;
     private final ProductsRepository productsRepository;
+    private final CartRepository cartRepository;
+    private final OrderPaymentRepository orderPaymentRepository;
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
@@ -59,15 +68,22 @@ public class OrdersServiceImpl implements OrdersService {
         String orderNo = createOrderNo();
         OrdersEntity createdOrdersEntity = OrdersEntity.builder().orderer(user)
             .orderNo(orderNo)
-            .totalPrice(dto.getTotalPrice()).build();
+            .totalPrice(dto.getTotalPrice())
+            .totalPaymentPrice(dto.getTotalPaymentPrice())
+            .totalPoint(dto.getTotalPoint())
+            .build();
         ordersRepository.save(createdOrdersEntity);
         int index = 1;
         for (Long productsId : dto.getProductsIdList()) {
             ProductsEntity foundProductEntity = productsRepository.findProductById(productsId);
+            Integer price =
+                foundProductEntity.getSalePrice() == null ? foundProductEntity.getPrice()
+                    : foundProductEntity.getSalePrice();
             OrderProductsEntity createdOrderProductsEntity = OrderProductsEntity.builder()
                 .orderer(user)
                 .ordersEntity(createdOrdersEntity).productsEntity(foundProductEntity)
                 .orderNo(orderNo).orderProductNo(orderNo + String.format("%04d", index++))
+                .price(price)
                 .build();
             orderProductsRepository.save(createdOrderProductsEntity);
         }
@@ -79,62 +95,123 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public PaymentResponse completePayment(User user, CompleteOrder dto)
+    public boolean checkPayment(OrdersRequestDTO.CheckPayment dto)
         throws IamportResponseException, IOException {
-        // id를 통해 해당 주문서의 merchant_uid 대조해본다.
+        // 결제내역 단건 조회
         IamportClient client = new IamportClient(apiKey, apiSecret, true);
+        // getPrepare는 클라에서만 사용 가능
+        // 여기서 만약 조회가 안되고 있다면 주문 취소하도록??
+        IamportResponse<Payment> payment_response = client.paymentByImpUid(dto.getImpUid());
+        log.info("결제내역 단건 조회 응답 주문번호: {}", payment_response.getResponse().getMerchantUid());
+        log.info("결제내역 단건 조회 응답 가격: {}", payment_response.getResponse().getAmount());
+        log.info("결제내역 단건 조회 응답 상태: {}", payment_response.getResponse().getStatus());
+        checkOrderStatusIsPaidFromAPI(payment_response.getResponse().getStatus());
         String orderNo = dto.getMerchantUid();
-
         // 주문서의 상태 확인
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
-        if (foundOrdersEntity.getStatus().equals(DataStatus.DELETED)) {
-
-        }
-        // 주문 진행 상태 확인
+        DataStatus dataStatus = foundOrdersEntity.getStatus();
+        checkOrdersEntityStatusIsNotDeleted(dataStatus);
+        // 주문서의 주문 진행 상태 확인
         OrderStatus orderStatus = foundOrdersEntity.getOrderStatus();
-        if (!orderStatus.equals(OrderStatus.PAY_ING)) {
-            if (orderStatus.equals(OrderStatus.PAY_DONE)) {
-                // 이미 처리했으면 탈출 return response;
-            } else {
-                // 예외처리
-            }
-        }
-
-        // 결제내역 단건 조회
-        // getPrepare는 클라에서만 사용 가능
-        IamportResponse<Payment> payment_response = client.paymentByImpUid(orderNo);
-        // 여기서 만약 조회가 안되고 있다면 주문 취소하도록??
-        log.info("결제내역 단건 조회 응답: {}", payment_response);
-
+        checkOrderStatusEqualsPAY_ING_OR_PAY_DONE(orderStatus);
         // 금액 비교
         BigDecimal createdOrderTotalPrice = new BigDecimal(foundOrdersEntity.getTotalPrice());
         BigDecimal paymentResponseTotalPrice = payment_response.getResponse().getAmount();
+        return createdOrderTotalPrice.equals(paymentResponseTotalPrice);
+    }
 
-        if (!createdOrderTotalPrice.equals(paymentResponseTotalPrice)) {
-            // 결제 취소
-            IamportResponse<Payment> canceledPayment = cancelPayments(orderNo,
-                paymentResponseTotalPrice, client);
-            log.info("결제취소 응답: {}", canceledPayment);
-            // 주문서 취소
-            cancelOrder(foundOrdersEntity);
+    private void checkOrdersEntityStatusIsNotDeleted(DataStatus dataStatus) {
+        if (dataStatus.equals(DataStatus.DELETED)) {
+            throw new OrderStatusException("order already deleted", ErrorCode.ILLEGAL_ORDER_STATUS);
         }
+    }
 
+    private void checkOrderStatusIsPaidFromAPI(String status) {
+        if (!status.equals("paid")) {
+            throw new OrderStatusException("orderStatus should be 'PAY_ING'",
+                ErrorCode.ILLEGAL_ORDER_STATUS);
+        }
+    }
+
+    private void checkOrderStatusEqualsPAY_ING_OR_PAY_DONE(OrderStatus orderStatus) {
+        if (!orderStatus.equals(OrderStatus.PAY_ING) && !orderStatus.equals(OrderStatus.PAY_DONE)) {
+            throw new OrderStatusException("orderStatus should be 'PAY_ING'",
+                ErrorCode.ILLEGAL_ORDER_STATUS);
+        }
+    }
+
+    @Override
+    public PaymentResponse completePayment(User user, CompleteOrder dto)
+        throws IamportResponseException, IOException {
+        if (user == null) {
+            user = userRepository.findById(1L).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND)
+            );
+        }
+        String orderNo = dto.getMerchantUid();
+        OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
+        DataStatus dataStatus = foundOrdersEntity.getStatus();
+        OrderStatus orderStatus = foundOrdersEntity.getOrderStatus();
+        checkOrdersEntityStatusIsNotDeleted(dataStatus);
+        checkOrderStatusEqualsPAY_ING_OR_PAY_DONE(orderStatus);
+
+        IamportClient client = new IamportClient(apiKey, apiSecret, true);
+        IamportResponse<Payment> payment_response = client.paymentByImpUid(dto.getImpUid());
+        Payment paymentResponse = payment_response.getResponse();
+        List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
+            foundOrdersEntity);
+        if (orderStatus.equals(OrderStatus.PAY_DONE)) {
+            PaymentResponse response = getPaymentResponse(user,
+                foundOrdersEntity, orderStatus, paymentResponse);
+            return response;
+        }
         // 결제 처리 완료
-        completeOrder(foundOrdersEntity);
-
+        completeOrder(foundOrdersEntity, orderProductsEntityList);
+        // 결제 완료 저장 => 일부 데이터는 결제 완료 받은 값이 필요
+        OrderPaymentEntity createdOrderPaymentEntity = OrderPaymentEntity.builder()
+            .ordersEntity(foundOrdersEntity).impUid(paymentResponse.getImpUid())
+            .orderNo(orderNo).paymentPrice(foundOrdersEntity.getTotalPaymentPrice())
+            .type(paymentResponse.getPgProvider())
+            .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
+            .purchasedAt(paymentResponse.getPaidAt()).build();
+        orderPaymentRepository.save(createdOrderPaymentEntity);
         // 장바구니에서 삭제
-
+        for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
+            cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity());
+        }
         // 다운로드 허용
+        // 다운로드 entity 생성 - 접근할 수 있는 링크 + 접근가능한 횟수 제한 + 아니면... 새로운 버킷에? 그리고 접근가능한 횟수 넘어가면 삭제?
 
-        PaymentResponse response = PaymentResponse.builder().build();
+        PaymentResponse response = getPaymentResponse(user,
+            foundOrdersEntity, orderStatus, paymentResponse);
         log.info("결제처리 응답: {}", response);
         return response;
     }
 
-    private void completeOrder(OrdersEntity ordersEntity) {
+    private PaymentResponse getPaymentResponse(User user, OrdersEntity foundOrdersEntity,
+        OrderStatus orderStatus, Payment paymentResponse) {
+        PaymentResponse response = PaymentResponse.builder().ordererId(user.getId())
+            .ordererNm(user.getName())
+            .ordererPhone(user.getMobile()).ordererEmail(user.getEmail())
+            .orderNo(foundOrdersEntity.getOrderNo()).orderStatus(orderStatus.getKorName())
+            .totalPrice(
+                foundOrdersEntity.getTotalPrice())
+            .totalPayment(foundOrdersEntity.getTotalPaymentPrice())
+            .totalPoint(foundOrdersEntity.getTotalPoint())
+            .purchasedAt(paymentResponse.getPaidAt())
+            .build();
+        List<OrderProducts> orderProductsList = orderProductsRepository.findAllProductsByOrder(
+            foundOrdersEntity);
+        response.setOrderProductList(orderProductsList);
+        log.info("결제처리 응답: {}", response);
+        return response;
+    }
+
+    private void completeOrder(OrdersEntity ordersEntity,
+        List<OrderProductsEntity> orderProductsEntityList) {
         ordersEntity.completeOrder();
-        if (!ordersEntity.getOrderStatus().equals(OrderStatus.PAY_DONE)) {
-            throw new StatusException("fail to complete order", ErrorCode.ILLEGAL_STATUS);
+        for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
+            orderProductsEntity.completeOrder();
         }
     }
 
@@ -145,27 +222,48 @@ public class OrdersServiceImpl implements OrdersService {
             // 예외 처리
         }
         if (dto.getStatus().equals("paid")) {
-            OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(
-                dto.getMerchant_uid());
-            CompleteOrder completeOrder = new CompleteOrder(foundOrdersEntity.getTotalPrice(),
+            CompleteOrder completeOrder = new CompleteOrder(dto.getImp_uid(),
                 dto.getMerchant_uid());
             completePayment(null, completeOrder);
         }
         return null;
     }
 
-    private void cancelOrder(OrdersEntity ordersEntity) {
-        ordersEntity.deleteOrder();
-        if (!ordersEntity.getStatus().equals(DataStatus.DELETED)) {
-            throw new StatusException("fail to delete order", ErrorCode.ILLEGAL_STATUS);
-        }
+    @Override
+    public PaymentResponse cancelAllPayment(User user, CancelAllPayment dto)
+        throws IamportResponseException, IOException {
+        String orderNo = dto.getMerchantUid();
+        String impUid = dto.getImpUid();
+        OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
+        cancelPayments(impUid, dto.getMerchantUid(),
+            BigDecimal.valueOf(foundOrdersEntity.getTotalPaymentPrice()),
+            dto.getReason());
+        cancelOrder(foundOrdersEntity);
+        return null;
     }
 
-    private IamportResponse<Payment> cancelPayments(String merchantUid, BigDecimal amount,
-        IamportClient client)
+    private IamportResponse<Payment> cancelPayments(String impUid, String merchantUid,
+        BigDecimal amount,
+        String reason)
         throws IamportResponseException, IOException {
+        IamportClient client = new IamportClient(apiKey, apiSecret, true);
+        IamportResponse<Payment> payment_response = client.paymentByImpUid(impUid);
+        Payment paymentResponse = payment_response.getResponse();
         CancelData cancelData = new CancelData(merchantUid, true, amount);
-        return client.cancelPaymentByImpUid(cancelData);
+        cancelData.setReason(reason);
+        IamportResponse<Payment> canceledPayment = client.cancelPaymentByImpUid(cancelData);
+        log.info("결제취소 응답: {}", canceledPayment);
+        if (canceledPayment.getResponse().getStatus().equals("")) {
+
+        }
+        return canceledPayment;
+    }
+
+    private void cancelOrder(OrdersEntity foundOrdersEntity) {
+        foundOrdersEntity.deleteOrder();
+        if (!foundOrdersEntity.getStatus().equals(DataStatus.DELETED)) {
+            throw new DataStatusException("fail to delete order", ErrorCode.ILLEGAL_DATA_STATUS);
+        }
     }
 
     private String createOrderNo() {

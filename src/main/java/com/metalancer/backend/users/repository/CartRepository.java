@@ -23,4 +23,6 @@ public interface CartRepository {
     Optional<CartEntity> findCartByUserAndAsset(User user, ProductsEntity asset);
 
     int countCartCnt(User user);
+
+    void deleteCart(User user, ProductsEntity productsEntity);
 }

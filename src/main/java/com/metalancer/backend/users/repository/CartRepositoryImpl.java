@@ -1,5 +1,6 @@
 package com.metalancer.backend.users.repository;
 
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.entity.ProductsEntity;
@@ -56,5 +57,12 @@ public class CartRepositoryImpl implements CartRepository {
     @Override
     public int countCartCnt(User user) {
         return cartJpaRepository.countAllByUser(user);
+    }
+
+    @Override
+    public void deleteCart(User user, ProductsEntity productsEntity) {
+        Optional<CartEntity> foundCartEntity = cartJpaRepository.findByUserAndProductsAndStatus(
+            user, productsEntity, DataStatus.ACTIVE);
+        foundCartEntity.ifPresent(CartEntity::delete);
     }
 }

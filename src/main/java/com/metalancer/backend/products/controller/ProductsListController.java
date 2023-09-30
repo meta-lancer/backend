@@ -3,11 +3,11 @@ package com.metalancer.backend.products.controller;
 
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
-import com.metalancer.backend.common.constants.ProperAssetType;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
+import com.metalancer.backend.products.controller.Response.ProductsDto.GenreGalaxyResponse;
 import com.metalancer.backend.products.controller.Response.ProductsDto.HotPickResponse;
-import com.metalancer.backend.products.controller.Response.ProductsDto.ProperAssetResponse;
+import com.metalancer.backend.products.controller.Response.ProductsDto.TrendSpotlightResponse;
 import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.service.ProductsListService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +35,7 @@ public class ProductsListController {
 
     private final ProductsListService productsListService;
 
-    @Operation(summary = "에셋 Hot Pick", description = "")
+    @Operation(summary = "메인페이지-에셋 Hot Pick", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/hot-pick")
     public BaseResponse<HotPickResponse> getHotPickList(
@@ -48,18 +48,37 @@ public class ProductsListController {
             productsListService.getHotPickList(type, period, adjustedPageable));
     }
 
-    @Operation(summary = "당신에게 어울리는 에셋", description = "")
+    @Operation(summary = "메인페이지-Trend Spotlight", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/proper-asset")
-    public BaseResponse<ProperAssetResponse> getProperAssetList(
-        @Parameter(description = "종류") @RequestParam ProperAssetType type,
+    @GetMapping("/genre-galaxy")
+    public BaseResponse<TrendSpotlightResponse> getTrendSpotlight(
+        @Parameter(name = "종류", description = "") @RequestParam String type,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("종류 옵션-{},  페이징-{}", type, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
-        return new BaseResponse<>(productsListService.getProperAssetList(type, adjustedPageable));
+        return new BaseResponse<>(productsListService.getTrendSpotlight(type, adjustedPageable));
     }
 
-    @Operation(summary = "필터 에셋", description = "")
+    @Operation(summary = "메인페이지-Genre Galaxy", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @GetMapping("/genre-galaxy")
+    public BaseResponse<GenreGalaxyResponse> getGenreGalaxyList(
+        @Parameter(name = "종류", description = "MODEL(\"모델\"),\n"
+            + "    ANIMAL(\"동물\"),\n"
+            + "    PLANT(\"식물\"),\n"
+            + "    BACKGROUND(\"배경\"),\n"
+            + "    FOOD(\"음식\"),\n"
+            + "    OBJECTS(\"사물\"),\n"
+            + "    ROBOT(\"로봇\"),\n"
+            + "    VFX(\"VFX\"),\n"
+            + "    ETC(\"기타\")") @RequestParam String type,
+        @Parameter(description = "페이징") Pageable pageable) {
+        log.info("종류 옵션-{},  페이징-{}", type, pageable);
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
+        return new BaseResponse<>(productsListService.getGenreGalaxyList(type, adjustedPageable));
+    }
+
+    @Operation(summary = "모두보기-필터 에셋", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/asset")
     public BaseResponse<Page<FilterAsset>> getFilterAssetList(

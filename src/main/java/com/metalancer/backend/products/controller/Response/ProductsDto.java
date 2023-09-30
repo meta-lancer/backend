@@ -1,9 +1,9 @@
 package com.metalancer.backend.products.controller.Response;
 
 import com.metalancer.backend.common.constants.HotPickType;
-import com.metalancer.backend.common.constants.ProperAssetType;
+import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
-import com.metalancer.backend.products.domain.ProperAsset;
+import com.metalancer.backend.products.domain.TrendSpotlight;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.domain.Page;
@@ -21,9 +21,17 @@ public class ProductsDto {
 
     @Data
     @AllArgsConstructor
-    public static class ProperAssetResponse {
+    public static class GenreGalaxyResponse {
 
-        private final ProperAssetType properAssetType;
-        private final Page<ProperAsset> properAssetList;
+        private final String genreGalaxyType;
+        private final Page<GenreGalaxy> genreGalaxyList;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class TrendSpotlightResponse {
+
+        private final String trendSpotlightType;
+        private final Page<TrendSpotlight> trendSpotlightList;
     }
 }

@@ -4,10 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class ProperAsset extends Asset {
+public class GenreGalaxy extends Asset {
 
     @Builder
-    public ProperAsset(Long assetId, String title, String assetUrl, Integer price) {
+    public GenreGalaxy(Long assetId, String title, String assetUrl, Integer price) {
         super(assetId, title, assetUrl, price);
     }
 }

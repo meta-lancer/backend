@@ -2,10 +2,10 @@ package com.metalancer.backend.products.service;
 
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
-import com.metalancer.backend.common.constants.ProperAssetType;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.products.controller.Response.ProductsDto.GenreGalaxyResponse;
 import com.metalancer.backend.products.controller.Response.ProductsDto.HotPickResponse;
-import com.metalancer.backend.products.controller.Response.ProductsDto.ProperAssetResponse;
+import com.metalancer.backend.products.controller.Response.ProductsDto.TrendSpotlightResponse;
 import com.metalancer.backend.products.domain.Asset;
 import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.domain.HotPickAsset;
@@ -64,13 +64,18 @@ public class ProductsListServiceImpl implements ProductsListService {
     }
 
     @Override
-    public ProperAssetResponse getProperAssetList(ProperAssetType type, Pageable pageable) {
+    public GenreGalaxyResponse getGenreGalaxyList(String type, Pageable pageable) {
         return null;
     }
 
     @Override
     public Page<FilterAsset> getFilterAssetList(Integer sortOption, List<Integer> typeOption,
         List<Integer> genreOption, List<Integer> priceOption, Pageable adjustedPageable) {
+        return null;
+    }
+
+    @Override
+    public TrendSpotlightResponse getTrendSpotlight(String type, Pageable adjustedPageable) {
         return null;
     }
 }

@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "genre_galaxy")
+@Entity(name = "genre_galaxy_type")
 @ToString
 public class GenreGalaxyTypeEntity extends BaseTimeEntity implements Serializable {
 
@@ -26,7 +26,7 @@ public class GenreGalaxyTypeEntity extends BaseTimeEntity implements Serializabl
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "genre_galaxy_id", nullable = false)
+    @Column(name = "genre_galaxy_type_id", nullable = false)
     private Long id;
 
     @Column(nullable = false)

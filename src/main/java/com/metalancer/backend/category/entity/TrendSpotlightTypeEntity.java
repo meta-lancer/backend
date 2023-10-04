@@ -17,23 +17,23 @@ import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "trend_spotlight")
+@Entity(name = "trend_spotlight_type")
 @ToString
-public class TrendSpotlightEntity extends BaseTimeEntity implements Serializable {
+public class TrendSpotlightTypeEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 745122177141999515L;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "trend_spotlight_id", nullable = false)
+    @Column(name = "trend_spotlight_type_id", nullable = false)
     private Long id;
 
     @Column(nullable = false)
     private String name;
 
     @Builder
-    public TrendSpotlightEntity(String name) {
+    public TrendSpotlightTypeEntity(String name) {
         this.name = name;
     }
 }

@@ -23,7 +23,8 @@ public class OpenApiConfig {
                 "1. 대부분의 api는 @AuthenticationPrincipal PrincipalDetails user(세션)로 유저를 식별합니다. \n\n "
                     + " 2. 그리고 페이징 사용 시, 페이지를 1부터 시작하게끔 설정했습니다. \n\n "
                     + " 3. 현재 에셋과 상품을 혼용해서 사용하고 있습니다. \n\n "
-                    + " 4. 이메일 로그인 -> 홈 조회 -> 에세 상세 조회 -> 구매하기/장바구니 담기 -> 결제하기(주문서 만들기, 포트원 토큰 발행 -> 모듈 결제처리 완료")
+                    + " 4. 이메일 로그인 -> 홈 조회 -> 에세 상세 조회 -> 구매하기/장바구니 담기 -> 결제하기(주문서 만들기, 포트원 토큰 발행 -> 모듈 결제처리 완료 \n\n"
+            )
             .contact(new Contact().name("메타오비스").email("metaovis@gmail.com"));
 
         return new OpenAPI()
@@ -51,7 +52,7 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi group3() {
         return GroupedOpenApi.builder()
-            .group("상품")
+            .group("상품(에셋)")
             .pathsToMatch("/api/products/**")
             .build();
     }
@@ -76,9 +77,16 @@ public class OpenApiConfig {
     public GroupedOpenApi group6() {
         return GroupedOpenApi.builder()
             .group("크리에이터 전용")
-            .pathsToMatch("/api/creators/**")
+            // creators -> creator 중
+            .pathsToMatch("/api/creator/**")
             .build();
     }
 
-
+    @Bean
+    public GroupedOpenApi group7() {
+        return GroupedOpenApi.builder()
+            .group("카테고리")
+            .pathsToMatch("/api/category/**")
+            .build();
+    }
 }

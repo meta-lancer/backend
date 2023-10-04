@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "hot_pick")
+@Entity(name = "hot_pick_type")
 @ToString
 public class HotPickTypeEntity extends BaseTimeEntity implements Serializable {
 
@@ -26,7 +26,7 @@ public class HotPickTypeEntity extends BaseTimeEntity implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "hot_pick_id", nullable = false)
+    @Column(name = "hot_pick_type_id", nullable = false)
     private Long id;
 
     @Column(nullable = false)

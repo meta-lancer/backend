@@ -1,6 +1,7 @@
 package com.metalancer.backend.category.controller;
 
 
+import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.service.CategoryListService;
 import com.metalancer.backend.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,7 @@ public class CategoryListController {
     @Operation(summary = "메인페이지-Hot Pick 카테고리", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/hot-pick")
-    public BaseResponse<List<String>> getHotPickCategoryList() {
+    public BaseResponse<List<MainCategory>> getHotPickCategoryList() {
         return new BaseResponse<>(
             categoryListService.getHotPickCategoryList());
     }
@@ -35,7 +36,7 @@ public class CategoryListController {
     @Operation(summary = "메인페이지-Trend Spotlight 카테고리", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/trend-spotlight")
-    public BaseResponse<List<String>> getTrendSpotlightCategoryList() {
+    public BaseResponse<List<MainCategory>> getTrendSpotlightCategoryList() {
         return new BaseResponse<>(
             categoryListService.getTrendSpotlightCategoryList());
     }
@@ -43,7 +44,7 @@ public class CategoryListController {
     @Operation(summary = "메인페이지-Genre Galaxy 카테고리", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/genre-galaxy")
-    public BaseResponse<List<String>> getGenreGalaxyCategoryList() {
+    public BaseResponse<List<MainCategory>> getGenreGalaxyCategoryList() {
         return new BaseResponse<>(
             categoryListService.getGenreGalaxyCategoryList());
     }

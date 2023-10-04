@@ -1,13 +1,14 @@
 package com.metalancer.backend.category.service;
 
+import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import java.util.List;
 
 public interface CategoryListService {
 
 
-    List<String> getHotPickCategoryList();
+    List<MainCategory> getHotPickCategoryList();
 
-    List<String> getTrendSpotlightCategoryList();
+    List<MainCategory> getTrendSpotlightCategoryList();
 
-    List<String> getGenreGalaxyCategoryList();
+    List<MainCategory> getGenreGalaxyCategoryList();
 }

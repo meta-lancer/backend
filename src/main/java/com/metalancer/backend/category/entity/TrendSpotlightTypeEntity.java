@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.entity;
 
+import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,9 +32,16 @@ public class TrendSpotlightTypeEntity extends BaseTimeEntity implements Serializ
 
     @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
+    private String nameKor;
 
     @Builder
-    public TrendSpotlightTypeEntity(String name) {
+    public TrendSpotlightTypeEntity(String name, String nameKor) {
         this.name = name;
+        this.nameKor = nameKor;
+    }
+
+    public MainCategory ToMainCategory() {
+        return MainCategory.builder().name(name).nameKor(nameKor).build();
     }
 }

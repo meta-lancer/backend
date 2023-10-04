@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.repository;
 
+import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.entity.TrendSpotlightTypeEntity;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,9 +14,9 @@ public class TrendSpotlightTypeRepositoryImpl implements TrendSpotlightTypeRepos
     private final TrendSpotlightTypeJpaRepository trendSpotlightTypeJpaRepository;
 
     @Override
-    public List<String> getTrendSpotlightCategoryList() {
+    public List<MainCategory> getTrendSpotlightCategoryList() {
         return trendSpotlightTypeJpaRepository.findAll().stream()
-            .map(TrendSpotlightTypeEntity::getName).collect(
+            .map(TrendSpotlightTypeEntity::ToMainCategory).collect(
                 Collectors.toList());
     }
 }

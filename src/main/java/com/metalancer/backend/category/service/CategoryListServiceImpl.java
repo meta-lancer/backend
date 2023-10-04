@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.service;
 
+import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.repository.GenreGalaxyTypeRepository;
 import com.metalancer.backend.category.repository.HotPickTypeRepository;
 import com.metalancer.backend.category.repository.TrendSpotlightTypeRepository;
@@ -21,18 +22,18 @@ public class CategoryListServiceImpl implements CategoryListService {
     private final GenreGalaxyTypeRepository genreGalaxyTypeRepository;
 
     @Override
-    public List<String> getHotPickCategoryList() {
+    public List<MainCategory> getHotPickCategoryList() {
         return hotPickTypeRepository.getHotPickCategoryList();
     }
 
     @Override
-    public List<String> getTrendSpotlightCategoryList() {
+    public List<MainCategory> getTrendSpotlightCategoryList() {
 
         return trendSpotlightTypeRepository.getTrendSpotlightCategoryList();
     }
 
     @Override
-    public List<String> getGenreGalaxyCategoryList() {
+    public List<MainCategory> getGenreGalaxyCategoryList() {
 
         return genreGalaxyTypeRepository.getGenreGalaxyCategoryList();
     }

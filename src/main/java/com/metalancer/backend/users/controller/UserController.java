@@ -40,7 +40,7 @@ public class UserController {
         return new BaseResponse<>(new AuthResponseDTO.userInfo(user.getUser()));
     }
 
-    @Operation(summary = "판매자 전환", description = "")
+    @Operation(summary = "판매자 전환", description = "호출하면 바로 판매자로 전환이 됩니다.")
     @ApiResponse(responseCode = "200", description = "전환 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @PatchMapping("/creator")
     public BaseResponse<Boolean> updateToCreator(

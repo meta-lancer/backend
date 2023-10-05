@@ -1,11 +1,28 @@
+buildscript {
+    ext {
+        // Querydsl 5.0 Unable to load class 'com.mysema.codegen.model.Type 에러 해결
+        queryDslVersion = "5.0.0"
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.0.8'
     id 'io.spring.dependency-management' version '1.1.0'
+    id "org.springdoc.openapi-gradle-plugin" version "1.6.0"
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.metalancer'
 version = '0.0.1-SNAPSHOT'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'src/main/generated']
+        }
+    }
+}
 
 java {
     sourceCompatibility = '17'
@@ -68,6 +85,29 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     testImplementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.145'
     implementation 'commons-io:commons-io:2.11.0'
+
+    // querydsl
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation 'com.querydsl:querydsl-apt'
+}
+
+def querydslDir = '$buildDir/generated/querydsl'
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = new File("src/main/generated")
+    querydslDefault = true
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
 
 tasks.named('test') {

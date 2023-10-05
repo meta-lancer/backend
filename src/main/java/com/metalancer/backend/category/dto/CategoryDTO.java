@@ -20,4 +20,18 @@ public class CategoryDTO {
             this.nameKor = nameKor;
         }
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class RequestCategory {
+
+        private String name;
+        private String nameKor;
+
+        @Builder
+        public RequestCategory(String name, String nameKor) {
+            this.name = name;
+            this.nameKor = nameKor;
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.metalancer.backend.category.controller;
 
 
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
+import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
 import com.metalancer.backend.category.service.CategoryListService;
 import com.metalancer.backend.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,4 +50,11 @@ public class CategoryListController {
             categoryListService.getGenreGalaxyCategoryList());
     }
 
+    @Operation(summary = "제작 요청-인기 분류", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @GetMapping("/request")
+    public BaseResponse<List<RequestCategory>> getRequestCategoryList() {
+        return new BaseResponse<>(
+            categoryListService.getRequestCategoryList());
+    }
 }

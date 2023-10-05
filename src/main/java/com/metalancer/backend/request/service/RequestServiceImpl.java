@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -19,7 +21,8 @@ public class RequestServiceImpl implements RequestService {
     private final ProductsRequestRepository productsRequestRepository;
 
     @Override
-    public Page<ProductsRequest> getProductsRequestList(Pageable adjustedPageable) {
-        return productsRequestRepository.findAll(adjustedPageable);
+    public Page<ProductsRequest> getProductsRequestList(List<String> requestTypeOptions,
+                                                        Pageable adjustedPageable) {
+        return productsRequestRepository.findAll(requestTypeOptions, adjustedPageable);
     }
 }

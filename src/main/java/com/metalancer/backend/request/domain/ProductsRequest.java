@@ -1,15 +1,18 @@
 package com.metalancer.backend.request.domain;
 
-import com.metalancer.backend.common.constants.ProductionRequestType;
-import java.time.LocalDateTime;
+import com.metalancer.backend.common.constants.ProductsRequestStatus;
 import lombok.Builder;
+
+import java.time.LocalDateTime;
 
 public class ProductsRequest {
 
     private final Long writerId;
     private final String nickname;
     private final String profileImg;
-    private final ProductionRequestType productionRequestType;
+    private final String productionRequestType;
+    private final String productionRequestTypeKor;
+    private final ProductsRequestStatus productsRequestStatus;
     private final String title;
     private final String content;
     private final String createdAtKor;
@@ -20,13 +23,15 @@ public class ProductsRequest {
 
     @Builder
     public ProductsRequest(Long writerId, String nickname, String profileImg,
-        ProductionRequestType productionRequestType, String title, String content,
-        String createdAtKor, String updatedAtKor,
-        LocalDateTime createdAt, LocalDateTime updatedAt) {
+                           String productionRequestType, String productionRequestTypeKor, ProductsRequestStatus productsRequestStatus, String title, String content,
+                           String createdAtKor, String updatedAtKor,
+                           LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.writerId = writerId;
         this.nickname = nickname;
         this.profileImg = profileImg;
         this.productionRequestType = productionRequestType;
+        this.productionRequestTypeKor = productionRequestTypeKor;
+        this.productsRequestStatus = productsRequestStatus;
         this.title = title;
         this.content = content;
         this.createdAtKor = createdAtKor;

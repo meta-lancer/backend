@@ -3,7 +3,7 @@ package com.metalancer.backend.common.constants;
 import lombok.Getter;
 
 @Getter
-public enum ProductionRequestType {
+public enum ProductsRequestStatus {
 
     Want("제작요청"),
     Wait("진행중"),
@@ -12,7 +12,7 @@ public enum ProductionRequestType {
 
     private final String korName;
 
-    private ProductionRequestType(String korName) {
+    private ProductsRequestStatus(String korName) {
         this.korName = korName;
     }
 }

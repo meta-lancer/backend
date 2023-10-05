@@ -89,4 +89,12 @@ public class OpenApiConfig {
             .pathsToMatch("/api/category/**")
             .build();
     }
+
+    @Bean
+    public GroupedOpenApi group8() {
+        return GroupedOpenApi.builder()
+            .group("제작요청")
+            .pathsToMatch("/api/request/**")
+            .build();
+    }
 }

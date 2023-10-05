@@ -19,5 +19,5 @@ public interface ProductsListService {
     Page<FilterAsset> getFilterAssetList(Integer sortOption, List<Integer> typeOption,
         List<Integer> genreOption, List<Integer> priceOption, Pageable adjustedPageable);
 
-    TrendSpotlightResponse getTrendSpotlight(String type, Pageable adjustedPageable);
+    TrendSpotlightResponse getTrendSpotlight(String platformType, Pageable adjustedPageable);
 }

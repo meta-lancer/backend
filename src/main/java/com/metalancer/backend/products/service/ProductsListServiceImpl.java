@@ -75,7 +75,9 @@ public class ProductsListServiceImpl implements ProductsListService {
     }
 
     @Override
-    public TrendSpotlightResponse getTrendSpotlight(String type, Pageable adjustedPageable) {
+    public TrendSpotlightResponse getTrendSpotlight(String platformType,
+        Pageable adjustedPageable) {
         return null;
     }
+
 }

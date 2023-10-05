@@ -50,13 +50,16 @@ public class ProductsListController {
 
     @Operation(summary = "메인페이지-Trend Spotlight", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/genre-galaxy")
+    @GetMapping("/trend-spotlight")
     public BaseResponse<TrendSpotlightResponse> getTrendSpotlight(
-        @Parameter(name = "종류", description = "") @RequestParam String type,
+        @Parameter(name = "종류", description =
+            "ALL(전체), VRCHAT(VR CHAT), MINECRAFT(마인크래프트), ZEPETO(제페토), "
+                + "ROBLOX(로블룩스), MIDDLEAGE(중세), FUTURE(미래), CARTOON(카툰), ACTUAL(실사)") @RequestParam String platformType,
         @Parameter(description = "페이징") Pageable pageable) {
-        log.info("종류 옵션-{},  페이징-{}", type, pageable);
+        log.info("종류 옵션-{},  페이징-{}", platformType, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
-        return new BaseResponse<>(productsListService.getTrendSpotlight(type, adjustedPageable));
+        return new BaseResponse<>(
+            productsListService.getTrendSpotlight(platformType, adjustedPageable));
     }
 
     @Operation(summary = "메인페이지-Genre Galaxy", description = "")

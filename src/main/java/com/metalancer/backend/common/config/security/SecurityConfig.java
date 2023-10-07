@@ -45,8 +45,8 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/index.html").denyAll()
             .requestMatchers("/api/user/**", "/h2-console", "/loginForm", "/login").authenticated()
             .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
-            .requestMatchers("/api/sell/**").hasAnyRole("SELLER", "ADMIN")
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/creators/**").hasAnyRole("SELLER", "ADMIN")
+//            .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().permitAll()
 
             .and()

@@ -1,6 +1,9 @@
 package com.metalancer.backend.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.metalancer.backend.admin.dto.CreatorList;
+import com.metalancer.backend.admin.dto.MemberList;
+import com.metalancer.backend.admin.dto.RegisterList;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
@@ -119,6 +122,52 @@ public class User extends BaseEntity implements Serializable {
             throw new BaseException((ErrorCode.LOGIN_DENIED));
         }
         ;
+    }
+
+    public MemberList toAdminMemberList() {
+        return MemberList.builder()
+            .memberId(id)
+            .email(email)
+            .mobile(mobile)
+            .name(name)
+            .username(username)
+            .job(job)
+            .loginType(loginType)
+            .role(role)
+            .status(getStatus())
+            .createdAt(getCreatedAt())
+            .updatedAt(getUpdatedAt())
+            .build();
+    }
+
+    public RegisterList toAdminRegisterList() {
+        return RegisterList.builder()
+            .memberId(id)
+            .email(email)
+            .mobile(mobile)
+            .name(name)
+            .username(username)
+            .loginType(loginType)
+            .status(getStatus())
+            .createdAt(getCreatedAt())
+            .updatedAt(getUpdatedAt())
+            .build();
+    }
+
+    public CreatorList toAdminCreatorList() {
+        return CreatorList.builder()
+            .memberId(id)
+            .email(email)
+            .mobile(mobile)
+            .name(name)
+            .username(username)
+            .job(job)
+            .loginType(loginType)
+            .role(role)
+            .status(getStatus())
+            .createdAt(getCreatedAt())
+            .updatedAt(getUpdatedAt())
+            .build();
     }
 
 }

@@ -1,7 +1,9 @@
 package com.metalancer.backend.admin.controller;
 
 
+import com.metalancer.backend.admin.dto.CreatorList;
 import com.metalancer.backend.admin.dto.MemberList;
+import com.metalancer.backend.admin.dto.RegisterList;
 import com.metalancer.backend.admin.service.AdminMemberService;
 import com.metalancer.backend.common.response.BaseResponse;
 import java.util.List;
@@ -22,6 +24,16 @@ public class AdminMemberController {
     @GetMapping("/list")
     public BaseResponse<List<MemberList>> getAdminMemberList() {
         return new BaseResponse<List<MemberList>>(adminMemberService.getAdminMemberList());
+    }
+
+    @GetMapping("/register")
+    public BaseResponse<List<RegisterList>> getAdminRegisterList() {
+        return new BaseResponse<List<RegisterList>>(adminMemberService.getAdminRegisterList());
+    }
+
+    @GetMapping("/creator")
+    public BaseResponse<List<CreatorList>> getAdminCreatorList() {
+        return new BaseResponse<List<CreatorList>>(adminMemberService.getAdminCreatorList());
     }
 
 }

@@ -52,7 +52,7 @@ public class SecurityConfig {
             .and()
             //일반 적인 로그인
             .formLogin()
-//                .loginPage("/loginForm") //로그인 페이지 url //미인증자일경우 해당 uri를 호
+            .loginPage("http://www.metaovis.com") //로그인 페이지 url //미인증자일경우 해당 uri를 호
             .loginProcessingUrl("/login") //이 url을 로그인 기능을 담당하게 함
             .defaultSuccessUrl("/") // 성공하면 이 url로 가게 해라
             //                .loginProcessingUrl(

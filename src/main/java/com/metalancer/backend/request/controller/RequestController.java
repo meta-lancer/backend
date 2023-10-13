@@ -6,6 +6,7 @@ import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.request.domain.ProductsRequest;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Create;
+import com.metalancer.backend.request.dto.ProductsRequestDTO.File;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Update;
 import com.metalancer.backend.request.service.RequestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,7 +54,7 @@ public class RequestController {
             requestService.getProductsRequestList(requestTypeOptions, adjustedPageable));
     }
 
-    @Operation(summary = "제작요청 게시판 - 게시판 등록", description = "")
+    @Operation(summary = "제작요청 게시판 - 게시판 등록", description = "파일 등록 하지않는다면 fileName, fileUrl null")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @PostMapping
     public BaseResponse<ProductsRequest> createRequest(
@@ -62,7 +63,7 @@ public class RequestController {
             requestService.createRequest(user, dto));
     }
 
-    @Operation(summary = "제작요청 게시판 - 게시판 수정", description = "")
+    @Operation(summary = "제작요청 게시판 - 게시판 수정", description = "파일 등록 하지않거나 삭제한다면 fileName, fileUrl null. 기존 유지는 기존 url, 파일명")
     @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @PatchMapping("/{requestId}")
     public BaseResponse<ProductsRequest> updateRequest(
@@ -95,4 +96,27 @@ public class RequestController {
             requestService.getRequestDetail(user, requestId));
     }
 
+    @Operation(summary = "제작요청 게시판 - 게시판 등록 시, 파일 업로드 url", description = "")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @GetMapping("/{requestId}/presigned-url")
+    public BaseResponse<String> getUploadRequestFilePreSignedUrl(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable(name = "제작요청 게시판 고유번호") Long requestId,
+        @Parameter(name = "파일명") @RequestParam String fileName
+    ) {
+        return new BaseResponse<>(
+            requestService.getUploadRequestFilePreSignedUrl(user, requestId, fileName));
+    }
+
+    @Operation(summary = "제작요청 게시판 - 파일 업로드 성공 시, 파일 정보 반영", description = "")
+    @ApiResponse(responseCode = "200", description = "반영 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PatchMapping("/{requestId}/file")
+    public BaseResponse<Boolean> updateRequestFile(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable(name = "제작요청 게시판 고유번호") Long requestId,
+        @RequestBody File dto
+    ) {
+        return new BaseResponse<>(
+            requestService.updateRequestFile(user, requestId, dto));
+    }
 }

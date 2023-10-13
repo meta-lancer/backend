@@ -1,6 +1,5 @@
 package com.metalancer.backend.request.entity;
 
-import com.metalancer.backend.category.entity.ProductsRequestTypeEntity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ProductsRequestStatus;
 import com.metalancer.backend.common.utils.Time;
@@ -40,9 +39,6 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User writer;
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private ProductsRequestTypeEntity productionRequestType;
     @Column(nullable = false)
     String title;
     @Column(nullable = false)
@@ -51,21 +47,27 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private ProductsRequestStatus productsRequestStatus;
 
+    private String fileUrl;
+
+    private String fileName;
+
     @Builder
-    public ProductsRequestEntity(User writer, ProductsRequestTypeEntity productionRequestType,
+    public ProductsRequestEntity(User writer,
         String title, String content, ProductsRequestStatus productsRequestStatus) {
         this.writer = writer;
-        this.productionRequestType = productionRequestType;
         this.title = title;
         this.content = content;
         this.productsRequestStatus = productsRequestStatus;
     }
 
+    public void setFile(String fileUrl, String fileName) {
+        this.fileUrl = fileUrl;
+        this.fileName = fileName;
+    }
+
     public ProductsRequest toDomain() {
         return ProductsRequest.builder().writerId(writer.getId()).nickname(writer.getName())
             .profileImg("")
-            .productionRequestType(productionRequestType.getName())
-            .productionRequestTypeKor(productionRequestType.getNameKor())
             .productsRequestStatus(productsRequestStatus)
             .title(title).content(content).createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
             .createdAtKor(Time.convertDateToKorForRequest(getCreatedAt()))
@@ -73,9 +75,8 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
             .build();
     }
 
-    public void update(ProductsRequestTypeEntity productionRequestType,
+    public void update(
         String title, String content, ProductsRequestStatus productsRequestStatus) {
-        this.productionRequestType = productionRequestType;
         this.title = title;
         this.content = content;
         this.productsRequestStatus = productsRequestStatus;
@@ -83,5 +84,9 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
 
     public void deleteRequest() {
         delete();
+    }
+
+    public void addViewCnt() {
+        this.viewCnt += 1;
     }
 }

@@ -118,4 +118,15 @@ public class S3Service {
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
             .toString();
     }
+
+    public String getRequestFilePresignedUrl(Long requestId, String fileName) {
+        String ext = FilenameUtils.getExtension(fileName);
+        String prefix = "request/" + requestId + "/file";
+        String newFileName = UUID.randomUUID().toString().substring(0, 8) + "." + ext;
+        newFileName = prefix + "/" + newFileName;
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(
+            newFileName);
+        URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
 }

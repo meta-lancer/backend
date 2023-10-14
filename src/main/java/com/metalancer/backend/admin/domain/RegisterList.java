@@ -1,4 +1,4 @@
-package com.metalancer.backend.admin.dto;
+package com.metalancer.backend.admin.domain;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;

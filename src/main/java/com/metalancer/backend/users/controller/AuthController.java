@@ -3,7 +3,6 @@ package com.metalancer.backend.users.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
-import com.metalancer.backend.users.dto.AuthRequestDTO;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.service.AuthService;
@@ -60,20 +59,20 @@ public class AuthController {
         return session.getAttribute(key);
     }
 
-    @Operation(summary = "이메일 로그인", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @PostMapping("/login")
-    public BaseResponse<Boolean> emailLogin(HttpSession session,
-        @RequestBody AuthRequestDTO.LoginRequest dto) {
-        return new BaseResponse<Boolean>(authService.emailLogin(session, dto));
-    }
+//    @Operation(summary = "이메일 로그인", description = "")
+//    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+//    @PostMapping("/login")
+//    public BaseResponse<Boolean> emailLogin(HttpSession session,
+//        @RequestBody AuthRequestDTO.LoginRequest dto) {
+//        return new BaseResponse<Boolean>(authService.emailLogin(session, dto));
+//    }
 
-    @Operation(summary = "이메일 로그아웃", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @PostMapping("/logout")
-    public BaseResponse<Boolean> emailLogout(HttpSession session) {
-        return new BaseResponse<Boolean>(authService.emailLogout(session));
-    }
+//    @Operation(summary = "이메일 로그아웃", description = "")
+//    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+//    @PostMapping("/logout")
+//    public BaseResponse<Boolean> emailLogout(HttpSession session) {
+//        return new BaseResponse<Boolean>(authService.emailLogout(session));
+//    }
 
 
 }

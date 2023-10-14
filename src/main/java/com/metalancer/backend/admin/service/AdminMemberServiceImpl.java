@@ -1,17 +1,22 @@
 package com.metalancer.backend.admin.service;
 
-import com.metalancer.backend.admin.dto.CreatorList;
-import com.metalancer.backend.admin.dto.MemberList;
-import com.metalancer.backend.admin.dto.RegisterList;
+import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.MemberList;
+import com.metalancer.backend.admin.domain.RegisterList;
+import com.metalancer.backend.admin.dto.AdminMemberDTO.Approve;
+import com.metalancer.backend.admin.dto.AdminMemberDTO.UpdateUser;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,5 +64,40 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return userRepository.findAll().stream().map(User::toAdminCreatorList)
             .filter(user -> user.getRole().equals(Role.ROLE_SELLER))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public String approveUserList(Approve dto) {
+        List<User> userList = new ArrayList<>();
+        for (Long userId : dto.getUserIdList()) {
+            Optional<User> user = userRepository.findById(userId);
+            user.ifPresent(userList::add);
+        }
+        return adminApproveMember(userList);
+    }
+
+    @Override
+    public MemberList updateMember(UpdateUser dto) {
+        User user = userRepository.findById(dto.getMemberId()).orElseThrow(
+            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+        );
+        user.update(dto.getName(), dto.getUsername(), dto.getMobile(), dto.getJob(), dto.getRole(),
+            dto.getStatus());
+        User updatedUser = userRepository.save(user);
+        return updatedUser.toAdminMemberList();
+    }
+
+    private String adminApproveMember(List<User> userList) {
+        int count = 0;
+        for (User user : userList) {
+            user.setActive();
+            Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApproved(
+                user.getEmail(), false);
+            if (approveLink.isPresent()) {
+                approveLink.get().approve();
+                count++;
+            }
+        }
+        return count + "명 승인 완료했습니다.";
     }
 }

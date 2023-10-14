@@ -1,9 +1,9 @@
 package com.metalancer.backend.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.metalancer.backend.admin.dto.CreatorList;
-import com.metalancer.backend.admin.dto.MemberList;
-import com.metalancer.backend.admin.dto.RegisterList;
+import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.MemberList;
+import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
@@ -68,6 +68,22 @@ public class User extends BaseEntity implements Serializable {
         this.name = name;
         this.username = username;
         this.job = job;
+    }
+
+    public void update(String name, String username, String mobile, String job,
+        Role role,
+        DataStatus status) {
+        this.mobile = mobile;
+        this.name = name;
+        this.username = username;
+        this.job = job;
+        this.role = role;
+        switch (status) {
+            case ACTIVE -> active();
+            case DELETED -> delete();
+            case PENDING -> pend();
+            case BANNED -> prohibit();
+        }
     }
 
     public void setNormalUsername() {

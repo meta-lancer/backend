@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<div th:style="${'width:500px; height: 300px; margin: 0 auto'}">
+    <H2 th:style="${'text-align: center'}">가입승인 완료 링크입니다.</H2>
+    <span>안녕하세요! 메타랜서입니다. <br/>다음 링크를 클릭해서 가입을 완료해주세요.</span>
+    <br/> <br/>
+    <div
+            th:style="${'width:100%; height: 50px; background: #E0E0E0; display: flex; align-items: center; justify-content: center'}">
+        <div>
+    <span th:style="${'text-align: center'}">
+    <a th:href="${url}" th:text="${url}"></a>
+      </span>
+        </div>
+    </div>
+    <br/>
+    <hr/>
+
+    <div th:style="${'display: flex; gap: 20px; margin-top: 20px'}">
+        <div th:style="${'margin: auto'}">
+            <img
+                    alt="첨부이미지"
+                    src=""/>
+        </div>
+        <div th:style="${'width: 350px'}">본 메일은 발신전용입니다. 문의 또는 오류사항이 생기면 metalancer23@gmail.com로 메일
+            보내주세요.
+            <br/><span>
+    Copyright 2023. METALANCER Company. All Rights Reserved.
+  </span></div>
+    </div>
+</div>
+</body>
+</html>

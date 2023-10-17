@@ -1,7 +1,9 @@
 package com.metalancer.backend.common.constants;
 
 import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
+import static com.metalancer.backend.common.constants.HttpStatus.CREATED;
 import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.FORBIDDEN;
 import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
 import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
 import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
@@ -15,16 +17,17 @@ public enum ErrorCode {
     /**
      * 회원가입 및 로그인
      */
-    SIGNUP_CREATED_OK(SUCCESS, "A001", "회원가입 성공"),
-    SIGNUP_COMPLETE(DUPLICATED_VALUE, "A002", "이미 존재하는 회원"),
+    SIGNUP_CREATED_OK(CREATED, "A001", "회원가입 성공"),
+    SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A002", "이미 존재하는 회원"),
     SIGNUP_DUPLICATED_ID(DUPLICATED_VALUE, "A003", "ID 중복"),
     SIGNUP_DUPLICATED_USERNAME(DUPLICATED_VALUE, "A004", "USERNAME 중복"),
+    SIGNUP_FAILED(BAD_REQUEST, "A005", "회원가입 실패"),
 
     LOGIN_OK(SUCCESS, "B001", "로그인 성공"),
-    LOGIN_NOT_FOUND_ID(NOT_FOUND_VALUE, "B002", "로그인 실패"),
-    LOGIN_NOT_FOUND_PW(NOT_FOUND_VALUE, "B003", "로그인 실패"),
-    LOGOUT_OK(SUCCESS, "B004", "로그아웃 성공"),
-    LOGOUT_STATE(UNAUTHORIZED, "B005", "로그아웃 상태"),
+    LOGIN_NOT_FOUND_ID_PW(NOT_FOUND_VALUE, "B002", "아이디 존재하지않거나 비밀번호가 일치하지않습니다."),
+    LOGOUT_OK(SUCCESS, "B003", "로그아웃 성공"),
+    LOGOUT_STATE(UNAUTHORIZED, "B004", "로그아웃 상태"),
+    LOGIN_DENIED(NOT_FOUND_VALUE, "B005", "로그인 불가"),
 
     /**
      * 회원정보
@@ -41,6 +44,20 @@ public enum ErrorCode {
      */
     AUTHORITY_HAVE(SUCCESS, "E001", "수정/삭제 권한이 있습니다"),
     AUTHORITY_NOT_HAVE(NOT_FOUND_VALUE, "E002", "수정/삭제 권한이 없습니다."),
+    INVALID_ROLE_ACCESS(FORBIDDEN, "E003", "올바르지 않은 권한 접근입니다."),
+
+    /**
+     * 포트원 결제
+     */
+    PORTONE_ERROR(NOT_FOUND_VALUE, "F002", "포트원 api 호출에 실패했습니다."),
+    ILLEGAL_ORDER_STATUS(INVALID_VALUE, "F003", "잘못된 주문 상태 입니다."),
+    FAIL_TO_ORDER(INVALID_VALUE, "F004", "주문에 실패했습니다."),
+
+    /**
+     * 이미지
+     */
+    IMAGES_UPLOAD_FAILED(UNEXPECTED_ERROR, "G002", "이미지 업로드에 실패했습니다"),
+    FILES_UPLOAD_FAILED(UNEXPECTED_ERROR, "G003", "파일 업로드에 실패했습니다"),
 
     /**
      * 토큰
@@ -54,9 +71,13 @@ public enum ErrorCode {
 
     INVALID_PARAMETER(BAD_REQUEST, "Z001", "요청값이 올바르지 않습니다."),
     NOT_FOUND(NOT_FOUND_VALUE, "Z002", "존재하지 않습니다."),
-    ILLEGAL_STATUS(INVALID_VALUE, "Z003", "잘못된 상태 입니다."),
+    ILLEGAL_DATA_STATUS(INVALID_VALUE, "Z003", "잘못된 데이터 상태 입니다."),
     SYSTEM_ERROR(UNEXPECTED_ERROR, "Z004", "일시적 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
 
+    STATUS_DELETED(INVALID_VALUE, "Z101", "삭제된 상태입니다."),
+    STATUS_PENDING(INVALID_VALUE, "Z102", "승인대기 상태입니다."),
+    STATUS_BANNED(INVALID_VALUE, "Z103", "정지된 상태입니다."),
+    ROLE_INVALID(INVALID_VALUE, "Z104", "올바르지않은 권한입니다."),
     /**
      * 잘못된 ExceptionCode
      */

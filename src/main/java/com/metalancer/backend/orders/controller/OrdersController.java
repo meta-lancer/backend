@@ -68,7 +68,7 @@ public class OrdersController {
         @RequestBody OrdersRequestDTO.CreateOrder dto) {
         log.info("주문서 만들기: {}", dto);
         return new BaseResponse<>(
-            ordersService.createOrder(user != null ? user.getUser() : null, dto));
+            ordersService.createOrder(user.getUser(), dto));
     }
 
 
@@ -110,7 +110,7 @@ public class OrdersController {
     ) throws Exception {
         log.info("결제 처리 완료 요청 객체: {}", dto);
         return new BaseResponse<PaymentResponse>(
-            ordersService.completePayment(user != null ? user.getUser() : null, dto));
+            ordersService.completePayment(user.getUser(), dto));
     }
 
     @Operation(summary = "결제 완료 처리 웹훅(포트원으로부터)", description = "")
@@ -131,7 +131,7 @@ public class OrdersController {
     ) throws Exception {
         log.info("결제 전체 취소 요청 객체: {}", dto);
         return new BaseResponse<PaymentResponse>(
-            ordersService.cancelAllPayment(user != null ? user.getUser() : null, dto));
+            ordersService.cancelAllPayment(user.getUser(), dto));
     }
 
 //    @PostMapping("/cancel")

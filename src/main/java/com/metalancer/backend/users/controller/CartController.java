@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,10 +38,12 @@ public class CartController {
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping
     public BaseResponse<Page<Cart>> getAllCart(
+        HttpSession session,
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("로그인되어있는 유저: {}", user);
-
+        log.info("세션: {}", session);
+        log.info("세션 LOGIN_USER: {}", session.getAttribute("LOGIN_USER"));
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(cartService.getAllCart(user.getUser(), adjustedPageable));
     }
@@ -53,7 +56,7 @@ public class CartController {
         @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
         return new BaseResponse<>(
-            cartService.createCart(user != null ? user.getUser() : null, assetId));
+            cartService.createCart(user.getUser(), assetId));
     }
 
     @Operation(summary = "장바구니 삭제", description = "")
@@ -64,7 +67,7 @@ public class CartController {
         @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
         return new BaseResponse<>(
-            cartService.deleteCart(user != null ? user.getUser() : null, assetId));
+            cartService.deleteCart(user.getUser(), assetId));
     }
 
     @Operation(summary = "장바구니 전체 삭제", description = "")

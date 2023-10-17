@@ -5,7 +5,6 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
-import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.exception.OrderStatusException;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.OrderProducts;
@@ -68,17 +67,12 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
-        if (user == null) {
-            user = userRepository.findById(1L).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND)
-            );
-        }
         String orderNo = createOrderNo();
         OrdersEntity createdOrdersEntity = OrdersEntity.builder().orderer(user)
             .orderNo(orderNo)
             .totalPrice(dto.getTotalPrice())
             .totalPaymentPrice(dto.getTotalPaymentPrice())
-            .totalPoint(dto.getTotalPoint())
+//            .totalPoint(dto.getTotalPoint())
             .build();
         ordersRepository.save(createdOrdersEntity);
         int index = 1;
@@ -151,11 +145,6 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public PaymentResponse completePayment(User user, CompleteOrder dto)
         throws IamportResponseException, IOException {
-        if (user == null) {
-            user = userRepository.findById(1L).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND)
-            );
-        }
         String orderNo = dto.getMerchantUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
         DataStatus dataStatus = foundOrdersEntity.getStatus();

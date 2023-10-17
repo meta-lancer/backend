@@ -57,6 +57,6 @@ public class UserController {
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         log.info("로그인되어있는 유저: {}", user);
         return new BaseResponse<>(
-            userService.getPayedAssetList(user != null ? user.getUser() : null, adjustedPageable));
+            userService.getPayedAssetList(user.getUser(), adjustedPageable));
     }
 }

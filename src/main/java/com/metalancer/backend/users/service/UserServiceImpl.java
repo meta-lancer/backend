@@ -1,9 +1,7 @@
 package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
-import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
-import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.PayedAssetsRepository;
@@ -40,11 +38,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<PayedAssets> getPayedAssetList(User user, Pageable pageable) {
-        if (user == null) {
-            user = userRepository.findById(1L).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND)
-            );
-        }
         return payedAssetsRepository.findAllPayedAssetList(user, pageable);
     }
 }

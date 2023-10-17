@@ -3,6 +3,7 @@ package com.metalancer.backend.category.controller;
 
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
+import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.service.CategoryListService;
 import com.metalancer.backend.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +38,7 @@ public class CategoryListController {
     @Operation(summary = "메인페이지-Trend Spotlight 카테고리", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/trend-spotlight")
-    public BaseResponse<List<MainCategory>> getTrendSpotlightCategoryList() {
+    public BaseResponse<List<TrendSpotlightCategory>> getTrendSpotlightCategoryList() {
         return new BaseResponse<>(
             categoryListService.getTrendSpotlightCategoryList());
     }

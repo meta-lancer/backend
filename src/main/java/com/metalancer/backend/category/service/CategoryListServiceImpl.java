@@ -2,6 +2,7 @@ package com.metalancer.backend.category.service;
 
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
+import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.repository.GenreGalaxyTypeRepository;
 import com.metalancer.backend.category.repository.HotPickTypeRepository;
 import com.metalancer.backend.category.repository.ProductsRequestTypeRepository;
@@ -30,8 +31,7 @@ public class CategoryListServiceImpl implements CategoryListService {
     }
 
     @Override
-    public List<MainCategory> getTrendSpotlightCategoryList() {
-
+    public List<TrendSpotlightCategory> getTrendSpotlightCategoryList() {
         return trendSpotlightTypeRepository.getTrendSpotlightCategoryList();
     }
 

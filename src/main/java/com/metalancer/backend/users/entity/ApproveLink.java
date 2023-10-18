@@ -58,4 +58,5 @@ public class ApproveLink extends BaseEntity {
         this.isApproved = true;
         this.approvedAt = LocalDateTime.now();
     }
+    
 }

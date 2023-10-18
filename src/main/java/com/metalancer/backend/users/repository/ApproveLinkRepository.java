@@ -8,7 +8,7 @@ public interface ApproveLinkRepository extends JpaRepository<ApproveLink, Long> 
 
     Optional<ApproveLink> findByEmail(String email);
 
-    Optional<ApproveLink> findByEmailAndApproved(String email, Boolean approved);
+    Optional<ApproveLink> findByEmailAndApprovedAtIsNull(String email);
 
     Optional<ApproveLink> findByApproveLink(String approveLink);
 }

@@ -39,6 +39,6 @@ public class InterestsEntity extends BaseTimeEntity implements Serializable {
     }
 
     public Interests toDomain() {
-        return Interests.builder().interestsName(name).ord(ord).build();
+        return Interests.builder().interestsId(id).interestsName(name).ord(ord).build();
     }
 }

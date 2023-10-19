@@ -46,8 +46,13 @@ public class User extends BaseEntity implements Serializable {
     private String email;
     private String name;
     private String username;
+    private String nickname;
     private String mobile;
     private String job;
+    private String link = "";
+    private String introduction = "";
+    private String careerIntroduction = "";
+    private String profileImg = "https://metaovis-user.s3.ap-northeast-2.amazonaws.com/default_profileImg.png";
     @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER;
     @JsonIgnore
@@ -84,6 +89,26 @@ public class User extends BaseEntity implements Serializable {
             case PENDING -> pend();
             case BANNED -> prohibit();
         }
+    }
+
+    public void setCareerIntroduction(String careerIntroduction) {
+        this.careerIntroduction = careerIntroduction;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void setProfileImg(String profileImg) {
+        this.profileImg = profileImg;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public void setNormalUsername() {

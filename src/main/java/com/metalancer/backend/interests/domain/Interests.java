@@ -1,22 +1,19 @@
 package com.metalancer.backend.interests.domain;
 
-import static lombok.AccessLevel.PROTECTED;
-
-import jakarta.persistence.Embeddable;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Embeddable
-@EqualsAndHashCode
-@NoArgsConstructor(access = PROTECTED)
+
+@Getter
 public class Interests {
 
-    private String interestsName;
-    private int ord;
+    private final Long interestsId;
+    private final String interestsName;
+    private final int ord;
 
     @Builder
-    public Interests(String interestsName, int ord) {
+    public Interests(Long interestsId, String interestsName, int ord) {
+        this.interestsId = interestsId;
         this.interestsName = interestsName;
         this.ord = ord;
     }

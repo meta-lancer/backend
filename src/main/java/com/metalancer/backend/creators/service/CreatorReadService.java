@@ -2,6 +2,7 @@ package com.metalancer.backend.creators.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
+import com.metalancer.backend.creators.domain.ManageAsset;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +16,6 @@ public interface CreatorReadService {
     String getCreatorPortfolio(Long creatorId);
 
     Page<CreatorAssetList> getMyRegisteredAssets(PrincipalDetails user, Pageable pageable);
+
+    Page<ManageAsset> getMyManageAssetList(PrincipalDetails user, Pageable pageable);
 }

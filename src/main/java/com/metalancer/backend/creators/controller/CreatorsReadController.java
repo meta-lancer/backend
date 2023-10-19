@@ -5,6 +5,7 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
+import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.service.CreatorReadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +41,17 @@ public class CreatorsReadController {
         pageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<Page<CreatorAssetList>>(
             creatorReadService.getMyRegisteredAssets(user, pageable));
+    }
+
+    @Operation(summary = "에셋 관리 목록 조회", description = "파라미터에 page=1&size=5&sort=createdAt,desc 처럼 붙여주셔야 최근 등록일 순으로 정렬됩니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @GetMapping("/creator/management")
+    public BaseResponse<Page<ManageAsset>> getMyManageAssetList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        Pageable pageable) {
+        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        return new BaseResponse<Page<ManageAsset>>(
+            creatorReadService.getMyManageAssetList(user, pageable));
     }
 
     @Operation(summary = "크리에이터 정보 조회", description = "")

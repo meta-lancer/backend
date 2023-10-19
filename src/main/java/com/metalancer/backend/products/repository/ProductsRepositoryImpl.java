@@ -96,5 +96,10 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         productsJpaRepository.save(createdProductsEntity);
     }
 
+    @Override
+    public long countAllByCreatorEntity(CreatorEntity creatorEntity) {
+        return productsJpaRepository.countAllByCreatorEntity(creatorEntity);
+    }
+
     ;
 }

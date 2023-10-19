@@ -11,4 +11,7 @@ public interface ProductsWishJpaRepository extends JpaRepository<ProductsWishEnt
 
     Optional<ProductsWishEntity> findByUserAndProductsEntityAndStatus(User user,
         ProductsEntity productsEntity, DataStatus status);
+
+    int countAllByUserAndProductsEntityAndStatus(User user, ProductsEntity productsEntity,
+        DataStatus status);
 }

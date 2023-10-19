@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
+import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.users.entity.CreatorEntity;
@@ -173,6 +174,11 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     public HotPickAsset toHotPickAsset() {
         return HotPickAsset.builder().assetId(id).title(title).price(price).assetUrl("").build();
+    }
+
+    public ManageAsset toManageAsset() {
+        return ManageAsset.builder().productsId(id).thumbnail(thumbnail).title(title).price(price)
+            .viewCnt(viewCnt).build();
     }
 
     public void setSalePrice(int salePrice) {

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Long> {
 
+    int countAllByCreatorEntity(CreatorEntity creatorEntity);
+
     Page<ProductsEntity> findAllByCreatorEntity(CreatorEntity creatorEntity, Pageable pageable);
 
     Page<ProductsEntity> findAllByCreatorEntityAndStatus(CreatorEntity creatorEntity,

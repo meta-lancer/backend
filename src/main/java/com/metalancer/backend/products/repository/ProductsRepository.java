@@ -34,4 +34,6 @@ public interface ProductsRepository {
     Page<HotPickAsset> findChargeProductList(PeriodType period, Pageable pageable);
 
     void save(ProductsEntity createdProductsEntity);
+
+    long countAllByCreatorEntity(CreatorEntity creatorEntity);
 }

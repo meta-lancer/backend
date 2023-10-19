@@ -9,4 +9,7 @@ public interface ProductsWishRepository {
 
     Optional<ProductsWishEntity> findByUserAndProduct(User foundUser,
         ProductsEntity foundProductsEntity);
+
+    int countAllByUserAndProduct(User foundUser,
+        ProductsEntity foundProductsEntity);
 }

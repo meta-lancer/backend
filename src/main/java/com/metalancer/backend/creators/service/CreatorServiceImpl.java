@@ -178,7 +178,7 @@ public class CreatorServiceImpl implements CreatorService {
             }
             productsThumbnailRepository.saveAll(productsThumbnailEntities);
         } catch (Exception e) {
-            log.info(e.getLocalizedMessage());
+            log.error(e.getLocalizedMessage() + ": ", e);
             throw new BaseException(ErrorCode.THUMBNAILS_UPLOAD_FAILED);
         }
     }
@@ -200,7 +200,7 @@ public class CreatorServiceImpl implements CreatorService {
             }
             productsViewsRepository.saveAll(productsViewsEntities);
         } catch (Exception e) {
-            log.info(e.getLocalizedMessage());
+            log.error(e.getLocalizedMessage() + ": ", e);
             throw new BaseException(ErrorCode.VIEWS_UPLOAD_FAILED);
         }
     }

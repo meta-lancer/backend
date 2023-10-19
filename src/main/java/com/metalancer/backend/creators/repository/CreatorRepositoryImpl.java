@@ -20,4 +20,11 @@ public class CreatorRepositoryImpl implements CreatorRepository {
             () -> new BaseException(ErrorCode.NOT_FOUND)
         );
     }
+
+    @Override
+    public CreatorEntity findByCreatorId(Long creatorId) {
+        return creatorJpaRepository.findById(creatorId).orElseThrow(
+            () -> new BaseException(ErrorCode.NOT_FOUND)
+        );
+    }
 }

@@ -1,6 +1,7 @@
 package com.metalancer.backend.products.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
+import com.metalancer.backend.creators.domain.CreatorAssetList;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,5 +57,11 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
 
     public void success() {
         this.success = true;
+    }
+
+    public CreatorAssetList toCreatorAssetList() {
+        return CreatorAssetList.builder().thumbnail(productsEntity.getThumbnail()).title(
+            productsEntity.getTitle()).price(productsEntity.getPrice()).productsId(
+            productsEntity.getId()).build();
     }
 }

@@ -62,7 +62,7 @@ public class UserController {
 
     @Operation(summary = "마이페이지 - 기존 정보 조회 수정", description = "")
     @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/career")
+    @PatchMapping("/basic")
     public BaseResponse<UserResponseDTO.BasicInfo> updateBasicInfo(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateBasicInfo dto

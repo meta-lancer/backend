@@ -60,12 +60,11 @@ public class PayedAssetsEntity extends BaseEntity implements Serializable {
     @Builder
     public PayedAssetsEntity(User user, ProductsEntity products,
         OrderProductsEntity orderProductsEntity, OrderPaymentEntity orderPaymentEntity,
-        Integer downloadedCnt, String downloadLink) {
+        String downloadLink) {
         this.user = user;
         this.products = products;
         this.orderProductsEntity = orderProductsEntity;
         this.orderPaymentEntity = orderPaymentEntity;
-        this.downloadedCnt = downloadedCnt;
         this.downloadLink = downloadLink;
     }
 

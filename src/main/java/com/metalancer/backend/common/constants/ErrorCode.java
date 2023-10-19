@@ -34,6 +34,7 @@ public enum ErrorCode {
      */
     USER_GET_OK(SUCCESS, "C001", "회원정보 있음"),
     USER_NOT_FOUND(NOT_FOUND_VALUE, "C002", "회원정보 없음"),
+    NICKNAME_UPDATE_COUNT_PROHIBIT(BAD_REQUEST, "C003", "닉네임을 1번 변경한 적이 있습니다."),
 
     USER_UPDATE_OK(SUCCESS, "D001", "회원정보 수정 성공"),
     USER_UPDATE_INVALID(NOT_FOUND_VALUE, "D002", "회원정보 수정 실패"),

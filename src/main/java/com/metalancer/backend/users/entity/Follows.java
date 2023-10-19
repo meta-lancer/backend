@@ -36,5 +36,5 @@ public class Follows extends BaseEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
-    private Creator creator;
+    private CreatorEntity creatorEntity;
 }

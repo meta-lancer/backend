@@ -6,5 +6,11 @@ import java.util.List;
 
 public interface CareerRepository {
 
+    CareerEntity findByIdAndUser(Long careerId, User foundUser);
+
     List<CareerEntity> findAllByUser(User foundUser);
+
+    void deleteCareer(Long careerId, User user);
+
+    void save(CareerEntity createdCareerEntity);
 }

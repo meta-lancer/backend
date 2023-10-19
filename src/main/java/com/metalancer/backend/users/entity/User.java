@@ -11,6 +11,8 @@ import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
+import com.metalancer.backend.interests.domain.Interests;
+import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,6 +22,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -47,6 +51,7 @@ public class User extends BaseEntity implements Serializable {
     private String name;
     private String username;
     private String nickname;
+    private LocalDateTime nicknameUpdatedAt;
     private String mobile;
     private String job;
     private String link = "";
@@ -211,4 +216,31 @@ public class User extends BaseEntity implements Serializable {
             .build();
     }
 
+    public void updateBasicInfo(String profileImg, String nickname, String introduction,
+        String link, String job) {
+        setNicknameUpdatedAt(this.nickname, nickname);
+        this.profileImg = profileImg;
+        this.nickname = nickname;
+        this.introduction = introduction;
+        this.link = link;
+        this.job = job;
+    }
+
+    public BasicInfo toBasicInfo(List<Interests> interests) {
+        return BasicInfo.builder().profileImg(profileImg)
+            .nickname(nickname)
+            .email(email)
+            .job(job).link(link)
+            .introduction(introduction).interestsList(interests).build();
+    }
+
+    public boolean checkNicknameUpdatedBefore() {
+        return nicknameUpdatedAt != null;
+    }
+
+    public void setNicknameUpdatedAt(String originNickname, String newNickname) {
+        if (!originNickname.equals(newNickname)) {
+            this.nicknameUpdatedAt = LocalDateTime.now();
+        }
+    }
 }

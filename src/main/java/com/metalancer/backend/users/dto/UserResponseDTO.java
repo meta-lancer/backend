@@ -35,13 +35,13 @@ public class UserResponseDTO {
     }
 
     @Data
-    public static class IntroAndExperience {
+    public static class IntroAndCareer {
 
         private String introduction;
         private List<Career> careerList;
 
         @Builder
-        public IntroAndExperience(String introduction, List<Career> careerList) {
+        public IntroAndCareer(String introduction, List<Career> careerList) {
             this.introduction = introduction;
             this.careerList = careerList;
         }

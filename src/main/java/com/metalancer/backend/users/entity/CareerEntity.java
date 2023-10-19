@@ -13,6 +13,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -41,11 +42,29 @@ public class CareerEntity extends BaseTimeEntity implements Serializable {
     private LocalDateTime beginAt;
     private LocalDateTime endAt;
 
+    @Builder
+    public CareerEntity(User user, String title, String description, LocalDateTime beginAt,
+        LocalDateTime endAt) {
+        this.user = user;
+        this.title = title;
+        this.description = description;
+        this.beginAt = beginAt;
+        this.endAt = endAt;
+    }
+
     public Career toDomain() {
         return Career.builder().careerId(id).title(title)
             .description(description)
             .beginAt(beginAt)
             .endAt(endAt).build();
+    }
+
+    public void update(String title, String description, LocalDateTime beginAt,
+        LocalDateTime endAt) {
+        this.title = title;
+        this.description = description;
+        this.beginAt = beginAt;
+        this.endAt = endAt;
     }
 
 }

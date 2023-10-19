@@ -4,7 +4,9 @@ package com.metalancer.backend.users.controller;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
+import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserResponseDTO;
+import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
 import com.metalancer.backend.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,8 +16,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,13 +60,67 @@ public class UserController {
         return new BaseResponse<UserResponseDTO.BasicInfo>(userService.getBasicInfo(user));
     }
 
+    @Operation(summary = "마이페이지 - 기존 정보 조회 수정", description = "")
+    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @GetMapping("/career")
+    public BaseResponse<UserResponseDTO.BasicInfo> updateBasicInfo(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.UpdateBasicInfo dto
+    ) {
+        return new BaseResponse<UserResponseDTO.BasicInfo>(
+            userService.updateBasicInfo(user, dto));
+    }
+
+
     @Operation(summary = "마이페이지 - 소개 및 업무경험 조회", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/experience")
-    public BaseResponse<UserResponseDTO.IntroAndExperience> getIntroAndExperience(
+    @GetMapping("/career")
+    public BaseResponse<IntroAndCareer> getIntroAndCareer(
         @AuthenticationPrincipal PrincipalDetails user) {
-        return new BaseResponse<UserResponseDTO.IntroAndExperience>(
-            userService.getIntroAndExperience(user));
+        return new BaseResponse<IntroAndCareer>(
+            userService.getIntroAndCareer(user));
+    }
+
+    @Operation(summary = "마이페이지 - 소개 및 업무경험 수정(자기소개만 수정)", description = "")
+    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PatchMapping("/career/intro")
+    public BaseResponse<IntroAndCareer> updateIntro(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.UpdateCareerIntroRequest dto
+    ) {
+        return new BaseResponse<IntroAndCareer>(
+            userService.updateCareerIntro(user, dto));
+    }
+
+    @Operation(summary = "마이페이지 - 업무경험 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PostMapping("/career")
+    public BaseResponse<IntroAndCareer> createCareer(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.CreateCareerRequest dto) {
+        return new BaseResponse<IntroAndCareer>(
+            userService.createCareer(user, dto));
+    }
+
+    @Operation(summary = "마이페이지 - 업무경험 수정", description = "")
+    @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PatchMapping("/career/{careerId}")
+    public BaseResponse<IntroAndCareer> updateCareer(
+        @PathVariable Long careerId,
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.UpdateCareerRequest dto) {
+        return new BaseResponse<IntroAndCareer>(
+            userService.updateCareer(careerId, user, dto));
+    }
+
+    @Operation(summary = "마이페이지 - 업무경험 삭제", description = "")
+    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @DeleteMapping("/career/{careerId}")
+    public BaseResponse<IntroAndCareer> deleteCareer(
+        @PathVariable Long careerId,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<IntroAndCareer>(
+            userService.deleteCareer(careerId, user));
     }
 
 //    @Operation(summary = "마이페이지 - 유저 결제 목록 조회", description = "")

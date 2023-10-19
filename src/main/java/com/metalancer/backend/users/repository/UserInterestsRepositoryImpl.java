@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.interests.domain.Interests;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
 import java.util.List;
@@ -21,5 +22,25 @@ public class UserInterestsRepositoryImpl implements UserInterestsRepository {
     @Override
     public List<UserInterestsEntity> findAllByUser(User user) {
         return userInterestsJpaRepository.findAllByUserAndStatus(user, DataStatus.ACTIVE);
+    }
+
+    @Override
+    public List<Interests> findAllDomainByUser(User user) {
+        List<UserInterestsEntity> userInterestsEntities = userInterestsJpaRepository.findAllByUserAndStatus(
+            user, DataStatus.ACTIVE);
+        return userInterestsEntities.stream()
+            .map(UserInterestsEntity::toDomain).toList();
+    }
+
+    @Override
+    public void deleteAll(List<UserInterestsEntity> userInterestsEntities) {
+        userInterestsJpaRepository.deleteAll(userInterestsEntities);
+    }
+
+    @Override
+    public void deleteAllByUser(User foundUser) {
+        List<UserInterestsEntity> userInterestsEntityList = findAllByUser(
+            foundUser);
+        userInterestsJpaRepository.deleteAll(userInterestsEntityList);
     }
 }

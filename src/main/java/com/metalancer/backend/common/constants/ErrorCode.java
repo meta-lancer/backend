@@ -71,7 +71,13 @@ public enum ErrorCode {
     MALFORMED_TOKEN(INVALID_ACCESS, "F003", "incorrect access-token"),
     UNAUTHORIZED_TOKEN(INVALID_ACCESS, "F004", "invalid access-token"),
 
-    INVALID_REFRESH_TOKEN(INVALID_ACCESS, "H005", "non-existent refresh-token"),
+    INVALID_REFRESH_TOKEN(INVALID_ACCESS, "F005", "non-existent refresh-token"),
+
+    /**
+     * 상품
+     */
+
+    PRODUCTS_STATUS_ERROR(INVALID_VALUE, "H001", "상품 상태에 문제가 있습니다."),
 
     INVALID_PARAMETER(BAD_REQUEST, "Z001", "요청값이 올바르지 않습니다."),
     NOT_FOUND(NOT_FOUND_VALUE, "Z002", "존재하지 않습니다."),

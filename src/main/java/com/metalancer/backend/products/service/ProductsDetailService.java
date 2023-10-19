@@ -13,5 +13,5 @@ public interface ProductsDetailService {
 
     ProductsDetail getProductDetail(PrincipalDetails user, Long productId);
 
-    String getProductDetailBySharedLink(String link);
+    ProductsDetail getProductDetailBySharedLink(PrincipalDetails user, String link);
 }

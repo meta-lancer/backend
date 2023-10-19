@@ -101,7 +101,35 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     }
 
     @Override
-    public String getProductDetailBySharedLink(String link) {
-        return null;
+    public ProductsDetail getProductDetailBySharedLink(PrincipalDetails user, String link) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductBySharedLinkAndStatus(
+            link,
+            DataStatus.ACTIVE);
+        foundProductsEntity.addViewCnt();
+        ProductsDetail response = foundProductsEntity.toProductsDetail();
+        if (user != null) {
+            User foundUser = user.getUser();
+            Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
+                foundUser, foundProductsEntity);
+            response.setHasWish(foundProductsWishEntity.isPresent());
+            Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(foundUser,
+                foundProductsEntity);
+            response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
+                .equals(DataStatus.ACTIVE));
+            //        response.setHasOrder();
+        }
+        List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
+        response.setTagList(tagList);
+
+        List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
+            foundProductsEntity);
+        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
+            foundProductsEntity);
+        String zipFileUrl = productsAssetFileRepository.findUrlByProduct(foundProductsEntity);
+        AssetFile assetFile = AssetFile.builder().thumbnailUrlList(thumbnailUrlList)
+            .viewUrlList(viewUrlList).zipFileUrl(zipFileUrl)
+            .build();
+        response.setAssetFile(assetFile);
+        return response;
     }
 }

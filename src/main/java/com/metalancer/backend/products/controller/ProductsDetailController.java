@@ -29,12 +29,11 @@ public class ProductsDetailController {
 
     private final ProductsDetailService productsDetailService;
 
-    @Operation(summary = "상품 상세 조회", description = "")
+    @Operation(summary = "상품 상세 조회", description = "썸네일, 3D 뷰, 에셋 파일 등이 온전히 있어야")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/{productId}")
     public BaseResponse<ProductsDetail> getProductDetail(
-        @AuthenticationPrincipal
-        PrincipalDetails user,
+        @AuthenticationPrincipal PrincipalDetails user,
         @PathVariable("productId") Long productId
     ) {
         log.info("상품 고유번호: {}", productId);
@@ -59,11 +58,13 @@ public class ProductsDetailController {
         return new BaseResponse<>(productsDetailService.toggleProductWish(user, productId));
     }
 
-    @Operation(summary = "링크 공유를 통한 상품 상세 조회", description = "")
+    @Operation(summary = "링크 공유를 통한 상품 상세 조회", description = "썸네일, 3D 뷰, 에셋 파일 등이 온전히 있어야")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/shared-link")
-    public BaseResponse<String> getProductDetailBySharedLink(
+    public BaseResponse<ProductsDetail> getProductDetailBySharedLink(
+        @AuthenticationPrincipal PrincipalDetails user,
         @RequestParam("link") String link) {
-        return new BaseResponse<String>(productsDetailService.getProductDetailBySharedLink(link));
+        return new BaseResponse<ProductsDetail>(
+            productsDetailService.getProductDetailBySharedLink(user, link));
     }
 }

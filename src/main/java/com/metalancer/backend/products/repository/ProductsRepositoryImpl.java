@@ -3,6 +3,7 @@ package com.metalancer.backend.products.repository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
+import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.entity.ProductsEntity;
@@ -26,6 +27,20 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         return productsJpaRepository.findById(productsId).orElseThrow(
             () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
+    }
+
+    @Override
+    public ProductsEntity findProductBySharedLinkAndStatus(String sharedLink, DataStatus status) {
+        Optional<ProductsEntity> productsEntity = productsJpaRepository.findBySharedLinkContains(
+            sharedLink);
+        if (productsEntity.isEmpty()) {
+            throw new BaseException(ErrorCode.NOT_FOUND);
+        }
+        ProductsEntity foundProductsEntity = productsEntity.get();
+        if (!foundProductsEntity.getStatus().equals(DataStatus.ACTIVE)) {
+            throw new BaseException(ErrorCode.PRODUCTS_STATUS_ERROR);
+        }
+        return foundProductsEntity;
     }
 
     @Override

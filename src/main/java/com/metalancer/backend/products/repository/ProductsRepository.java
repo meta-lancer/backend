@@ -12,6 +12,8 @@ public interface ProductsRepository {
 
     ProductsEntity findProductById(Long productsId);
 
+    ProductsEntity findProductBySharedLinkAndStatus(String SharedLink, DataStatus status);
+
     ProductsEntity findProductByIdAndStatus(Long productsId, DataStatus status);
 
     Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity, Pageable pageable);

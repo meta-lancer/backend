@@ -46,6 +46,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private CreatorEntity creatorEntity;
+    @Column(unique = true)
     private String sharedLink;
     private String title;
     private int price;

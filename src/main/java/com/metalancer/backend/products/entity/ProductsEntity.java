@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -84,8 +85,9 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     }
 
     public void setSharedLink() {
+        String baseLink = "https://www.metaovis.com/details?share_id=";
         int length = 10;
-        this.sharedLink = RandomStringUtils.randomAlphanumeric(length);
+        this.sharedLink = baseLink + RandomStringUtils.randomAlphanumeric(length);
     }
 
     public void setDiscount(double discount) {
@@ -147,7 +149,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         String title,
         int price, String thumbnail, String assetDetail, String assetNotice, String assetCopyRight,
         String website,
-        String productionProgram, String compatibleProgram) {
+        List<String> productionProgram, String compatibleProgram) {
         this.creatorEntity = creatorEntity;
         this.category = productsCategoryEntity;
         this.title = title;
@@ -157,7 +159,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         this.assetNotice = assetNotice;
         this.assetCopyRight = assetCopyRight;
         this.website = website;
-        this.productionProgram = productionProgram;
+        this.productionProgram = productionProgram != null ? productionProgram.toString() : "";
         this.compatibleProgram = compatibleProgram;
         setSharedLink();
     }
@@ -181,5 +183,10 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public void deleteProducts() {
+        delete();
+        ;
     }
 }

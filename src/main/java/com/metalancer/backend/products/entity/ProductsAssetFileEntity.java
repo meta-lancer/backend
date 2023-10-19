@@ -37,6 +37,9 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
 
     @Column(nullable = false)
     private String url;
+    @Column(nullable = false)
+    private String fileName;
+    private Boolean success = false;
 //    @Column(nullable = false)
 //    private String fileSize;
 //    private String version;
@@ -45,8 +48,13 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
 //    private boolean hasAnimation;
 
     @Builder
-    public ProductsAssetFileEntity(ProductsEntity productsEntity, String url) {
+    public ProductsAssetFileEntity(ProductsEntity productsEntity, String url, String fileName) {
         this.productsEntity = productsEntity;
         this.url = url;
+        this.fileName = fileName;
+    }
+
+    public void success() {
+        this.success = true;
     }
 }

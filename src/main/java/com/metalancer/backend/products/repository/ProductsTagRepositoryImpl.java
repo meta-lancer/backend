@@ -21,7 +21,17 @@ public class ProductsTagRepositoryImpl implements ProductsTagRepository {
     }
 
     @Override
+    public List<ProductsTagEntity> findTagEntityListByProduct(ProductsEntity products) {
+        return productsTagJpaRepository.findAllByProductsEntityOrderByNameAsc(products);
+    }
+
+    @Override
     public List<ProductsTagEntity> saveAll(List<ProductsTagEntity> productsTagEntityList) {
         return productsTagJpaRepository.saveAll(productsTagEntityList);
+    }
+
+    @Override
+    public void deleteAll(List<ProductsTagEntity> productsTagEntities) {
+        productsTagJpaRepository.deleteAll(productsTagEntities);
     }
 }

@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.service;
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.AssetType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
@@ -29,6 +30,8 @@ import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -93,7 +96,45 @@ public class CreatorServiceImpl implements CreatorService {
 
     @Override
     public String getAssetFilePreSignedUrl(Long productsId) {
-        return uploadService.getAssetFilePresignedUrl(productsId);
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        Optional<ProductsAssetFileEntity> productsAssetFileEntity = productsAssetFileRepository.findOptionalEntityByProducts(
+            productsEntity);
+        if (productsAssetFileEntity.isEmpty()) {
+            String randomFileName = UUID.randomUUID().toString().substring(0, 10) + ".zip";
+            String uploadedZipFileUrl = uploadService.getAssetFilePresignedUrl(productsId,
+                randomFileName);
+            String shortUrl = uploadService.extractBaseUrl(uploadedZipFileUrl);
+            ProductsAssetFileEntity createdProductsAssetFileEntity = ProductsAssetFileEntity.builder()
+                .productsEntity(productsEntity).url(shortUrl)
+                .fileName(randomFileName)
+                .build();
+            productsAssetFileRepository.save(createdProductsAssetFileEntity);
+            return uploadedZipFileUrl;
+        }
+
+        ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileEntity.get();
+        String savedFileName = foundProductsAssetFileEntity.getFileName();
+        return uploadService.getAssetFilePresignedUrl(productsId, savedFileName);
+    }
+
+    @Override
+    public Boolean successAsset(Long productsId, PrincipalDetails user) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        ProductsAssetFileEntity productsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            productsEntity);
+        productsAssetFileEntity.success();
+        return productsAssetFileEntity.getSuccess();
+    }
+
+    @Override
+    public Boolean failAsset(Long productsId, PrincipalDetails user) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        productsEntity.deleteProducts();
+        // tag 삭제
+        List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
+            productsEntity);
+        productsTagRepository.deleteAll(productsTagEntities);
+        return true;
     }
 
     private void saveTagList(AssetRequest dto, ProductsEntity savedProductsEntity) {
@@ -172,6 +213,7 @@ public class CreatorServiceImpl implements CreatorService {
             savedProductsId, zipFile, randomFileName);
         ProductsAssetFileEntity createdProductsAssetFileEntity = ProductsAssetFileEntity.builder()
             .productsEntity(savedProductsEntity).url(uploadedZipFileUrl)
+            .fileName(randomFileName)
             .build();
         productsAssetFileRepository.save(createdProductsAssetFileEntity);
     }

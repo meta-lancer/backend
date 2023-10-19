@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.service;
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.users.entity.User;
@@ -12,4 +13,8 @@ public interface CreatorService {
         AssetRequest dto);
 
     String getAssetFilePreSignedUrl(Long productsId);
+
+    Boolean successAsset(Long productsId, PrincipalDetails user);
+
+    Boolean failAsset(Long productsId, PrincipalDetails user);
 }

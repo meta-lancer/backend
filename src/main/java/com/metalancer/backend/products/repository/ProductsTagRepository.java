@@ -8,5 +8,9 @@ public interface ProductsTagRepository {
 
     List<String> findTagListByProduct(ProductsEntity products);
 
+    List<ProductsTagEntity> findTagEntityListByProduct(ProductsEntity products);
+
     public List<ProductsTagEntity> saveAll(List<ProductsTagEntity> productsTagEntityList);
+
+    void deleteAll(List<ProductsTagEntity> productsTagEntities);
 }

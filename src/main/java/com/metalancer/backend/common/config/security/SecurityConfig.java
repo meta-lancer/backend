@@ -145,7 +145,7 @@ public class SecurityConfig {
 
     @Component
     @RequiredArgsConstructor
-    public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+    public static class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         private final ObjectMapper objectMapper;
 
@@ -167,7 +167,7 @@ public class SecurityConfig {
     }
 
     @Component
-    public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    public static class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response,

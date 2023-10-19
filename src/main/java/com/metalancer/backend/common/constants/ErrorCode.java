@@ -58,7 +58,10 @@ public enum ErrorCode {
      */
     IMAGES_UPLOAD_FAILED(UNEXPECTED_ERROR, "G002", "이미지 업로드에 실패했습니다"),
     FILES_UPLOAD_FAILED(UNEXPECTED_ERROR, "G003", "파일 업로드에 실패했습니다"),
-
+    ASSETS_UPLOAD_FAILED(UNEXPECTED_ERROR, "G004", "에셋 등록에 실패했습니다"),
+    THUMBNAILS_UPLOAD_FAILED(UNEXPECTED_ERROR, "G005", "썸네일 등록에 실패했습니다"),
+    VIEWS_UPLOAD_FAILED(UNEXPECTED_ERROR, "G006", "3D 뷰 등록에 실패했습니다"),
+    SHORTEN_URL_FAILED(UNEXPECTED_ERROR, "G007", "presigned url 축약에 실패했습니다"),
     /**
      * 토큰
      */
@@ -73,6 +76,8 @@ public enum ErrorCode {
     NOT_FOUND(NOT_FOUND_VALUE, "Z002", "존재하지 않습니다."),
     ILLEGAL_DATA_STATUS(INVALID_VALUE, "Z003", "잘못된 데이터 상태 입니다."),
     SYSTEM_ERROR(UNEXPECTED_ERROR, "Z004", "일시적 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
+    FAIL_TO_CREATE(INVALID_VALUE, "Z005", "등록에 실패했습니다."),
+    FAIL_TO_UPDATE(INVALID_VALUE, "Z006", "수정에 실패했습니다."),
 
     STATUS_DELETED(INVALID_VALUE, "Z101", "삭제된 상태입니다."),
     STATUS_PENDING(INVALID_VALUE, "Z102", "승인대기 상태입니다."),

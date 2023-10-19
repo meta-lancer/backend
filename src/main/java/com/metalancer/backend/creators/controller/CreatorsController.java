@@ -16,7 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +56,27 @@ public class CreatorsController {
     public BaseResponse<String> getAssetFilePreSignedUrl(
         @Parameter(description = "상품 고유번호") @PathVariable Long productsId) {
         return new BaseResponse<>(creatorService.getAssetFilePreSignedUrl(productsId));
+    }
+
+    @Operation(summary = "에셋 등록 성공", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PatchMapping("/{productsId}/success")
+    public BaseResponse<Boolean> successAsset(
+        @PathVariable Long productsId,
+        @AuthenticationPrincipal PrincipalDetails user) {
+
+        return new BaseResponse<Boolean>(
+            creatorService.successAsset(productsId, user));
+    }
+
+    @Operation(summary = "에셋 등록 실패", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @DeleteMapping("/{productsId}/fail")
+    public BaseResponse<Boolean> failAsset(
+        @PathVariable Long productsId,
+        @AuthenticationPrincipal PrincipalDetails user) {
+
+        return new BaseResponse<Boolean>(
+            creatorService.failAsset(productsId, user));
     }
 }

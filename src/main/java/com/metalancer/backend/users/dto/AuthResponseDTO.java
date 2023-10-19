@@ -23,6 +23,7 @@ public class AuthResponseDTO {
         private LoginType loginType;
         private DataStatus status;
         private Role role;
+        private Long creatorId;
 
         public userInfo(User user) {
             this.userId = user.getId();

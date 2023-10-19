@@ -35,6 +35,27 @@ public class UserResponseDTO {
     }
 
     @Data
+    public static class OtherCreatorBasicInfo {
+
+        private String profileImg;
+        private String nickname;
+        private String email;
+        private String introduction;
+        private String link;
+
+        @Builder
+        public OtherCreatorBasicInfo(String profileImg, String nickname, String email,
+            String introduction,
+            String link) {
+            this.profileImg = profileImg;
+            this.nickname = nickname;
+            this.email = email;
+            this.introduction = introduction;
+            this.link = link;
+        }
+    }
+
+    @Data
     public static class IntroAndCareer {
 
         private String introduction;

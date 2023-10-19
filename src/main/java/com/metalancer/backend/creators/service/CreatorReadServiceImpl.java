@@ -11,8 +11,16 @@ import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
+import com.metalancer.backend.users.domain.Career;
+import com.metalancer.backend.users.domain.Portfolio;
+import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
+import com.metalancer.backend.users.dto.UserResponseDTO.OtherCreatorBasicInfo;
+import com.metalancer.backend.users.entity.CareerEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.CareerRepository;
+import com.metalancer.backend.users.repository.PortfolioRepository;
+import com.metalancer.backend.users.repository.UserInterestsRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +42,25 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     private final ProductsWishRepository productsWishRepository;
     private final ProductsRepository productsRepository;
     private final ProductsTagRepository productsTagRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final CareerRepository careerRepository;
+    private final UserInterestsRepository userInterestsRepository;
 
     @Override
-    public String getCreatorInfo(PrincipalDetails user, Long creatorId) {
-        return null;
+    public OtherCreatorBasicInfo getCreatorBasicInfo(PrincipalDetails userPrincipalDetails,
+        Long creatorId) {
+        User foundUser = userPrincipalDetails.getUser();
+        CreatorEntity creatorEntity = creatorRepository.findByCreatorId(creatorId);
+        User creatorUser = creatorEntity.getUser();
+        return creatorUser.toOtherCreatorBasicInfo();
+    }
+
+    @Override
+    public IntroAndCareer getCreatorIntroAndCareer(PrincipalDetails user, Long creatorId) {
+        User foundUser = user.getUser();
+        CreatorEntity creatorEntity = creatorRepository.findByCreatorId(creatorId);
+        User creatorUser = creatorEntity.getUser();
+        return getIntroAndExperience(creatorUser);
     }
 
     @Override
@@ -62,8 +85,9 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     }
 
     @Override
-    public String getCreatorPortfolio(Long creatorId) {
-        return null;
+    public List<Portfolio> getCreatorPortfolio(Long creatorId) {
+        CreatorEntity creatorEntity = creatorRepository.findByCreatorId(creatorId);
+        return portfolioRepository.findAllByCreator(creatorEntity);
     }
 
     @Override
@@ -94,5 +118,20 @@ public class CreatorReadServiceImpl implements CreatorReadService {
         }
         long total = productsRepository.countAllByCreatorEntity(creatorEntity);
         return new PageImpl<>(manageAssets, pageable, total);
+    }
+
+    @Override
+    public List<Portfolio> getMyPortfolio(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        return portfolioRepository.findAllByCreator(creatorEntity);
+    }
+
+    private IntroAndCareer getIntroAndExperience(User foundUser) {
+        List<CareerEntity> careerEntities = careerRepository.findAllByUser(foundUser);
+        List<Career> careerList = careerEntities.stream().map(CareerEntity::toDomain).toList();
+        return IntroAndCareer.builder().introduction(foundUser.getCareerIntroduction())
+            .careerList(careerList).build();
     }
 }

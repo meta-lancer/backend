@@ -68,7 +68,7 @@ public class SecurityConfig {
                 "/loginForm")
             .authenticated()
             .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
-            .requestMatchers("/api/creators/**").hasAnyRole("SELLER", "ADMIN")
+            .requestMatchers("/api/creator/**").hasAnyRole("SELLER", "ADMIN")
 //            .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().permitAll()
 

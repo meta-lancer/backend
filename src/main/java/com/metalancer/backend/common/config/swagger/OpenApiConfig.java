@@ -41,13 +41,13 @@ public class OpenApiConfig {
             .build();
     }
 
-    @Bean
-    public GroupedOpenApi group2() {
-        return GroupedOpenApi.builder()
-            .group("게시물")
-            .pathsToMatch("/api/posts/**")
-            .build();
-    }
+//    @Bean
+//    public GroupedOpenApi group2() {
+//        return GroupedOpenApi.builder()
+//            .group("게시물")
+//            .pathsToMatch("/api/posts/**")
+//            .build();
+//    }
 
     @Bean
     public GroupedOpenApi group3() {

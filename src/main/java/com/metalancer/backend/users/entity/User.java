@@ -13,6 +13,7 @@ import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.interests.domain.Interests;
 import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
+import com.metalancer.backend.users.dto.UserResponseDTO.OtherCreatorBasicInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -232,6 +233,14 @@ public class User extends BaseEntity implements Serializable {
             .email(email)
             .job(job).link(link)
             .introduction(introduction).interestsList(interests).build();
+    }
+
+    public OtherCreatorBasicInfo toOtherCreatorBasicInfo() {
+        return OtherCreatorBasicInfo.builder().profileImg(profileImg)
+            .nickname(nickname)
+            .email(email)
+            .link(link)
+            .introduction(introduction).build();
     }
 
     public boolean checkNicknameUpdatedBefore() {

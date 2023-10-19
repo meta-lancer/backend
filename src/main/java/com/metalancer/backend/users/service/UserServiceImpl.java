@@ -3,6 +3,7 @@ package com.metalancer.backend.users.service;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.interests.domain.Interests;
 import com.metalancer.backend.users.domain.Career;
 import com.metalancer.backend.users.domain.PayedAssets;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final UserInterestsRepository userInterestsRepository;
     private final PayedAssetsRepository payedAssetsRepository;
     private final CareerRepository careerRepository;
+    private final CreatorRepository creatorRepository;
 
     @Override
     public boolean updateToCreator(PrincipalDetails user) {

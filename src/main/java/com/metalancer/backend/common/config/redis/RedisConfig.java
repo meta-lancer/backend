@@ -1,5 +1,7 @@
 package com.metalancer.backend.common.config.redis;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,8 +33,27 @@ public class RedisConfig extends AbstractHttpSessionApplicationInitializer {
     @Bean
     public DefaultCookieSerializer defaultCookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+
+//        if (isLocalEnvironment()) {
+//            serializer.setUseSecureCookie(false); // Use non-secure cookies for HTTP in local env
+//            serializer.setSameSite(null);  // Might help in some local scenarios
+//            // ... any other local configurations
+//        }
+//        else {
         serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // Match main domain
+//        }
         return serializer;
     }
 
+    private boolean isLocalEnvironment() {
+        // Your logic to determine if the environment is local,
+        // e.g., based on a specific profile or environment variable.
+        try {
+            String hostname = InetAddress.getLocalHost().getHostName();
+            return "localhost".equalsIgnoreCase(hostname) || "127.0.0.1".equals(hostname);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

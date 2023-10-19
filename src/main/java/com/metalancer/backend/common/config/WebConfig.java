@@ -15,10 +15,10 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                     .allowedOrigins(
-                        "http://localhost:3000", "http://localhost:3002",
+                        "http://localhost:3000", "http://localhost:3001", "http://localhost:3002",
                         "https://www.metaovis.com", "https://api.metaovis.com",
                         "https://metaovis.com", "https://admin.metaovis.com")
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);
             }

@@ -1,25 +1,41 @@
 package com.metalancer.backend.common.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private final PrincipalOAuth2UserService principalOAuth2UserService;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -48,8 +64,8 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests()
             .requestMatchers("/swagger-ui/index.html").denyAll()
-            .requestMatchers("/api/auth/**", "/api/user/**", "/h2-console", "/loginForm",
-                "/api/auth/login")
+            .requestMatchers("/h2-console",
+                "/loginForm")
             .authenticated()
             .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
             .requestMatchers("/api/creators/**").hasAnyRole("SELLER", "ADMIN")
@@ -59,9 +75,9 @@ public class SecurityConfig {
             .and()
             //일반 적인 로그인
             .formLogin()
-            .loginPage("http://www.metaovis.com") //로그인 페이지 url //미인증자일경우 해당 uri를 호
+            .loginPage("https://www.metaovis.com") //로그인 페이지 url //미인증자일경우 해당 uri를 호
             .loginProcessingUrl("/api/auth/login") //이 url을 로그인 기능을 담당하게 함
-            .defaultSuccessUrl("http://www.metaovis.com") // 성공하면 이 url로 가게 해라
+            .defaultSuccessUrl("https://www.metaovis.com") // 성공하면 이 url로 가게 해라
             //                .loginProcessingUrl(
 //                        "/login") //login 주소가 호출되면 시큐리티가 낚아 채서(post로 오는것) 대신 로그인 진행 -> 컨트롤러를 안만들어도 된다.
 //                .defaultSuccessUrl("/")
@@ -69,7 +85,7 @@ public class SecurityConfig {
             .and()
             //OAuth 로그인
             .oauth2Login()
-            .loginPage("http://www.metaovis.com") //로그
+            .loginPage("https://www.metaovis.com") //로그
             .successHandler(successHandler())
             .userInfoEndpoint()
             .userService(
@@ -88,10 +104,14 @@ public class SecurityConfig {
                 }
             })  // 로그아웃 핸들러 추가
             .logoutSuccessHandler((request, response, authentication) -> {
-                response.sendRedirect("http://www.metaovis.com");
+                response.sendRedirect("https://www.metaovis.com");
             }) // 로그아웃 성공 핸들러
             .deleteCookies("remember-me"); // 로그아웃 후 삭제할 쿠키 지정
-        
+
+        http.exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler);
+
         return http.build();
     }
 
@@ -121,5 +141,40 @@ public class SecurityConfig {
 //            writer.println(body);
 //            writer.flush();
         });
+    }
+
+    @Component
+    @RequiredArgsConstructor
+    public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
+        private final ObjectMapper objectMapper;
+
+        @Override
+        public void handle(HttpServletRequest request,
+            HttpServletResponse response,
+            AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            log.error("No Authorities", accessDeniedException);
+            log.error("Request Uri : {}", request.getRequestURI());
+
+//            ApiResponse<ErrorResponse> apiResponse = ApiResponse.createAuthoritiesError();
+//            String responseBody = objectMapper.writeValueAsString(apiResponse);
+
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setCharacterEncoding("UTF-8");
+//            response.getWriter().write(responseBody);
+        }
+    }
+
+    @Component
+    public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+        @Override
+        public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) throws IOException, ServletException {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setCharacterEncoding("UTF-8");
+        }
     }
 }

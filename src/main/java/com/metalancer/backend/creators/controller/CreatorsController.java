@@ -39,16 +39,13 @@ public class CreatorsController {
     @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @PostMapping
     public BaseResponse<CreatorResponseDTO.AssetCreatedResponse> createAsset(
-//        @AuthenticationPrincipal
-//        PrincipalDetails user,
         @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
         @RequestPart(value = "views", required = false) MultipartFile[] views,
-        @RequestPart(value = "zipFile", required = false) MultipartFile zipFile,
         @RequestPart(required = true) CreatorRequestDTO.AssetRequest dto,
         @AuthenticationPrincipal PrincipalDetails user) {
 
         return new BaseResponse<CreatorResponseDTO.AssetCreatedResponse>(
-            creatorService.createAsset(user.getUser(), thumbnails, views, zipFile, dto));
+            creatorService.createAsset(user.getUser(), thumbnails, views, dto));
     }
 
     @Operation(summary = "에셋 파일 presignedUrl 획득", description = "유효시간 5분")

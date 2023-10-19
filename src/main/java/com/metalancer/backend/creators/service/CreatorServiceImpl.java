@@ -52,7 +52,7 @@ public class CreatorServiceImpl implements CreatorService {
 
     @Override
     public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
-        @NotNull MultipartFile[] views, @NotNull MultipartFile zipFile, AssetRequest dto) {
+        @NotNull MultipartFile[] views, AssetRequest dto) {
         try {
             ProductsCategoryEntity categoryEntity = productsCategoryRepository.findByCategoryNameAndUseYN(
                 dto.getProductsCategory(),
@@ -65,8 +65,8 @@ public class CreatorServiceImpl implements CreatorService {
             saveTagList(dto, savedProductsEntity);
             uploadThumbnailImages(savedProductsId, savedProductsEntity, thumbnails);
             upload3DViews(savedProductsId, savedProductsEntity, views);
-            uploadAssetZipFile(savedProductsId, savedProductsEntity, zipFile, dto);
             ProductsDetail productsDetail = savedProductsEntity.toProductsDetail();
+            log.info("상세 데이터 조회");
             List<String> tagList = productsTagRepository.findTagListByProduct(savedProductsEntity);
             productsDetail.setTagList(tagList);
             List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
@@ -74,19 +74,20 @@ public class CreatorServiceImpl implements CreatorService {
             if (thumbnailUrlList != null && thumbnailUrlList.size() > 0) {
                 savedProductsEntity.setThumbnail(thumbnailUrlList.get(0));
             }
+            log.info("썸네일 목록 조회");
             List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
                 savedProductsEntity);
-            String zipFileUrl = productsAssetFileRepository.findUrlByProduct(savedProductsEntity);
+            log.info("3D 뷰 데이터 조회");
             AssetFile assetFile = AssetFile.builder().thumbnailUrlList(thumbnailUrlList)
-                .viewUrlList(viewUrlList).zipFileUrl(zipFileUrl)
+                .viewUrlList(viewUrlList).zipFileUrl("")
                 .build();
             productsDetail.setAssetFile(assetFile);
             return AssetCreatedResponse.builder().productsDetail(productsDetail)
                 .build();
+
         } catch (Exception e) {
-            e.printStackTrace();
             log.info(e.getMessage());
-            throw new BaseException(ErrorCode.IMAGES_UPLOAD_FAILED);
+            throw new BaseException(ErrorCode.ASSETS_UPLOAD_FAILED);
         }
     }
 
@@ -121,36 +122,46 @@ public class CreatorServiceImpl implements CreatorService {
 
     private void uploadThumbnailImages(Long savedProductsId, ProductsEntity savedProductsEntity,
         MultipartFile[] thumbnails) throws IOException {
-        int index = 1;
-        List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
-        for (MultipartFile thumbnail : thumbnails) {
-            String randomFileName = uploadService.getRandomStringForImageName(8);
-            String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(AssetType.THUMBNAIL,
-                savedProductsId, thumbnail, randomFileName);
-            ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
-                .productsEntity(savedProductsEntity).thumbnailOrd(index++)
-                .thumbnailUrl(uploadedThumbnailUrl)
-                .build();
-            productsThumbnailEntities.add(createdProductsThumbnailEntity);
+        try {
+            int index = 1;
+            List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
+            for (MultipartFile thumbnail : thumbnails) {
+                String randomFileName = uploadService.getRandomStringForImageName(8);
+                String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(AssetType.THUMBNAIL,
+                    savedProductsId, thumbnail, randomFileName);
+                ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
+                    .productsEntity(savedProductsEntity).thumbnailOrd(index++)
+                    .thumbnailUrl(uploadedThumbnailUrl)
+                    .build();
+                productsThumbnailEntities.add(createdProductsThumbnailEntity);
+            }
+            productsThumbnailRepository.saveAll(productsThumbnailEntities);
+        } catch (Exception e) {
+            log.info(e.getLocalizedMessage());
+            throw new BaseException(ErrorCode.THUMBNAILS_UPLOAD_FAILED);
         }
-        productsThumbnailRepository.saveAll(productsThumbnailEntities);
     }
 
     private void upload3DViews(Long savedProductsId, ProductsEntity savedProductsEntity,
         MultipartFile[] views)
         throws IOException {
-        int index = 1;
-        List<ProductsViewsEntity> productsViewsEntities = new ArrayList<>();
-        for (MultipartFile view : views) {
-            String randomFileName = uploadService.getRandomStringForImageName(8);
-            String uploaded3DViewUrl = uploadService.uploadToAssetBucket(AssetType.VIEWS_3D,
-                savedProductsId, view, randomFileName);
-            ProductsViewsEntity createdProductsViewsEntity = ProductsViewsEntity.builder()
-                .productsEntity(savedProductsEntity).viewOrd(index++).viewUrl(uploaded3DViewUrl)
-                .build();
-            productsViewsEntities.add(createdProductsViewsEntity);
+        try {
+            int index = 1;
+            List<ProductsViewsEntity> productsViewsEntities = new ArrayList<>();
+            for (MultipartFile view : views) {
+                String randomFileName = uploadService.getRandomStringForImageName(8);
+                String uploaded3DViewUrl = uploadService.uploadToAssetBucket(AssetType.VIEWS_3D,
+                    savedProductsId, view, randomFileName);
+                ProductsViewsEntity createdProductsViewsEntity = ProductsViewsEntity.builder()
+                    .productsEntity(savedProductsEntity).viewOrd(index++).viewUrl(uploaded3DViewUrl)
+                    .build();
+                productsViewsEntities.add(createdProductsViewsEntity);
+            }
+            productsViewsRepository.saveAll(productsViewsEntities);
+        } catch (Exception e) {
+            log.info(e.getLocalizedMessage());
+            throw new BaseException(ErrorCode.VIEWS_UPLOAD_FAILED);
         }
-        productsViewsRepository.saveAll(productsViewsEntities);
     }
 
     private void uploadAssetZipFile(Long savedProductsId, ProductsEntity savedProductsEntity,

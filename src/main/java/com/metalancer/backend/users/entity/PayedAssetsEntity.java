@@ -69,10 +69,15 @@ public class PayedAssetsEntity extends BaseEntity implements Serializable {
     }
 
     public PayedAssets toDomain() {
-        return PayedAssets.builder().payedAssetsId(id).orderNo(orderProductsEntity.getOrderNo())
-            .orderProductNo(orderProductsEntity.getOrderProductNo()).productsId(
-                products.getId()).title(products.getTitle())
-            .purchasedAt(orderPaymentEntity.getPurchasedAt()).thumbnail(products.getThumbnail())
-            .downloadedCnt(downloadedCnt).downloadLink(downloadLink).build();
+        User seller = orderProductsEntity.getProductsEntity().getCreatorEntity().getUser();
+        return PayedAssets.builder()
+            .payedAssetsId(id).orderNo(orderProductsEntity.getOrderNo())
+            .orderProductNo(orderProductsEntity.getOrderProductNo()).productsId(products.getId())
+            .title(products.getTitle()).purchasedAt(orderPaymentEntity.getPurchasedAt())
+            .thumbnail(products.getThumbnail()).downloadedCnt(downloadedCnt)
+            .downloadLink(downloadLink).sellerName(seller.getName())
+            .sellerNickname(seller.getNickname()).sellerPhone(seller.getMobile())
+            .price(orderPaymentEntity.getOrdersEntity().getTotalPrice())
+            .build();
     }
 }

@@ -2,6 +2,7 @@ package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.interests.domain.Interests;
@@ -9,6 +10,7 @@ import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.users.domain.Career;
+import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
@@ -66,11 +68,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<PayedAssets> getPayedAssetList(User user, Pageable pageable) {
-        return payedAssetsRepository.findAllPayedAssetList(user, pageable);
-    }
-
-    @Override
     public BasicInfo getBasicInfo(PrincipalDetails userPrincipalDetails) {
         User foundUser = userPrincipalDetails.getUser();
         List<UserInterestsEntity> userInterestsEntityList = userInterestsRepository.findAllByUser(
@@ -102,6 +99,35 @@ public class UserServiceImpl implements UserService {
         LocalDateTime endAt = convertDateToLocalDateTime(endDate);
         return orderPaymentRepository.findAllByUserWithDateOption(
             foundUser, pageable, beginAt, endAt);
+    }
+
+    @Override
+    public List<OrderStatusList> getOrderStatusList() {
+        OrderStatus[] orderStatusArr = OrderStatus.values();
+        List<OrderStatus> orderStatuses = List.of(orderStatusArr);
+        List<OrderStatusList> response = new ArrayList<>();
+        for (OrderStatus orderStatus : orderStatuses) {
+            OrderStatusList orderStatusList = new OrderStatusList(orderStatus);
+            response.add(orderStatusList);
+        }
+        response.remove(0);
+        return response;
+    }
+
+    @Override
+    public Page<PayedAssets> getPayedAssetList(String status, String beginDate, String endDate,
+        PrincipalDetails user, Pageable pageable) {
+        User foundUser = user.getUser();
+        LocalDateTime beginAt = convertDateToLocalDateTime(beginDate);
+        LocalDateTime endAt = convertDateToLocalDateTime(endDate);
+        OrderStatus orderStatus = !status.isEmpty() ? OrderStatus.valueOf(status) : null;
+
+        if (orderStatus != null) {
+            return payedAssetsRepository.findAllPayedAssetListWithStatusAndDateOption(foundUser,
+                pageable, beginAt, endAt, orderStatus);
+        }
+        return payedAssetsRepository.findAllPayedAssetListWithStatusAndDateOption(foundUser,
+            pageable, beginAt, endAt);
     }
 
     private static LocalDateTime convertDateToLocalDateTime(String dateString) {
@@ -171,4 +197,5 @@ public class UserServiceImpl implements UserService {
         return IntroAndCareer.builder().introduction(foundUser.getCareerIntroduction())
             .careerList(careerList).build();
     }
+
 }

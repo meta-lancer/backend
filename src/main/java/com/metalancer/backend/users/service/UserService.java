@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
+import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
@@ -9,7 +10,7 @@ import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerRequest;
 import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
 import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
-import com.metalancer.backend.users.entity.User;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +18,6 @@ public interface UserService {
 
     boolean updateToCreator(PrincipalDetails user);
 
-    Page<PayedAssets> getPayedAssetList(User user, Pageable pageable);
 
     BasicInfo getBasicInfo(PrincipalDetails user);
 
@@ -36,4 +36,10 @@ public interface UserService {
     Page<PayedOrder> getPaymentList(PrincipalDetails user, String type, String beginDate,
         String endDate,
         Pageable adjustedPageable);
+
+    List<OrderStatusList> getOrderStatusList();
+
+    Page<PayedAssets> getPayedAssetList(String status, String beginDate, String endDate,
+        PrincipalDetails user,
+        Pageable pageable);
 }

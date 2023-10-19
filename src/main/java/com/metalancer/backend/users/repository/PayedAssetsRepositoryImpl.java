@@ -1,9 +1,10 @@
 package com.metalancer.backend.users.repository;
 
-import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,12 +24,22 @@ public class PayedAssetsRepositoryImpl implements PayedAssetsRepository {
     }
 
     @Override
-    public Page<PayedAssets> findAllPayedAssetList(User user, Pageable pageable) {
-        Page<PayedAssetsEntity> payedAssetsEntities = payedAssetsJpaRepository.findAllByUserAndStatusOrderByCreatedAtDesc(
-            user, DataStatus.ACTIVE,
+    public Page<PayedAssets> findAllPayedAssetListWithStatusAndDateOption(User user,
+        Pageable pageable, LocalDateTime beginAt, LocalDateTime endAt, OrderStatus orderStatus) {
+        Page<PayedAssetsEntity> payedAssetsEntities = payedAssetsJpaRepository.findAllByUser(
+            beginAt, endAt,
+            user, orderStatus,
             pageable);
         return payedAssetsEntities.map(PayedAssetsEntity::toDomain);
     }
 
+    @Override
+    public Page<PayedAssets> findAllPayedAssetListWithStatusAndDateOption(User foundUser,
+        Pageable pageable, LocalDateTime beginAt, LocalDateTime endAt) {
+        Page<PayedAssetsEntity> payedAssetsEntities = payedAssetsJpaRepository.findAllByUser(
+            beginAt, endAt,
+            foundUser, pageable);
+        return payedAssetsEntities.map(PayedAssetsEntity::toDomain);
+    }
 
 }

@@ -39,17 +39,33 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
-        // 상품 조회
-        // return 도메인 url + 상품의 공유 고유번호
-        return "";
+        ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
+            DataStatus.ACTIVE);
+        return foundProductsEntity.getSharedLink();
     }
 
     @Override
     public boolean toggleProductWish(PrincipalDetails user, Long productId) {
-        // user와 상품 고유번호를 가지고 찜하기 조회
-        // 데이터가 없다면 추가, 있다면 삭제
-        // return 추가 - true, 삭제 - false
-        return false;
+        User foundUser = user.getUser();
+        ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
+            DataStatus.ACTIVE);
+        Optional<ProductsWishEntity> productsWishEntity = productsWishRepository.findByUserAndProduct(
+            foundUser, foundProductsEntity);
+        if (productsWishEntity.isEmpty()) {
+            ProductsWishEntity createdProductsWish = ProductsWishEntity.builder()
+                .productsEntity(foundProductsEntity)
+                .user(foundUser).build();
+            productsWishRepository.save(createdProductsWish);
+            return true;
+        }
+        ProductsWishEntity foundProductsWish = productsWishEntity.get();
+        if (foundProductsWish.getStatus().equals(DataStatus.ACTIVE)) {
+            foundProductsWish.deleteProductsWish();
+            return false;
+        } else {
+            foundProductsWish.restoreProductsWish();
+            return true;
+        }
     }
 
     @Override
@@ -82,5 +98,10 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             .build();
         response.setAssetFile(assetFile);
         return response;
+    }
+
+    @Override
+    public String getProductDetailBySharedLink(String link) {
+        return null;
     }
 }

@@ -2,10 +2,10 @@ package com.metalancer.backend.products.service;
 
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
-import com.metalancer.backend.products.controller.Response.ProductsDto.GenreGalaxyResponse;
-import com.metalancer.backend.products.controller.Response.ProductsDto.HotPickResponse;
-import com.metalancer.backend.products.controller.Response.ProductsDto.TrendSpotlightResponse;
 import com.metalancer.backend.products.domain.FilterAsset;
+import com.metalancer.backend.products.dto.ProductsDto.GenreGalaxyResponse;
+import com.metalancer.backend.products.dto.ProductsDto.HotPickResponse;
+import com.metalancer.backend.products.dto.ProductsDto.TrendSpotlightResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

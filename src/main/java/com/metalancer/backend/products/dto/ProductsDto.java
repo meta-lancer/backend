@@ -1,4 +1,4 @@
-package com.metalancer.backend.products.controller.Response;
+package com.metalancer.backend.products.dto;
 
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.products.domain.GenreGalaxy;

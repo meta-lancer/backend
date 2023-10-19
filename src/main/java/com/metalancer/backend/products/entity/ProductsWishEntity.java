@@ -45,4 +45,12 @@ public class ProductsWishEntity extends BaseEntity implements Serializable {
         this.user = user;
         this.productsEntity = productsEntity;
     }
+
+    public void restoreProductsWish() {
+        restore();
+    }
+
+    public void deleteProductsWish() {
+        delete();
+    }
 }

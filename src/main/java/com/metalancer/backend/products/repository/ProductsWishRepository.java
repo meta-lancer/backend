@@ -12,4 +12,6 @@ public interface ProductsWishRepository {
 
     int countAllByUserAndProduct(User foundUser,
         ProductsEntity foundProductsEntity);
+
+    void save(ProductsWishEntity createdProductsWish);
 }

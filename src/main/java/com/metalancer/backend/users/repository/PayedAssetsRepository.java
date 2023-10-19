@@ -11,4 +11,5 @@ public interface PayedAssetsRepository {
     void save(PayedAssetsEntity createdPayedAssetsEntity);
 
     Page<PayedAssets> findAllPayedAssetList(User user, Pageable pageable);
+
 }

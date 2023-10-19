@@ -14,23 +14,35 @@ public class PayedAssets {
     private String orderProductNo;
     private Long productsId;
     private String title;
+    private String price;
+    private String sellerNickname;
+    private String sellerName;
+    private String sellerPhone;
     private String thumbnail;
     private LocalDateTime purchasedAt;
     private Integer downloadedCnt;
     private String downloadLink;
+    private LocalDateTime downloadUntilAt;
 
     @Builder
     public PayedAssets(Long payedAssetsId, String orderNo, String orderProductNo, Long productsId,
         String title,
-        String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink) {
+        String price, String sellerNickname, String sellerName, String sellerPhone,
+        String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink,
+        LocalDateTime downloadUntilAt) {
         this.payedAssetsId = payedAssetsId;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.productsId = productsId;
         this.title = title;
+        this.price = price;
+        this.sellerNickname = sellerNickname;
+        this.sellerName = sellerName;
+        this.sellerPhone = sellerPhone;
         this.thumbnail = thumbnail;
         this.purchasedAt = purchasedAt;
         this.downloadedCnt = downloadedCnt;
         this.downloadLink = downloadLink;
+        this.downloadUntilAt = downloadUntilAt;
     }
 }

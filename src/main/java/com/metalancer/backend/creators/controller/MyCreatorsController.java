@@ -37,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/creator")
 public class MyCreatorsController {
 
     private final CreatorService creatorService;
@@ -88,7 +88,7 @@ public class MyCreatorsController {
 
     @Operation(summary = "내가 등록한 에셋 조회", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/creator/my-assets")
+    @GetMapping("/my-assets")
     public BaseResponse<Page<CreatorAssetList>> getMyRegisteredAssets(
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
@@ -99,7 +99,7 @@ public class MyCreatorsController {
 
     @Operation(summary = "내 포트폴리오 조회", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/creator/portfolio")
+    @GetMapping("/portfolio")
     public BaseResponse<List<Portfolio>> getMyPortfolio(
         @AuthenticationPrincipal PrincipalDetails user) {
         return new BaseResponse<List<Portfolio>>(creatorReadService.getMyPortfolio(user));
@@ -107,7 +107,7 @@ public class MyCreatorsController {
 
     @Operation(summary = "에셋 관리 목록 조회", description = "파라미터에 page=1&size=5&sort=createdAt,desc 처럼 붙여주셔야 최근 등록일 순으로 정렬됩니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    @GetMapping("/creator/management")
+    @GetMapping("/management")
     public BaseResponse<Page<ManageAsset>> getMyManageAssetList(
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {

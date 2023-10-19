@@ -11,4 +11,5 @@ public interface PayedAssetsJpaRepository extends JpaRepository<PayedAssetsEntit
 
     Page<PayedAssetsEntity> findAllByUserAndStatusOrderByCreatedAtDesc(User user, DataStatus status,
         Pageable pageable);
+
 }

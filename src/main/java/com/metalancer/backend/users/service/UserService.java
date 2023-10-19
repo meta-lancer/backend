@@ -2,6 +2,7 @@ package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.users.domain.PayedAssets;
+import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateBasicInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
@@ -31,4 +32,8 @@ public interface UserService {
     IntroAndCareer updateCareerIntro(PrincipalDetails user, UpdateCareerIntroRequest dto);
 
     BasicInfo updateBasicInfo(PrincipalDetails user, UpdateBasicInfo dto);
+
+    Page<PayedOrder> getPaymentList(PrincipalDetails user, String type, String beginDate,
+        String endDate,
+        Pageable adjustedPageable);
 }

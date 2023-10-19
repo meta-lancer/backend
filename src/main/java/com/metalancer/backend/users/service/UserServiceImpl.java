@@ -5,8 +5,12 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.interests.domain.Interests;
+import com.metalancer.backend.orders.repository.OrderPaymentRepository;
+import com.metalancer.backend.orders.repository.OrderProductsRepository;
+import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.users.domain.Career;
 import com.metalancer.backend.users.domain.PayedAssets;
+import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateBasicInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
@@ -20,6 +24,9 @@ import com.metalancer.backend.users.repository.CareerRepository;
 import com.metalancer.backend.users.repository.PayedAssetsRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +47,9 @@ public class UserServiceImpl implements UserService {
     private final PayedAssetsRepository payedAssetsRepository;
     private final CareerRepository careerRepository;
     private final CreatorRepository creatorRepository;
+    private final OrdersRepository ordersRepository;
+    private final OrderProductsRepository orderProductsRepository;
+    private final OrderPaymentRepository orderPaymentRepository;
 
     @Override
     public boolean updateToCreator(PrincipalDetails user) {
@@ -82,6 +92,22 @@ public class UserServiceImpl implements UserService {
         foundUser.updateBasicInfo(dto.getProfileImg(), dto.getNickname(), dto.getIntroduction(),
             dto.getLink(), dto.getJob());
         return foundUser.toBasicInfo(interests);
+    }
+
+    @Override
+    public Page<PayedOrder> getPaymentList(PrincipalDetails user, String type, String beginDate,
+        String endDate, Pageable pageable) {
+        User foundUser = user.getUser();
+        LocalDateTime beginAt = convertDateToLocalDateTime(beginDate);
+        LocalDateTime endAt = convertDateToLocalDateTime(endDate);
+        return orderPaymentRepository.findAllByUserWithDateOption(
+            foundUser, pageable, beginAt, endAt);
+    }
+
+    private static LocalDateTime convertDateToLocalDateTime(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        return date.atStartOfDay();
     }
 
     private static boolean nicknameUpdateValidate(UpdateBasicInfo dto, User foundUser) {

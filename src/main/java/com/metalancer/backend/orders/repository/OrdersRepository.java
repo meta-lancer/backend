@@ -7,4 +7,5 @@ public interface OrdersRepository {
     void save(OrdersEntity ordersEntity);
 
     OrdersEntity findEntityByOrderNo(String orderNo);
+
 }

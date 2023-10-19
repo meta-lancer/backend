@@ -29,4 +29,6 @@ public class PayedAssetsRepositoryImpl implements PayedAssetsRepository {
             pageable);
         return payedAssetsEntities.map(PayedAssetsEntity::toDomain);
     }
+
+
 }

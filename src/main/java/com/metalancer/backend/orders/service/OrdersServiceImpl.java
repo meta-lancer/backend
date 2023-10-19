@@ -193,6 +193,8 @@ public class OrdersServiceImpl implements OrdersService {
         OrderPaymentEntity createdOrderPaymentEntity = OrderPaymentEntity.builder()
             .ordersEntity(foundOrdersEntity).impUid(paymentResponse.getImpUid())
             .orderNo(orderNo).paymentPrice(foundOrdersEntity.getTotalPaymentPrice())
+            .title(paymentResponse.getName())
+            .receiptUrl(paymentResponse.getReceiptUrl())
             .type(paymentResponse.getPgProvider())
             .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
             .purchasedAt(paymentResponse.getPaidAt()).build();

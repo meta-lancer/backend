@@ -75,7 +75,7 @@ public class MyCreatorsController {
             creatorService.successAsset(productsId, user));
     }
 
-    @Operation(summary = "에셋 등록 실패", description = "")
+    @Operation(summary = "에셋 등록 실패", description = "본인이 아니면 403 예외")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @DeleteMapping("/{productsId}/fail")
     public BaseResponse<Boolean> failAsset(
@@ -84,6 +84,16 @@ public class MyCreatorsController {
 
         return new BaseResponse<Boolean>(
             creatorService.failAsset(productsId, user));
+    }
+
+    @Operation(summary = "에셋 등록 삭제", description = "본인이 아니면 403 예외")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @DeleteMapping("/{productsId}")
+    public BaseResponse<Boolean> deleteAsset(
+        @PathVariable Long productsId,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<Boolean>(
+            creatorService.deleteAsset(productsId, user));
     }
 
     @Operation(summary = "내가 등록한 에셋 조회", description = "")

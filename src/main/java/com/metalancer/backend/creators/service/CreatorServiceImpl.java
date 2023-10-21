@@ -129,8 +129,24 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public Boolean failAsset(Long productsId, PrincipalDetails user) {
         ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        if (!productsEntity.getCreatorEntity().getUser().getId().equals(user.getUser().getId())) {
+            throw new BaseException(ErrorCode.IS_NOT_WRITER);
+        }
         productsEntity.deleteProducts();
         // tag 삭제
+        List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
+            productsEntity);
+        productsTagRepository.deleteAll(productsTagEntities);
+        return true;
+    }
+
+    @Override
+    public Boolean deleteAsset(Long productsId, PrincipalDetails user) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        productsEntity.deleteProducts();
+        if (!productsEntity.getCreatorEntity().getUser().getId().equals(user.getUser().getId())) {
+            throw new BaseException(ErrorCode.IS_NOT_WRITER);
+        }
         List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
             productsEntity);
         productsTagRepository.deleteAll(productsTagEntities);

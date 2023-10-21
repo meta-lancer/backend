@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.BaseException;
@@ -13,6 +14,7 @@ import com.metalancer.backend.users.domain.Career;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
+import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateBasicInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
@@ -20,6 +22,7 @@ import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerRequest;
 import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
 import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
 import com.metalancer.backend.users.entity.CareerEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
 import com.metalancer.backend.users.repository.CareerRepository;
@@ -31,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -128,6 +132,16 @@ public class UserServiceImpl implements UserService {
         }
         return payedAssetsRepository.findAllPayedAssetListWithStatusAndDateOption(foundUser,
             pageable, beginAt, endAt);
+    }
+
+    @Override
+    public AuthResponseDTO.userInfo getUserInfo(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        AuthResponseDTO.userInfo response = new AuthResponseDTO.userInfo(foundUser);
+        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        creator.ifPresent(creatorEntity -> response.setCreatorId(creatorEntity.getId()));
+        return response;
     }
 
     private static LocalDateTime convertDateToLocalDateTime(String dateString) {

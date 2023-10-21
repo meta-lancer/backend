@@ -48,7 +48,7 @@ public class UserController {
     public BaseResponse<AuthResponseDTO.userInfo> getUserInfo(
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("로그인되어있는 유저: {}", user);
-        return new BaseResponse<>(new AuthResponseDTO.userInfo(user.getUser()));
+        return new BaseResponse<AuthResponseDTO.userInfo>(userService.getUserInfo(user));
     }
 
     @Operation(summary = "판매자 전환", description = "호출하면 바로 판매자로 전환이 됩니다.")

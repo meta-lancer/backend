@@ -17,4 +17,6 @@ public interface CreatorService {
     Boolean successAsset(Long productsId, PrincipalDetails user);
 
     Boolean failAsset(Long productsId, PrincipalDetails user);
+
+    Boolean deleteAsset(Long productsId, PrincipalDetails user);
 }

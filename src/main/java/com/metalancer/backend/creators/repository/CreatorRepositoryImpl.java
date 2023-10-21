@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,11 @@ public class CreatorRepositoryImpl implements CreatorRepository {
         return creatorJpaRepository.findByUserAndStatus(user, status).orElseThrow(
             () -> new BaseException(ErrorCode.NOT_FOUND)
         );
+    }
+
+    @Override
+    public Optional<CreatorEntity> findOptionalByUserAndStatus(User user, DataStatus status) {
+        return creatorJpaRepository.findByUserAndStatus(user, status);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
+import com.metalancer.backend.users.dto.AuthResponseDTO.userInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateBasicInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
@@ -42,4 +43,6 @@ public interface UserService {
     Page<PayedAssets> getPayedAssetList(String status, String beginDate, String endDate,
         PrincipalDetails user,
         Pageable pageable);
+
+    userInfo getUserInfo(PrincipalDetails user);
 }

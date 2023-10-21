@@ -168,7 +168,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     public ProductsDetail toProductsDetail() {
         return ProductsDetail.builder().assetId(id).category(category.toDomain()).creator(
-                creatorEntity.toDamain())
+                creatorEntity.toDomain())
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt).build();
     }

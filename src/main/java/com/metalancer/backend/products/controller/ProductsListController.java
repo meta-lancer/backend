@@ -67,7 +67,8 @@ public class ProductsListController {
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/genre-galaxy")
     public BaseResponse<GenreGalaxyResponse> getGenreGalaxyList(
-            @Parameter(name = "종류", description = "MODEL(\"모델\"), \n"
+            @Parameter(name = "종류", description = "ALL(전체), \n " +
+                    "      MODEL(\"모델\"), \n"
                     + "    ANIMAL(\"동물\"),\n"
                     + "    PLANT(\"식물\"),\n"
                     + "    BACKGROUND(\"배경\"),\n"

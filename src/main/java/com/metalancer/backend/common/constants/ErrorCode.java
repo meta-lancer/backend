@@ -46,7 +46,7 @@ public enum ErrorCode {
     AUTHORITY_HAVE(SUCCESS, "E001", "수정/삭제 권한이 있습니다"),
     AUTHORITY_NOT_HAVE(NOT_FOUND_VALUE, "E002", "수정/삭제 권한이 없습니다."),
     INVALID_ROLE_ACCESS(FORBIDDEN, "E003", "올바르지 않은 권한 접근입니다."),
-
+    IS_NOT_WRITER(INVALID_ACCESS, "E004", "본인만 접근 가능합니다."),
     /**
      * 포트원 결제
      */

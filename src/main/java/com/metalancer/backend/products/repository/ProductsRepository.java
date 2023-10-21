@@ -8,6 +8,8 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProductsRepository {
 
     ProductsEntity findProductById(Long productsId);
@@ -19,13 +21,13 @@ public interface ProductsRepository {
     Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
     Page<ProductsEntity> findProductsListByCreatorAndStatus(CreatorEntity creatorEntity,
-        DataStatus status,
-        Pageable pageable);
+                                                            DataStatus status,
+                                                            Pageable pageable);
 
     Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
     Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
-        Pageable pageable);
+                                                   Pageable pageable);
 
     Page<HotPickAsset> findNewProductList(Pageable pageable);
 
@@ -38,4 +40,6 @@ public interface ProductsRepository {
     void save(ProductsEntity createdProductsEntity);
 
     long countAllByCreatorEntity(CreatorEntity creatorEntity);
+
+    Page<ProductsEntity> findAllDistinctByTagListAndStatus(List<String> tagList, DataStatus status, Pageable pageable);
 }

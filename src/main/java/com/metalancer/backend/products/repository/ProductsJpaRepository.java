@@ -6,8 +6,11 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Long> {
@@ -38,4 +41,8 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
                                                                                                    LocalDateTime startDate,
                                                                                                    LocalDateTime endDate,
                                                                                                    Pageable pageable);
+
+
+    @Query("SELECT DISTINCT pt.productsEntity FROM products_tag pt WHERE pt.name IN :tagList and pt.productsEntity.status = :status")
+    Page<ProductsEntity> findDistinctProductsByTagNamesAndStatus(@Param("tagList") List<String> tagList, @Param("status") DataStatus status, Pageable pageable);
 }

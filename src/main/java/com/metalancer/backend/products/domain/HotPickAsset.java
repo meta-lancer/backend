@@ -13,7 +13,7 @@ public class HotPickAsset extends Asset {
     }
 
     @Builder
-    public HotPickAsset(Long assetId, String title, String assetUrl, Integer price) {
-        super(assetId, title, assetUrl, price);
+    public HotPickAsset(Long productsId, String title, String thumbnail, Integer price) {
+        super(productsId, title, thumbnail, price);
     }
 }

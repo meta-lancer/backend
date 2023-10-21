@@ -7,7 +7,7 @@ import lombok.Getter;
 public class FilterAsset extends Asset {
 
     @Builder
-    public FilterAsset(Long assetId, String title, String assetUrl, Integer price) {
-        super(assetId, title, assetUrl, price);
+    public FilterAsset(Long productsId, String title, String thumbnail, Integer price) {
+        super(productsId, title, thumbnail, price);
     }
 }

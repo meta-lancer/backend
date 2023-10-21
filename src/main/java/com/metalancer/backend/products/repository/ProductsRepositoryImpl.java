@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -90,7 +91,7 @@ public class ProductsRepositoryImpl implements ProductsRepository {
                         pageable)
                 .map(ProductsEntity::toHotPickAsset);
     }
-    
+
     @Override
     public Page<HotPickAsset> findSaleProductList(Pageable pageable) {
         return null;
@@ -135,6 +136,11 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     @Override
     public long countAllByCreatorEntity(CreatorEntity creatorEntity) {
         return productsJpaRepository.countAllByCreatorEntity(creatorEntity);
+    }
+
+    @Override
+    public Page<ProductsEntity> findAllDistinctByTagListAndStatus(List<String> tagList, DataStatus status, Pageable pageable) {
+        return productsJpaRepository.findDistinctProductsByTagNamesAndStatus(tagList, status, pageable);
     }
 
     ;

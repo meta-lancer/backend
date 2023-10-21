@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.exception.OrderStatusException;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.OrderProducts;
@@ -33,16 +34,17 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -67,38 +69,41 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
+        user = userRepository.findById(user.getId()).orElseThrow(
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         String orderNo = createOrderNo();
         OrdersEntity createdOrdersEntity = OrdersEntity.builder().orderer(user)
-            .orderNo(orderNo)
-            .totalPrice(dto.getTotalPrice())
-            .totalPaymentPrice(dto.getTotalPaymentPrice())
+                .orderNo(orderNo)
+                .totalPrice(dto.getTotalPrice())
+                .totalPaymentPrice(dto.getTotalPaymentPrice())
 //            .totalPoint(dto.getTotalPoint())
-            .build();
+                .build();
         ordersRepository.save(createdOrdersEntity);
         int index = 1;
         for (Long productsId : dto.getProductsIdList()) {
             ProductsEntity foundProductEntity = productsRepository.findProductById(productsId);
             Integer price =
-                foundProductEntity.getSalePrice() == null ? foundProductEntity.getPrice()
-                    : foundProductEntity.getSalePrice();
+                    foundProductEntity.getSalePrice() == null ? foundProductEntity.getPrice()
+                            : foundProductEntity.getSalePrice();
             OrderProductsEntity createdOrderProductsEntity = OrderProductsEntity.builder()
-                .orderer(user)
-                .ordersEntity(createdOrdersEntity).productsEntity(foundProductEntity)
-                .orderNo(orderNo).orderProductNo(orderNo + String.format("%04d", index++))
-                .price(price)
-                .build();
+                    .orderer(user)
+                    .ordersEntity(createdOrdersEntity).productsEntity(foundProductEntity)
+                    .orderNo(orderNo).orderProductNo(orderNo + String.format("%04d", index++))
+                    .price(price)
+                    .build();
             orderProductsRepository.save(createdOrderProductsEntity);
         }
         CreatedOrder response = createdOrdersEntity.toCreatedOrderDomain();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
-            createdOrdersEntity);
+                createdOrdersEntity);
         response.setOrderProductList(orderProductsEntityList);
         return response;
     }
 
     @Override
     public boolean checkPayment(OrdersRequestDTO.CheckPayment dto)
-        throws IamportResponseException, IOException {
+            throws IamportResponseException, IOException {
         // 결제내역 단건 조회
         IamportClient client = new IamportClient(apiKey, apiSecret, true);
         // getPrepare는 클라에서만 사용 가능
@@ -131,20 +136,23 @@ public class OrdersServiceImpl implements OrdersService {
     private void checkOrderStatusIsPaidFromAPI(String status) {
         if (!status.equals("paid")) {
             throw new OrderStatusException("orderStatus should be 'PAY_ING'",
-                ErrorCode.ILLEGAL_ORDER_STATUS);
+                    ErrorCode.ILLEGAL_ORDER_STATUS);
         }
     }
 
     private void checkOrderStatusEqualsPAY_ING_OR_PAY_DONE(OrderStatus orderStatus) {
         if (!orderStatus.equals(OrderStatus.PAY_ING) && !orderStatus.equals(OrderStatus.PAY_DONE)) {
             throw new OrderStatusException("orderStatus should be 'PAY_ING'",
-                ErrorCode.ILLEGAL_ORDER_STATUS);
+                    ErrorCode.ILLEGAL_ORDER_STATUS);
         }
     }
 
     @Override
     public PaymentResponse completePayment(User user, CompleteOrder dto)
-        throws IamportResponseException, IOException {
+            throws IamportResponseException, IOException {
+        user = userRepository.findById(user.getId()).orElseThrow(
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         String orderNo = dto.getMerchantUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
         DataStatus dataStatus = foundOrdersEntity.getStatus();
@@ -156,17 +164,17 @@ public class OrdersServiceImpl implements OrdersService {
         IamportResponse<Payment> payment_response = client.paymentByImpUid(dto.getImpUid());
         Payment paymentResponse = payment_response.getResponse();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
-            foundOrdersEntity);
+                foundOrdersEntity);
         if (orderStatus.equals(OrderStatus.PAY_DONE)) {
             PaymentResponse response = getPaymentResponse(user,
-                foundOrdersEntity, orderStatus, paymentResponse);
+                    foundOrdersEntity, orderStatus, paymentResponse);
             return response;
         }
         // 결제 처리 완료
         completeOrder(foundOrdersEntity, orderProductsEntityList);
         // 결제 완료 저장 => 일부 데이터는 결제 완료 받은 값이 필요
         OrderPaymentEntity savedOrderPaymentEntity = createOrderPaymentEntity(orderNo,
-            foundOrdersEntity, paymentResponse);
+                foundOrdersEntity, paymentResponse);
         // 장바구니에서 삭제
         for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
             cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity());
@@ -174,55 +182,58 @@ public class OrdersServiceImpl implements OrdersService {
             ProductsEntity foundProductEntity = orderProductsEntity.getProductsEntity();
             String assetUrl = productsAssetFileRepository.findUrlByProduct(foundProductEntity);
             PayedAssetsEntity createdPayedAssetsEntity = PayedAssetsEntity.builder().user(user)
-                .orderProductsEntity(orderProductsEntity)
-                .products(foundProductEntity)
-                .orderPaymentEntity(savedOrderPaymentEntity)
-                .downloadLink(assetUrl).build();
+                    .orderProductsEntity(orderProductsEntity)
+                    .products(foundProductEntity)
+                    .orderPaymentEntity(savedOrderPaymentEntity)
+                    .downloadLink(assetUrl).build();
             payedAssetsRepository.save(createdPayedAssetsEntity);
         }
 
         PaymentResponse response = getPaymentResponse(user,
-            foundOrdersEntity, orderStatus, paymentResponse);
+                foundOrdersEntity, orderStatus, paymentResponse);
         log.info("결제처리 응답: {}", response);
         return response;
     }
 
     private OrderPaymentEntity createOrderPaymentEntity(String orderNo,
-        OrdersEntity foundOrdersEntity,
-        Payment paymentResponse) {
+                                                        OrdersEntity foundOrdersEntity,
+                                                        Payment paymentResponse) {
         OrderPaymentEntity createdOrderPaymentEntity = OrderPaymentEntity.builder()
-            .ordersEntity(foundOrdersEntity).impUid(paymentResponse.getImpUid())
-            .orderNo(orderNo).paymentPrice(foundOrdersEntity.getTotalPaymentPrice())
-            .title(paymentResponse.getName())
-            .receiptUrl(paymentResponse.getReceiptUrl())
-            .type(paymentResponse.getPgProvider())
-            .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
-            .purchasedAt(paymentResponse.getPaidAt()).build();
+                .ordersEntity(foundOrdersEntity).impUid(paymentResponse.getImpUid())
+                .orderNo(orderNo).paymentPrice(foundOrdersEntity.getTotalPaymentPrice())
+                .title(paymentResponse.getName())
+                .receiptUrl(paymentResponse.getReceiptUrl())
+                .type(paymentResponse.getPgProvider())
+                .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
+                .purchasedAt(paymentResponse.getPaidAt()).build();
         orderPaymentRepository.save(createdOrderPaymentEntity);
         return orderPaymentRepository.findByOrderNo(orderNo);
     }
 
     private PaymentResponse getPaymentResponse(User user, OrdersEntity foundOrdersEntity,
-        OrderStatus orderStatus, Payment paymentResponse) {
+                                               OrderStatus orderStatus, Payment paymentResponse) {
+        user = userRepository.findById(user.getId()).orElseThrow(
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         PaymentResponse response = PaymentResponse.builder().ordererId(user.getId())
-            .ordererNm(user.getName())
-            .ordererPhone(user.getMobile()).ordererEmail(user.getEmail())
-            .orderNo(foundOrdersEntity.getOrderNo()).orderStatus(orderStatus)
-            .totalPrice(
-                foundOrdersEntity.getTotalPrice())
-            .totalPayment(foundOrdersEntity.getTotalPaymentPrice())
-            .totalPoint(foundOrdersEntity.getTotalPoint())
-            .purchasedAt(paymentResponse.getPaidAt())
-            .build();
+                .ordererNm(user.getName())
+                .ordererPhone(user.getMobile()).ordererEmail(user.getEmail())
+                .orderNo(foundOrdersEntity.getOrderNo()).orderStatus(orderStatus)
+                .totalPrice(
+                        foundOrdersEntity.getTotalPrice())
+                .totalPayment(foundOrdersEntity.getTotalPaymentPrice())
+                .totalPoint(foundOrdersEntity.getTotalPoint())
+                .purchasedAt(paymentResponse.getPaidAt())
+                .build();
         List<OrderProducts> orderProductsList = orderProductsRepository.findAllProductsByOrder(
-            foundOrdersEntity);
+                foundOrdersEntity);
         response.setOrderProductList(orderProductsList);
         log.info("결제처리 응답: {}", response);
         return response;
     }
 
     private void completeOrder(OrdersEntity ordersEntity,
-        List<OrderProductsEntity> orderProductsEntityList) {
+                               List<OrderProductsEntity> orderProductsEntityList) {
         ordersEntity.completeOrder();
         for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
             orderProductsEntity.completeOrder();
@@ -231,13 +242,13 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public PaymentResponse completePaymentByWebhook(CompleteOrderWebhook dto)
-        throws IamportResponseException, IOException {
+            throws IamportResponseException, IOException {
         if (!dto.getImp_uid().equals(impUid)) {
             // 예외 처리
         }
         if (dto.getStatus().equals("paid")) {
             CompleteOrder completeOrder = new CompleteOrder(dto.getImp_uid(),
-                dto.getMerchant_uid());
+                    dto.getMerchant_uid());
             // 가격이 맞는지, 고유번호가 맞는 지 등
             completePayment(null, completeOrder);
         }
@@ -246,21 +257,24 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public PaymentResponse cancelAllPayment(User user, CancelAllPayment dto)
-        throws IamportResponseException, IOException {
+            throws IamportResponseException, IOException {
+        user = userRepository.findById(user.getId()).orElseThrow(
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         String orderNo = dto.getMerchantUid();
         String impUid = dto.getImpUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
         cancelPayments(impUid, dto.getMerchantUid(),
-            BigDecimal.valueOf(foundOrdersEntity.getTotalPaymentPrice()),
-            dto.getReason());
+                BigDecimal.valueOf(foundOrdersEntity.getTotalPaymentPrice()),
+                dto.getReason());
         cancelOrder(foundOrdersEntity);
         return null;
     }
 
     private IamportResponse<Payment> cancelPayments(String impUid, String merchantUid,
-        BigDecimal amount,
-        String reason)
-        throws IamportResponseException, IOException {
+                                                    BigDecimal amount,
+                                                    String reason)
+            throws IamportResponseException, IOException {
         IamportClient client = new IamportClient(apiKey, apiSecret, true);
         IamportResponse<Payment> payment_response = client.paymentByImpUid(impUid);
         Payment paymentResponse = payment_response.getResponse();

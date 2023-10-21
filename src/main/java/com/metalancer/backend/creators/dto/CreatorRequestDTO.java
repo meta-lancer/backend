@@ -1,6 +1,7 @@
 package com.metalancer.backend.creators.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,40 @@ public class CreatorRequestDTO {
 
         @Schema(description = "추천 태그 등록", example = "[\"리깅\", \"3D 모델링\"]")
         private List<String> tagList;
+    }
+
+    @Data
+    public static class PortfolioCreate {
+
+        @Schema(description = "제목")
+        private String title;
+        @Schema(description = "시작날")
+        private LocalDateTime beginAt;
+        @Schema(description = "마감날(진행중이면 null로)")
+        private LocalDateTime endAt;
+        @Schema(description = "작업 인원수")
+        private int workerCnt;
+        @Schema(description = "작업툴")
+        private String tool;
+        @Schema(description = "첨부 파일")
+        private String referenceFile;
+    }
+
+    @Data
+    public static class PortfolioUpdate {
+
+        @Schema(description = "제목")
+        private String title;
+        @Schema(description = "시작날")
+        private LocalDateTime beginAt;
+        @Schema(description = "마감날(진행중이면 null로)")
+        private LocalDateTime endAt;
+        @Schema(description = "작업 인원수")
+        private int workerCnt;
+        @Schema(description = "작업툴")
+        private String tool;
+        @Schema(description = "첨부 파일")
+        private String referenceFile;
     }
 
 }

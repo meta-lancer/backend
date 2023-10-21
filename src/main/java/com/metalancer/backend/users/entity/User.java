@@ -1,7 +1,6 @@
 package com.metalancer.backend.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.metalancer.backend.admin.domain.CreatorList;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.common.BaseEntity;
@@ -51,7 +50,7 @@ public class User extends BaseEntity implements Serializable {
     private String email;
     private String name;
     private String username;
-    private String nickname;
+    private String nickname = "";
     private LocalDateTime nicknameUpdatedAt;
     private String mobile;
     private String job;
@@ -195,22 +194,6 @@ public class User extends BaseEntity implements Serializable {
             .name(name)
             .username(username)
             .loginType(loginType)
-            .status(getStatus())
-            .createdAt(getCreatedAt())
-            .updatedAt(getUpdatedAt())
-            .build();
-    }
-
-    public CreatorList toAdminCreatorList() {
-        return CreatorList.builder()
-            .memberId(id)
-            .email(email)
-            .mobile(mobile)
-            .name(name)
-            .username(username)
-            .job(job)
-            .loginType(loginType)
-            .role(role)
             .status(getStatus())
             .createdAt(getCreatedAt())
             .updatedAt(getUpdatedAt())

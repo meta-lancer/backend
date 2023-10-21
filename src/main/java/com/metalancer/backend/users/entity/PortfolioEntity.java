@@ -62,7 +62,7 @@ public class PortfolioEntity extends BaseTimeEntity implements Serializable {
             .referenceFile(referenceFile).build();
     }
 
-    public void Update(String title, LocalDateTime beginAt,
+    public void update(String title, LocalDateTime beginAt,
         LocalDateTime endAt, int workerCnt, String tool, String referenceFile) {
         this.title = title;
         this.beginAt = beginAt;

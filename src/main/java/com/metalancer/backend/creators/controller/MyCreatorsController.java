@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -113,6 +114,39 @@ public class MyCreatorsController {
     public BaseResponse<List<Portfolio>> getMyPortfolio(
         @AuthenticationPrincipal PrincipalDetails user) {
         return new BaseResponse<List<Portfolio>>(creatorReadService.getMyPortfolio(user));
+    }
+
+    @Operation(summary = "내 포트폴리오 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PostMapping("/portfolio")
+    public BaseResponse<List<Portfolio>> createMyPortfolio(
+        @RequestBody CreatorRequestDTO.PortfolioCreate dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<List<Portfolio>>(
+            creatorService.createMyPortfolio(dto, user));
+    }
+
+    @Operation(summary = "내 포트폴리오 수정", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PatchMapping("/portfolio/{portfolioId}")
+    public BaseResponse<List<Portfolio>> updateMyPortfolio(
+        @PathVariable Long portfolioId,
+        @RequestBody CreatorRequestDTO.PortfolioUpdate dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+
+        return new BaseResponse<List<Portfolio>>(
+            creatorService.updateMyPortfolio(portfolioId, dto, user));
+    }
+
+
+    @Operation(summary = "내 포트폴리오 삭제", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @DeleteMapping("/portfolio/{portfolioId}")
+    public BaseResponse<List<Portfolio>> deleteMyPortfolio(
+        @PathVariable Long portfolioId,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<List<Portfolio>>(
+            creatorService.deleteMyPortfolio(portfolioId, user));
     }
 
     @Operation(summary = "에셋 관리 목록 조회", description = "파라미터에 page=1&size=5&sort=createdAt,desc 처럼 붙여주셔야 최근 등록일 순으로 정렬됩니다.")

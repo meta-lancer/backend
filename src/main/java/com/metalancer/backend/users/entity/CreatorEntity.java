@@ -66,7 +66,7 @@ public class CreatorEntity extends BaseEntity implements Serializable {
         }
     }
 
-    public Creator toDamain() {
+    public Creator toDomain() {
         return Creator.builder().creatorId(id).nickName(user.getName()).profileImg("").email(email)
             .introduction(introduction).introductionShort(introductionShort).satisficationRate(0.0)
             .userType("일반회원").cnt(0).build();

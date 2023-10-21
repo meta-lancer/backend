@@ -7,6 +7,8 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.Use_YN;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.external.aws.s3.S3Service;
@@ -24,8 +26,11 @@ import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
+import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import com.metalancer.backend.users.entity.PortfolioEntity;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.PortfolioRepository;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +57,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final ProductsThumbnailRepository productsThumbnailRepository;
     private final ProductsViewsRepository productsViewsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
+    private final PortfolioRepository portfolioRepository;
 
     @Override
     public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
@@ -232,5 +238,43 @@ public class CreatorServiceImpl implements CreatorService {
             .fileName(randomFileName)
             .build();
         productsAssetFileRepository.save(createdProductsAssetFileEntity);
+    }
+
+    @Override
+    public List<Portfolio> deleteMyPortfolio(Long portfolioId, PrincipalDetails user) {
+        User foundUser = user.getUser();
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        PortfolioEntity portfolioEntity = portfolioRepository.findEntityByIdAndCreator(portfolioId,
+            creatorEntity);
+        portfolioRepository.delete(portfolioEntity);
+        return portfolioRepository.findAllByCreator(creatorEntity);
+    }
+
+    @Override
+    public List<Portfolio> createMyPortfolio(PortfolioCreate dto, PrincipalDetails user) {
+        User foundUser = user.getUser();
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
+            .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
+            .workerCnt(dto.getWorkerCnt()).tool(dto.getTool()).referenceFile(dto.getReferenceFile())
+            .build();
+        portfolioRepository.save(portfolioEntity);
+        return portfolioRepository.findAllByCreator(creatorEntity);
+    }
+
+    @Override
+    public List<Portfolio> updateMyPortfolio(Long portfolioId, PortfolioUpdate dto,
+        PrincipalDetails user) {
+        User foundUser = user.getUser();
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        PortfolioEntity portfolioEntity = portfolioRepository.findEntityByIdAndCreator(portfolioId,
+            creatorEntity);
+        portfolioEntity.update(dto.getTitle(), dto.getBeginAt(), dto.getEndAt(), dto.getWorkerCnt(),
+            dto.getTool(), dto.getReferenceFile());
+        portfolioRepository.save(portfolioEntity);
+        return portfolioRepository.findAllByCreator(creatorEntity);
     }
 }

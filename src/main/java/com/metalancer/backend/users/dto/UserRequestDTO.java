@@ -4,13 +4,15 @@ import com.metalancer.backend.common.constants.ValidationText;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
+@NoArgsConstructor
 public class UserRequestDTO {
 
     @Data
@@ -40,30 +42,34 @@ public class UserRequestDTO {
     }
 
     @Data
+    @NoArgsConstructor
     public static class UpdateCareerIntroRequest {
 
-        private final String intro;
+        private String intro;
     }
 
     @Data
+    @NoArgsConstructor
     public static class CreateCareerRequest {
 
-        private final String title;
-        private final LocalDateTime beginAt;
-        private final LocalDateTime endAt;
-        private final String description;
+        private String title;
+        private LocalDateTime beginAt;
+        private LocalDateTime endAt;
+        private String description;
     }
 
     @Data
+    @NoArgsConstructor
     public static class UpdateCareerRequest {
 
-        private final String title;
-        private final LocalDateTime beginAt;
-        private final LocalDateTime endAt;
-        private final String description;
+        private String title;
+        private LocalDateTime beginAt;
+        private LocalDateTime endAt;
+        private String description;
     }
 
     @Data
+    @NoArgsConstructor
     public static class UpdateBasicInfo {
 
         private String profileImg;

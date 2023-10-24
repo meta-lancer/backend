@@ -35,7 +35,7 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "이메일 회원가입", description = "이메일, 비밀번호, 직업, 관심분야, 약관동의 필요. Response - 회원고유번호")
-    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = Long.class)))
     @PostMapping
     public BaseResponse<Long> createUser(@RequestBody UserRequestDTO.CreateRequest dto)
         throws Exception {
@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @Operation(summary = "가입 승인처리", description = "")
-    @ApiResponse(responseCode = "200", description = "승인 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "승인 성공", content = @Content(schema = @Schema(implementation = AuthResponseDTO.userInfo.class)))
     @PatchMapping("/status/{link}")
     public BaseResponse<AuthResponseDTO.userInfo> approveUserByLink(
         @PathVariable("link") String link) {

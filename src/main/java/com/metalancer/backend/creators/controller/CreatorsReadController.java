@@ -11,6 +11,7 @@ import com.metalancer.backend.users.dto.UserResponseDTO;
 import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,7 +37,7 @@ public class CreatorsReadController {
     private final CreatorReadService creatorReadService;
 
     @Operation(summary = "기존 정보 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = UserResponseDTO.OtherCreatorBasicInfo.class)))
     @GetMapping("/users/{creatorId}/basic")
     public BaseResponse<UserResponseDTO.OtherCreatorBasicInfo> getBasicInfo(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -46,7 +47,7 @@ public class CreatorsReadController {
     }
 
     @Operation(summary = "소개 및 업무경험 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = IntroAndCareer.class)))
     @GetMapping("/users/{creatorId}/career")
     public BaseResponse<IntroAndCareer> getIntroAndCareer(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -56,7 +57,9 @@ public class CreatorsReadController {
     }
 
     @Operation(summary = "크리에이터 에셋 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = CreatorAssetList.class)))
+    })
     @GetMapping("/users/{creatorId}/creator-asset")
     public BaseResponse<Page<CreatorAssetList>> getCreatorAssetList(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -68,7 +71,9 @@ public class CreatorsReadController {
     }
 
     @Operation(summary = "크리에이터 포트폴리오 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
     @GetMapping("/users/{creatorId}/portfolio")
     public BaseResponse<List<Portfolio>> getCreatorPortfolio(
         @Parameter(description = "크리에이터 고유번호") @PathVariable Long creatorId) {

@@ -8,6 +8,7 @@ import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,7 +36,9 @@ public class CartController {
     private final CartService cartService;
 
     @Operation(summary = "장바구니 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Cart.class)))
+    })
     @GetMapping
     public BaseResponse<Page<Cart>> getAllCart(
         HttpSession session,
@@ -49,7 +52,7 @@ public class CartController {
     }
 
     @Operation(summary = "장바구니 생성", description = "")
-    @ApiResponse(responseCode = "200", description = "생성 성공. true면 새롭게 생성, false면 이미 존재함", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "생성 성공. true면 새롭게 생성, false면 이미 존재함", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PostMapping("/asset/{assetId}")
     public BaseResponse<Boolean> createCart(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -60,7 +63,7 @@ public class CartController {
     }
 
     @Operation(summary = "장바구니 삭제", description = "")
-    @ApiResponse(responseCode = "200", description = "삭제 성공. true면 삭제 완료, false면 애초에 존재 x", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "삭제 성공. true면 삭제 완료, false면 애초에 존재 x", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @DeleteMapping("/asset/{assetId}")
     public BaseResponse<Boolean> deleteCart(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -71,7 +74,7 @@ public class CartController {
     }
 
     @Operation(summary = "장바구니 전체 삭제", description = "")
-    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @DeleteMapping
     public BaseResponse<Boolean> deleteAllCart(
         @AuthenticationPrincipal PrincipalDetails user) {

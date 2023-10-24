@@ -10,7 +10,9 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.users.entity.ApproveLink;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.UserRepository;
@@ -31,6 +33,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     private final UserRepository userRepository;
     private final ApproveLinkRepository approveLinkRepository;
+    private final CreatorRepository creatorRepository;
 
     @Override
     public List<MemberList> getAdminMemberList() {
@@ -61,7 +64,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     @Override
     public List<CreatorList> getAdminCreatorList() {
-        return userRepository.findAll().stream().map(User::toAdminCreatorList)
+        return creatorRepository.findAll().stream().map(CreatorEntity::toAdminCreatorList)
             .filter(user -> user.getRole().equals(Role.ROLE_SELLER))
             .collect(Collectors.toList());
     }
@@ -91,8 +94,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         int count = 0;
         for (User user : userList) {
             user.setActive();
-            Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApproved(
-                user.getEmail(), false);
+            Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApprovedAtIsNull(
+                user.getEmail());
             if (approveLink.isPresent()) {
                 approveLink.get().approve();
                 count++;

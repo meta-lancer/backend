@@ -4,6 +4,7 @@ package com.metalancer.backend.admin.controller;
 import com.metalancer.backend.admin.service.AdminCategoryService;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
+import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,7 +36,7 @@ public class AdminCategoryController {
     @Operation(summary = "메인페이지-Trend Spotlight 카테고리", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     @GetMapping("/trend-spotlight")
-    public BaseResponse<List<MainCategory>> getAdminTrendSpotlightCategoryList() {
+    public BaseResponse<List<TrendSpotlightCategory>> getAdminTrendSpotlightCategoryList() {
         return new BaseResponse<>(
             adminCategoryService.getAdminTrendSpotlightCategoryList());
     }

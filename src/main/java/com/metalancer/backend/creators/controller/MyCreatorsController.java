@@ -13,6 +13,7 @@ import com.metalancer.backend.creators.service.CreatorService;
 import com.metalancer.backend.users.domain.Portfolio;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +46,7 @@ public class MyCreatorsController {
     private final CreatorReadService creatorReadService;
 
     @Operation(summary = "에셋 등록", description = "미구현")
-    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetCreatedResponse.class)))
     @PostMapping
     public BaseResponse<CreatorResponseDTO.AssetCreatedResponse> createAsset(
         @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
@@ -58,7 +59,7 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "에셋 파일 presignedUrl 획득", description = "유효시간 5분")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = String.class)))
     @GetMapping("/{productsId}/asset-file/url")
     public BaseResponse<String> getAssetFilePreSignedUrl(
         @Parameter(description = "상품 고유번호") @PathVariable Long productsId) {
@@ -66,7 +67,7 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "에셋 등록 성공", description = "")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PatchMapping("/{productsId}/success")
     public BaseResponse<Boolean> successAsset(
         @PathVariable Long productsId,
@@ -77,7 +78,7 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "에셋 등록 실패", description = "본인이 아니면 403 예외")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @DeleteMapping("/{productsId}/fail")
     public BaseResponse<Boolean> failAsset(
         @PathVariable Long productsId,
@@ -88,7 +89,7 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "에셋 등록 삭제", description = "본인이 아니면 403 예외")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @DeleteMapping("/{productsId}")
     public BaseResponse<Boolean> deleteAsset(
         @PathVariable Long productsId,
@@ -98,7 +99,9 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "내가 등록한 에셋 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = CreatorAssetList.class)))
+    })
     @GetMapping("/my-assets")
     public BaseResponse<Page<CreatorAssetList>> getMyRegisteredAssets(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -109,7 +112,9 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "내 포트폴리오 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
     @GetMapping("/portfolio")
     public BaseResponse<List<Portfolio>> getMyPortfolio(
         @AuthenticationPrincipal PrincipalDetails user) {
@@ -117,7 +122,9 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "내 포트폴리오 등록", description = "")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
     @PostMapping("/portfolio")
     public BaseResponse<List<Portfolio>> createMyPortfolio(
         @RequestBody CreatorRequestDTO.PortfolioCreate dto,
@@ -127,7 +134,9 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "내 포트폴리오 수정", description = "")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
     @PatchMapping("/portfolio/{portfolioId}")
     public BaseResponse<List<Portfolio>> updateMyPortfolio(
         @PathVariable Long portfolioId,
@@ -140,7 +149,9 @@ public class MyCreatorsController {
 
 
     @Operation(summary = "내 포트폴리오 삭제", description = "")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
     @DeleteMapping("/portfolio/{portfolioId}")
     public BaseResponse<List<Portfolio>> deleteMyPortfolio(
         @PathVariable Long portfolioId,
@@ -150,7 +161,9 @@ public class MyCreatorsController {
     }
 
     @Operation(summary = "에셋 관리 목록 조회", description = "파라미터에 page=1&size=5&sort=createdAt,desc 처럼 붙여주셔야 최근 등록일 순으로 정렬됩니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = ManageAsset.class)))
+    })
     @GetMapping("/management")
     public BaseResponse<Page<ManageAsset>> getMyManageAssetList(
         @AuthenticationPrincipal PrincipalDetails user,

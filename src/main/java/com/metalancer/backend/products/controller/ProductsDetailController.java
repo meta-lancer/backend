@@ -30,7 +30,7 @@ public class ProductsDetailController {
     private final ProductsDetailService productsDetailService;
 
     @Operation(summary = "상품 상세 조회", description = "썸네일, 3D 뷰, 에셋 파일 등이 온전히 있어야")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ProductsDetail.class)))
     @GetMapping("/{productId}")
     public BaseResponse<ProductsDetail> getProductDetail(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -41,7 +41,7 @@ public class ProductsDetailController {
     }
 
     @Operation(summary = "상품 링크 공유", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = String.class)))
     @GetMapping("/{productId}/shared-link")
     public BaseResponse<String> getProductDetailSharedLink(
         @PathVariable("productId") Long productId) {
@@ -50,7 +50,7 @@ public class ProductsDetailController {
     }
 
     @Operation(summary = "상품 찜하기", description = "추가하면 true, 삭제/실패하면 false")
-    @ApiResponse(responseCode = "200", description = "토글 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "토글 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PostMapping("/{productId}/wish")
     public BaseResponse<Boolean> toggleProductWish(@AuthenticationPrincipal
     PrincipalDetails user, @PathVariable("productId") Long productId) {
@@ -59,7 +59,7 @@ public class ProductsDetailController {
     }
 
     @Operation(summary = "링크 공유를 통한 상품 상세 조회", description = "썸네일, 3D 뷰, 에셋 파일 등이 온전히 있어야")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = ProductsDetail.class)))
     @GetMapping("/shared-link")
     public BaseResponse<ProductsDetail> getProductDetailBySharedLink(
         @AuthenticationPrincipal PrincipalDetails user,

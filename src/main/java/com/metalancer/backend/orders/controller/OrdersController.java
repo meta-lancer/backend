@@ -16,6 +16,9 @@ import com.siot.IamportRestClient.response.AccessToken;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Prepare;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -62,6 +65,7 @@ public class OrdersController {
     @Operation(summary = "주문서 만들기", description = "결제하기를 누르면 결제완료 이전의 주문서가 만들어집니다. \n\n " +
         "여기서 결제모듈에 사용될 orderNo가 생성됩니다. \n\n " +
         "로그인 후, Session값이 제대로 설정될 때까지 유저1로 진행됩니다.")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = CreatedOrder.class)))
     @PostMapping
     public BaseResponse<CreatedOrder> createOrder(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -73,6 +77,7 @@ public class OrdersController {
 
 
     @Operation(summary = "포트원 결제에 필요한 토큰 발행", description = "프론트엔드에서 포트원 api 호출 시 필요할 수도 있다.")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = String.class)))
     @GetMapping("/token")
     public BaseResponse<String> getPortOneAccessToken() throws Exception {
         IamportClient client = new IamportClient(apiKey, apiSecret, true);
@@ -81,6 +86,7 @@ public class OrdersController {
     }
 
     @Operation(summary = "결제정보 사전 등록 요청", description = "가맹점 고유번호와 결제금액만으로 미리 등록")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PostMapping("/prepare")
     public BaseResponse<Boolean> postPreparePayments(
         @RequestBody OrdersRequestDTO.PostPreparePayments dto)
@@ -95,6 +101,7 @@ public class OrdersController {
     }
 
     @Operation(summary = "결제내역 단건 조회", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PostMapping("/payments/validation")
     public BaseResponse<Boolean> checkPayment(@RequestBody OrdersRequestDTO.CheckPayment dto)
         throws IamportResponseException, IOException {
@@ -103,6 +110,7 @@ public class OrdersController {
 
 
     @Operation(summary = "결제 완료 처리", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = PaymentResponse.class)))
     @PostMapping("/payments")
     public BaseResponse<PaymentResponse> completePayment(
         @AuthenticationPrincipal PrincipalDetails user,
@@ -114,6 +122,7 @@ public class OrdersController {
     }
 
     @Operation(summary = "결제 완료 처리 웹훅(포트원으로부터)", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = PaymentResponse.class)))
     @PostMapping("/payments/webhook")
     public BaseResponse<PaymentResponse> completePaymentByWebhook(
         @RequestBody OrdersRequestDTO.CompleteOrderWebhook dto
@@ -124,6 +133,7 @@ public class OrdersController {
     }
 
     @Operation(summary = "결제 전체 취소 요청", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = PaymentResponse.class)))
     @PatchMapping("/payments/cancellation/all")
     public BaseResponse<PaymentResponse> cancelAllPayment(
         @AuthenticationPrincipal PrincipalDetails user,

@@ -7,6 +7,7 @@ import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.service.CategoryListService;
 import com.metalancer.backend.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +29,9 @@ public class CategoryListController {
     private final CategoryListService categoryListService;
 
     @Operation(summary = "메인페이지-Hot Pick 카테고리", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = MainCategory.class)))
+    })
     @GetMapping("/hot-pick")
     public BaseResponse<List<MainCategory>> getHotPickCategoryList() {
         return new BaseResponse<>(
@@ -36,7 +39,9 @@ public class CategoryListController {
     }
 
     @Operation(summary = "메인페이지-Trend Spotlight 카테고리", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = TrendSpotlightCategory.class)))
+    })
     @GetMapping("/trend-spotlight")
     public BaseResponse<List<TrendSpotlightCategory>> getTrendSpotlightCategoryList() {
         return new BaseResponse<>(
@@ -44,7 +49,9 @@ public class CategoryListController {
     }
 
     @Operation(summary = "메인페이지-Genre Galaxy 카테고리", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = MainCategory.class)))
+    })
     @GetMapping("/genre-galaxy")
     public BaseResponse<List<MainCategory>> getGenreGalaxyCategoryList() {
         return new BaseResponse<>(
@@ -52,7 +59,9 @@ public class CategoryListController {
     }
 
     @Operation(summary = "제작 요청-인기 분류", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = RequestCategory.class)))
+    })
     @GetMapping("/request")
     public BaseResponse<List<RequestCategory>> getRequestCategoryList() {
         return new BaseResponse<>(

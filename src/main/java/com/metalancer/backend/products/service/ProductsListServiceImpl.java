@@ -114,10 +114,8 @@ public class ProductsListServiceImpl implements ProductsListService {
     public Page<FilterAsset> getFilterAssetList(List<String> categoryOption,
         List<String> trendOption, List<Integer> priceOption,
         Pageable pageable) {
-        List<String> tagList = null;
-        // 앞부분 로직 ....
-        if (isNullOrEmpty(categoryOption) && isNullOrEmpty(
-            trendOption)) {
+        List<String> tagList = new ArrayList<>();
+        if (isNullOrEmpty(categoryOption) && isNullOrEmpty(trendOption)) {
             Page<ProductsEntity> productsEntities =
                 priceOption == null || priceOption.size() == 0 ?
                     productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
@@ -127,11 +125,10 @@ public class ProductsListServiceImpl implements ProductsListService {
         }
 
         if (!isNullOrEmpty(categoryOption)) {
-
+            setTagListByOption(categoryOption, tagList);
         }
-
         if (!isNullOrEmpty(trendOption)) {
-
+            setTagListByOption(trendOption, tagList);
         }
 
         // tagList를 가져온다.
@@ -143,6 +140,13 @@ public class ProductsListServiceImpl implements ProductsListService {
                     tagList, DataStatus.ACTIVE, priceOption, pageable);
 
         return productsEntities.map(ProductsEntity::toFilterAsset);
+    }
+
+    private void setTagListByOption(List<String> categoryOption, List<String> tagList) {
+        for (String category : categoryOption) {
+            List<String> categoryTagList = tagsRepository.findAllByParentsTagName(category);
+            tagList.addAll(categoryTagList);
+        }
     }
 
     public static boolean isNullOrEmpty(List<?> list) {

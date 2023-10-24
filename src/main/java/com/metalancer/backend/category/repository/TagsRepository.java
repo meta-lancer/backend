@@ -13,4 +13,6 @@ public interface TagsRepository {
     List<String> findAllTrendSpotLightTags();
 
     List<String> findAllGenreGalaxyTags();
+
+    List<String> findAllByParentsTagName(String parentsTagName);
 }

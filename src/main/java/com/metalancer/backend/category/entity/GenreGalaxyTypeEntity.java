@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
@@ -30,19 +32,18 @@ public class GenreGalaxyTypeEntity extends BaseTimeEntity implements Serializabl
     @Column(name = "genre_galaxy_type_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String nameKor;
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private TagsEntity tagsEntity;
 
     @Builder
-    public GenreGalaxyTypeEntity(String name, String nameKor) {
-        this.name = name;
-        this.nameKor = nameKor;
+    public GenreGalaxyTypeEntity(TagsEntity tagsEntity, String name, String nameKor) {
+        this.tagsEntity = tagsEntity;
     }
 
     public MainCategory ToMainCategory() {
-        return MainCategory.builder().name(name).nameKor(nameKor).build();
+        String tagName = tagsEntity != null ? tagsEntity.getTagNameEn() : "all";
+        String tagNameKor = tagsEntity != null ? tagsEntity.getTagName() : "전체";
+        return MainCategory.builder().name(tagName).nameKor(tagNameKor).build();
     }
 }

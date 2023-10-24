@@ -66,6 +66,14 @@ public class CreatorEntity extends BaseEntity implements Serializable {
         }
     }
 
+    public void setActive() {
+        active();
+    }
+
+    public void setPending() {
+        pend();
+    }
+
     public Creator toDomain() {
         return Creator.builder().creatorId(id).nickName(user.getName()).profileImg("").email(email)
             .introduction(introduction).introductionShort(introductionShort).satisficationRate(0.0)

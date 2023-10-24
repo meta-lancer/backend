@@ -15,4 +15,6 @@ public interface CreatorRepository {
     CreatorEntity findByCreatorId(Long creatorId);
 
     List<CreatorEntity> findAll();
+
+    void save(CreatorEntity createdCreator);
 }

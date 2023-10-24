@@ -39,4 +39,9 @@ public class CreatorRepositoryImpl implements CreatorRepository {
     public List<CreatorEntity> findAll() {
         return creatorJpaRepository.findAll();
     }
+
+    @Override
+    public void save(CreatorEntity createdCreator) {
+        creatorJpaRepository.save(createdCreator);
+    }
 }

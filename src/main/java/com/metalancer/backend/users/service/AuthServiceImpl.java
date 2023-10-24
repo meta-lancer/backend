@@ -3,15 +3,18 @@ package com.metalancer.backend.users.service;
 import static com.metalancer.backend.common.constants.ObjectText.LOGIN_USER;
 
 import com.metalancer.backend.common.constants.ApplicationText;
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.RandomStringGenerator;
+import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateRequest;
 import com.metalancer.backend.users.entity.ApproveLink;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserAgreementEntity;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
@@ -47,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final UserInterestsRepository userInterestsRepository;
     private final UserAgreementRepository userAgreementRepository;
+    private final CreatorRepository creatorRepository;
 
     @Override
     public Long createUser(UserRequestDTO.CreateRequest dto) throws MessagingException {
@@ -134,6 +138,11 @@ public class AuthServiceImpl implements AuthService {
         User foundUser = userRepository.findByEmail(foundApproveLink.getEmail())
             .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
         foundUser.setActive();
+
+        Optional<CreatorEntity> foundCreator = creatorRepository.findOptionalByUserAndStatus(
+            foundUser, DataStatus.PENDING);
+        foundCreator.ifPresent(CreatorEntity::setActive);
+
         return new AuthResponseDTO.userInfo(foundUser);
     }
 
@@ -151,5 +160,28 @@ public class AuthServiceImpl implements AuthService {
     public boolean emailLogout(HttpSession session) {
         session.removeAttribute(LOGIN_USER);
         return true;
+    }
+
+    @Override
+    public Long createCreator(CreateRequest dto) throws MessagingException {
+        User createdUser = createEmailUser(dto);
+        createdUser = userRepository.save(createdUser);
+        User foundUser = userRepository.findById(createdUser.getId()).orElseThrow(
+            () -> new BaseException(ErrorCode.SIGNUP_FAILED)
+        );
+        setUserInterests(foundUser, dto);
+        setAgreement(foundUser, dto);
+        createdApproveLink(foundUser);
+        createCreator(foundUser);
+        CreatorEntity foundCreator = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.PENDING);
+        return foundCreator.getId();
+    }
+
+    private void createCreator(User foundUser) {
+        CreatorEntity createdCreator = CreatorEntity.builder().user(foundUser)
+            .email(foundUser.getEmail()).build();
+        creatorRepository.save(createdCreator);
+        createdCreator.setPending();
     }
 }

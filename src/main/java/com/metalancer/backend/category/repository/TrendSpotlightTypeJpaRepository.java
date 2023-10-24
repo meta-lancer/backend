@@ -1,11 +1,14 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.category.entity.TrendSpotlightTypeEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TrendSpotlightTypeJpaRepository extends
-        JpaRepository<TrendSpotlightTypeEntity, Long> {
-    Optional<TrendSpotlightTypeEntity> findByName(String name);
+    JpaRepository<TrendSpotlightTypeEntity, Long> {
+
+    @Query("select tsl from trend_spotlight_type tsl where tsl.tagsEntity.tagNameEn = :name")
+    Optional<TrendSpotlightTypeEntity> findByName(@Param("name") String name);
 }

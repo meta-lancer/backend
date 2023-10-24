@@ -5,10 +5,9 @@ import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ProductsRepository {
 
@@ -21,13 +20,13 @@ public interface ProductsRepository {
     Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
     Page<ProductsEntity> findProductsListByCreatorAndStatus(CreatorEntity creatorEntity,
-                                                            DataStatus status,
-                                                            Pageable pageable);
+        DataStatus status,
+        Pageable pageable);
 
     Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
     Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
-                                                   Pageable pageable);
+        Pageable pageable);
 
     Page<HotPickAsset> findNewProductList(Pageable pageable);
 
@@ -41,5 +40,15 @@ public interface ProductsRepository {
 
     long countAllByCreatorEntity(CreatorEntity creatorEntity);
 
-    Page<ProductsEntity> findAllDistinctByTagListAndStatus(List<String> tagList, DataStatus status, Pageable pageable);
+    Page<ProductsEntity> findAllDistinctByTagListAndStatus(List<String> tagList, DataStatus status,
+        Pageable pageable);
+
+    Page<ProductsEntity> findAllByStatusWithPriceOption(DataStatus dataStatus,
+        List<Integer> priceOption, Pageable pageable);
+
+
+    Page<ProductsEntity> findAllDistinctByTagListAndStatusWithPriceOption(List<String> tagList,
+        DataStatus dataStatus, List<Integer> priceOption, Pageable pageable);
+
+    Page<ProductsEntity> findAllByStatus(DataStatus status, Pageable pageable);
 }

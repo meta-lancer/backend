@@ -37,7 +37,6 @@ public class CategoryListServiceImpl implements CategoryListService {
 
     @Override
     public List<MainCategory> getGenreGalaxyCategoryList() {
-
         return genreGalaxyTypeRepository.getGenreGalaxyCategoryList();
     }
 

@@ -53,7 +53,7 @@ public class ProductsListController {
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = TrendSpotlightResponse.class)))
     @GetMapping("/trend-spotlight")
     public BaseResponse<TrendSpotlightResponse> getTrendSpotlight(
-        @Parameter(name = "종류", description =
+        @Parameter(name = "platformType", description =
             "ALL(전체), VRCHAT(VR CHAT), MINECRAFT(마인크래프트), ZEPETO(제페토), "
                 + "ROBLOX(로블룩스), MIDDLEAGE(중세), FUTURE(미래), CARTOON(카툰), ACTUAL(실사)") @RequestParam String platformType,
         @Parameter(description = "페이징") Pageable pageable) {
@@ -67,7 +67,7 @@ public class ProductsListController {
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = GenreGalaxyResponse.class)))
     @GetMapping("/genre-galaxy")
     public BaseResponse<GenreGalaxyResponse> getGenreGalaxyList(
-        @Parameter(name = "종류", description = "ALL(전체), \n " +
+        @Parameter(name = "type", description = "ALL(전체), \n " +
             "      MODEL(\"모델\"), \n"
             + "    ANIMAL(\"동물\"),\n"
             + "    PLANT(\"식물\"),\n"
@@ -89,16 +89,17 @@ public class ProductsListController {
     })
     @GetMapping("/asset")
     public BaseResponse<Page<FilterAsset>> getFilterAssetList(
-        @Parameter(description = "정렬 옵션") @RequestParam Integer sortOption,
-        @Parameter(description = "유형 옵션") @RequestParam List<Integer> typeOption,
-        @Parameter(description = "장르 옵션") @RequestParam List<Integer> genreOption,
+        @Parameter(description = "카테고리 옵션") @RequestParam List<String> categoryOption,
+        @Parameter(description = "인기있는 분류 옵션") @RequestParam List<String> trendOption,
         @Parameter(description = "가격 옵션") @RequestParam List<Integer> priceOption,
         @Parameter(description = "페이징") Pageable pageable) {
-        log.info("정렬 옵션-{}, 유형 옵션-{}, 장르 옵션-{}, 가격 옵션-{}, 페이징-{}", sortOption, typeOption,
-            genreOption, priceOption, pageable);
-        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
-        return new BaseResponse<>(
-            productsListService.getFilterAssetList(sortOption, typeOption, genreOption, priceOption,
+        log.info("카테고리 옵션-{}, 인기있는 분류 옵션-{}, 가격 옵션-{}, 페이징-{}", categoryOption,
+            trendOption, priceOption, pageable);
+        // 최신 등록일순으로
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        return new BaseResponse<Page<FilterAsset>>(
+            productsListService.getFilterAssetList(categoryOption, trendOption,
+                priceOption,
                 adjustedPageable));
     }
 }

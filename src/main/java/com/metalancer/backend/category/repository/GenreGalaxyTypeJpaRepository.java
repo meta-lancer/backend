@@ -1,10 +1,13 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.category.entity.GenreGalaxyTypeEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface GenreGalaxyTypeJpaRepository extends JpaRepository<GenreGalaxyTypeEntity, Long> {
-    Optional<GenreGalaxyTypeEntity> findByName(String name);
+
+    @Query("select ggt from genre_galaxy_type ggt where ggt.tagsEntity.tagNameEn = :name")
+    Optional<GenreGalaxyTypeEntity> findByName(@Param("name") String name);
 }

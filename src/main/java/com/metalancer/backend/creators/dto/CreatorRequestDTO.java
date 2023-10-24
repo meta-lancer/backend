@@ -17,22 +17,23 @@ public class CreatorRequestDTO {
         private String title;
         @Schema(description = "에셋 가격", example = "")
         private int price;
-        @Schema(description = "주문서 만들기로부터 받은 orderNo", example = "20235325346344")
-        private String productsCategory;
-
-        private String compatibleProgram;
 
         @Schema(description = "모델 타입", example = "")
         private String modelType;
 
-
+        @Schema(description = "에셋 상세", example = "")
         private String assetDetail;
+        @Schema(description = "유의사항", example = "")
         private String assetNotice;
+        @Schema(description = "상품저작권 안내", example = "")
         private String assetCopyRight;
+        @Schema(description = "웹사이트 방문", example = "")
         private String website;
 
         @Schema(description = "제작 프로그램", example = "")
         private List<String> productionProgram;
+        @Schema(description = "호환 프로그램", example = "")
+        private String compatibleProgram;
 
 
         @Schema(description = "추천 태그 등록", example = "[\"리깅\", \"3D 모델링\"]")

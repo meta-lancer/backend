@@ -15,4 +15,6 @@ public interface CategoryListService {
     List<MainCategory> getGenreGalaxyCategoryList();
 
     List<RequestCategory> getRequestCategoryList();
+
+    List<String> getTagRegisterRecommendList(String keyword);
 }

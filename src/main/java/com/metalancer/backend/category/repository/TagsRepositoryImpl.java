@@ -6,6 +6,7 @@ import com.metalancer.backend.category.entity.TrendSpotlightTypeEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -71,5 +72,14 @@ public class TagsRepositoryImpl implements TagsRepository {
         List<TagsEntity> tagsEntityList = tagsJpaRepository.findAllByParentId(
             tagsEntity.getId());
         return tagsEntityList.stream().map(TagsEntity::getTagName).toList();
+    }
+
+    @Override
+    public List<String> findAllByKeywordLimit10(String keyword) {
+        List<TagsEntity> tagsList = tagsJpaRepository.findAllByTagNameContains("%" + keyword + "%");
+        return tagsList.stream().map(TagsEntity::getTagName).sorted(
+                Comparator.comparingInt((String name) -> name.indexOf(keyword))
+                    .thenComparing(name -> name))
+            .limit(10).toList();
     }
 }

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "카테고리 목록", description = "")
@@ -66,5 +67,16 @@ public class CategoryListController {
     public BaseResponse<List<RequestCategory>> getRequestCategoryList() {
         return new BaseResponse<>(
             categoryListService.getRequestCategoryList());
+    }
+
+    @Operation(summary = "에셋 등록 - 태그 등록 시 추천검색어", description = "최대 10개까지만 조회됩니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/tag-register")
+    public BaseResponse<List<String>> getTagRegisterRecommendList(
+        @RequestParam("keyword") String keyword) {
+        return new BaseResponse<List<String>>(
+            categoryListService.getTagRegisterRecommendList(keyword));
     }
 }

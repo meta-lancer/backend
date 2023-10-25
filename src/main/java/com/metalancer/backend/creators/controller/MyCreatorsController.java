@@ -45,7 +45,7 @@ public class MyCreatorsController {
     private final CreatorService creatorService;
     private final CreatorReadService creatorReadService;
 
-    @Operation(summary = "에셋 등록", description = "미구현")
+    @Operation(summary = "에셋 등록", description = "상세페이지에 있는 모든 데이터 기반으로 구현")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetCreatedResponse.class)))
     @PostMapping
     public BaseResponse<CreatorResponseDTO.AssetCreatedResponse> createAsset(
@@ -53,9 +53,20 @@ public class MyCreatorsController {
         @RequestPart(value = "views", required = false) MultipartFile[] views,
         @RequestPart(required = true) CreatorRequestDTO.AssetRequest dto,
         @AuthenticationPrincipal PrincipalDetails user) {
-
         return new BaseResponse<CreatorResponseDTO.AssetCreatedResponse>(
             creatorService.createAsset(user.getUser(), thumbnails, views, dto));
+    }
+
+    @Operation(summary = "에셋 수정", description = "(미구현) 보낸 이미지들이 없으면 업데이트 하지 않습니다. ")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetCreatedResponse.class)))
+    @PostMapping
+    public BaseResponse<CreatorResponseDTO.AssetCreatedResponse> updateAsset(
+        @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
+        @RequestPart(value = "views", required = false) MultipartFile[] views,
+        @RequestPart(required = true) CreatorRequestDTO.AssetRequest dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<CreatorResponseDTO.AssetCreatedResponse>(
+            creatorService.updateAsset(user.getUser(), thumbnails, views, dto));
     }
 
     @Operation(summary = "에셋 파일 presignedUrl 획득", description = "유효시간 5분")

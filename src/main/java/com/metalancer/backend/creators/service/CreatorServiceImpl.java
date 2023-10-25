@@ -70,6 +70,7 @@ public class CreatorServiceImpl implements CreatorService {
             CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(user,
                 DataStatus.ACTIVE);
             ProductsEntity savedProductsEntity = createProductsEntity(dto, creatorEntity);
+            createProductsAssetFileEntity(dto, savedProductsEntity);
             Long savedProductsId = savedProductsEntity.getId();
             saveTagList(dto, savedProductsEntity);
             uploadThumbnailImages(savedProductsId, savedProductsEntity, thumbnails);
@@ -98,6 +99,19 @@ public class CreatorServiceImpl implements CreatorService {
             log.info(e.getMessage());
             throw new BaseException(ErrorCode.ASSETS_UPLOAD_FAILED);
         }
+    }
+
+    private void createProductsAssetFileEntity(AssetRequest dto,
+        ProductsEntity savedProductsEntity) {
+        ProductsAssetFileEntity createdProductsAssetFileEntity = ProductsAssetFileEntity.builder().
+            productsEntity(savedProductsEntity)
+            .productionProgram(String.join(", ", dto.getProductionProgram()))
+            .compatibleProgram(
+                String.join(", ", dto.getCompatibleProgram())).support(dto.getSupport())
+            .animation(dto.getAnimation()).rigging(dto.getRigging()).copyRight(dto.getCopyRight())
+            .extList(String.join(", ", dto.getExtList())).fileSize(dto.getFileSize())
+            .recentVersion(dto.getRecentVersion()).build();
+        productsAssetFileRepository.save(createdProductsAssetFileEntity);
     }
 
     @Override
@@ -172,10 +186,10 @@ public class CreatorServiceImpl implements CreatorService {
     private ProductsEntity createProductsEntity(AssetRequest dto, CreatorEntity creatorEntity) {
         ProductsEntity createdProductsEntity = ProductsEntity.builder()
             .creatorEntity(creatorEntity).title(dto.getTitle()).price(dto.getPrice())
-            .productionProgram(dto.getProductionProgram()).compatibleProgram(
-                dto.getCompatibleProgram()).assetDetail(dto.getAssetDetail()).assetNotice(
+            .assetDetail(dto.getAssetDetail())
+            .assetNotice(
                 dto.getAssetNotice()).assetCopyRight(dto.getAssetCopyRight())
-            .website(dto.getWebsite()).build();
+            .build();
         productsRepository.save(createdProductsEntity);
         return productsRepository.findProductById(
             createdProductsEntity.getId());
@@ -283,5 +297,11 @@ public class CreatorServiceImpl implements CreatorService {
             dto.getTool(), dto.getReferenceFile());
         portfolioRepository.save(portfolioEntity);
         return portfolioRepository.findAllByCreator(creatorEntity);
+    }
+
+    @Override
+    public AssetCreatedResponse updateAsset(User user, MultipartFile[] thumbnails,
+        MultipartFile[] views, AssetRequest dto) {
+        return null;
     }
 }

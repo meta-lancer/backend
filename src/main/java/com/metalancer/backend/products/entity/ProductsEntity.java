@@ -21,7 +21,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,21 +57,10 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private double rate = 5;
     private int ratingCnt = 1;
     private int viewCnt = 0;
-
-    // 이미지
     private String thumbnail;
-    // 태그
-    // 확장자
-    // 제작 프로그램
-    // 호환 프로그램
-    // 상품 저작권 안내
-
     private String assetDetail;
     private String assetNotice;
     private String assetCopyRight;
-    private String website;
-    private String productionProgram;
-    private String compatibleProgram;
 
     public void setActive() {
         active();
@@ -151,10 +139,8 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     @Builder
     public ProductsEntity(CreatorEntity creatorEntity,
         ProductsCategoryEntity productsCategoryEntity,
-        String title,
-        int price, String thumbnail, String assetDetail, String assetNotice, String assetCopyRight,
-        String website,
-        List<String> productionProgram, String compatibleProgram) {
+        String title, int price, String thumbnail, String assetDetail, String assetNotice,
+        String assetCopyRight) {
         this.creatorEntity = creatorEntity;
         this.category = productsCategoryEntity;
         this.title = title;
@@ -163,9 +149,6 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         this.assetDetail = assetDetail;
         this.assetNotice = assetNotice;
         this.assetCopyRight = assetCopyRight;
-        this.website = website;
-        this.productionProgram = productionProgram != null ? productionProgram.toString() : "";
-        this.compatibleProgram = compatibleProgram;
         setSharedLink();
     }
 

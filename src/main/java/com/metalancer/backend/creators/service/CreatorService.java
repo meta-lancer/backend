@@ -29,4 +29,7 @@ public interface CreatorService {
     List<Portfolio> createMyPortfolio(PortfolioCreate dto, PrincipalDetails user);
 
     List<Portfolio> updateMyPortfolio(Long portfolioId, PortfolioUpdate dto, PrincipalDetails user);
+
+    AssetCreatedResponse updateAsset(User user, MultipartFile[] thumbnails, MultipartFile[] views,
+        AssetRequest dto);
 }

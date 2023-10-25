@@ -2,9 +2,13 @@ package com.metalancer.backend.common.exception;
 
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.response.ErrorResponse;
+import com.metalancer.backend.external.slack.SlackService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import java.util.Arrays;
 import java.util.HashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,7 +19,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final SlackService slackService;
+    private final Environment env;
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -69,6 +77,7 @@ public class GlobalExceptionHandler {
             .message(code.getMessage())
             .validation(new HashMap<>())
             .build();
+        sendErrorSlackMessageIfProfileEqualsDev(response);
 
         return new ResponseEntity<>(response,
             HttpStatus.valueOf(code.getStatus().value));
@@ -86,6 +95,14 @@ public class GlobalExceptionHandler {
         log.error(response.getMessage());
         log.error("handleException", ex);
         ex.printStackTrace();
+        sendErrorSlackMessageIfProfileEqualsDev(response);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private void sendErrorSlackMessageIfProfileEqualsDev(ErrorResponse response) {
+        String[] activeProfiles = env.getActiveProfiles();
+        if (Arrays.asList(activeProfiles).contains("dev")) {
+            slackService.postSlackMessageToExceptionChannel(response.getMessage());
+        }
     }
 }

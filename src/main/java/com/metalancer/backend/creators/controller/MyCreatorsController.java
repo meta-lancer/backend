@@ -59,7 +59,7 @@ public class MyCreatorsController {
 
     @Operation(summary = "에셋 수정", description = "(미구현) 보낸 이미지들이 없으면 업데이트 하지 않습니다. ")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetCreatedResponse.class)))
-    @PostMapping
+    @PatchMapping
     public BaseResponse<CreatorResponseDTO.AssetCreatedResponse> updateAsset(
         @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
         @RequestPart(value = "views", required = false) MultipartFile[] views,

@@ -66,9 +66,10 @@ public class TagsRepositoryImpl implements TagsRepository {
 
     @Override
     public List<String> findAllByParentsTagName(String parentsTagName) {
-        TagsEntity tagsEntity = tagsJpaRepository.findByTagName(parentsTagName).orElseThrow(
-            () -> new NotFoundException("TagsEntity: ", ErrorCode.NOT_FOUND)
-        );
+        TagsEntity tagsEntity = tagsJpaRepository.findByTagNameOrTagNameEn(parentsTagName)
+            .orElseThrow(
+                () -> new NotFoundException("TagsEntity: ", ErrorCode.NOT_FOUND)
+            );
         List<TagsEntity> tagsEntityList = tagsJpaRepository.findAllByParentId(
             tagsEntity.getId());
         return tagsEntityList.stream().map(TagsEntity::getTagName).toList();

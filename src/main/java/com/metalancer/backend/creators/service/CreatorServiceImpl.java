@@ -7,9 +7,11 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
+import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.external.aws.s3.S3Service;
 import com.metalancer.backend.products.domain.AssetFile;
@@ -39,6 +41,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -76,21 +79,9 @@ public class CreatorServiceImpl implements CreatorService {
             uploadThumbnailImages(savedProductsId, savedProductsEntity, thumbnails);
             upload3DViews(savedProductsId, savedProductsEntity, views);
             ProductsDetail productsDetail = savedProductsEntity.toProductsDetail();
-            log.info("상세 데이터 조회");
-            List<String> tagList = productsTagRepository.findTagListByProduct(savedProductsEntity);
-            productsDetail.setTagList(tagList);
-            List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
-                savedProductsEntity);
-            if (thumbnailUrlList != null && thumbnailUrlList.size() > 0) {
-                savedProductsEntity.setThumbnail(thumbnailUrlList.get(0));
-            }
-            log.info("썸네일 목록 조회");
-            List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
-                savedProductsEntity);
-            log.info("3D 뷰 데이터 조회");
-            AssetFile assetFile = AssetFile.builder().thumbnailUrlList(thumbnailUrlList)
-                .viewUrlList(viewUrlList).zipFileUrl("")
-                .build();
+            getProductsDetailTagList(savedProductsEntity, productsDetail);
+            AssetFile assetFile = getProductsDetailAssetFile(savedProductsEntity,
+                productsDetail);
             productsDetail.setAssetFile(assetFile);
             return AssetCreatedResponse.builder().productsDetail(productsDetail)
                 .build();
@@ -99,6 +90,41 @@ public class CreatorServiceImpl implements CreatorService {
             log.info(e.getMessage());
             throw new BaseException(ErrorCode.ASSETS_UPLOAD_FAILED);
         }
+    }
+
+    private AssetFile getProductsDetailAssetFile(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> thumbnailUrlList = getProductsThumbnailList(savedProductsEntity,
+            productsDetail);
+        log.info("썸네일 목록 조회");
+        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
+            savedProductsEntity);
+        log.info("3D 뷰 데이터 조회");
+        ProductsAssetFileEntity productsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            savedProductsEntity);
+        AssetFile assetFile = productsAssetFileEntity.toAssetFile();
+        assetFile.setThumbnailUrlList(thumbnailUrlList);
+        assetFile.setViewUrlList(viewUrlList);
+        assetFile.setZipFileUrl("");
+        return assetFile;
+    }
+
+    @Nullable
+    private List<String> getProductsThumbnailList(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
+            savedProductsEntity);
+        if (thumbnailUrlList != null && thumbnailUrlList.size() > 0) {
+            productsDetail.setThumbnail(thumbnailUrlList.get(0));
+            productsDetail.setThumbnailList(thumbnailUrlList);
+        }
+        return thumbnailUrlList;
+    }
+
+    private void getProductsDetailTagList(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> tagList = productsTagRepository.findTagListByProduct(savedProductsEntity);
+        productsDetail.setTagList(tagList);
     }
 
     private void createProductsAssetFileEntity(AssetRequest dto,
@@ -173,6 +199,37 @@ public class CreatorServiceImpl implements CreatorService {
         return true;
     }
 
+    @Override
+    public AssetUpdatedResponse updateAsset(Long productsId, User user, MultipartFile[] thumbnails,
+        MultipartFile[] views, AssetUpdate dto) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        productsEntity.update(dto);
+        productsEntity = productsRepository.findProductById(productsId);
+        productsRepository.save(productsEntity);
+        productsEntity = productsRepository.findProductById(productsId);
+        ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            productsEntity);
+        foundProductsAssetFileEntity.update(productsEntity, dto);
+
+        // 어떤 건 그대로고, 어떤 건 수정하려고 하면 정신나감
+//        if (thumbnails) {
+//
+//        }
+//
+//        if (views) {
+//
+//        }
+
+        productsAssetFileRepository.save(foundProductsAssetFileEntity);
+
+        ProductsDetail productsDetail = productsEntity.toProductsDetail();
+        getProductsDetailTagList(productsEntity, productsDetail);
+        AssetFile assetFile = getProductsDetailAssetFile(productsEntity,
+            productsDetail);
+        productsDetail.setAssetFile(assetFile);
+        return AssetUpdatedResponse.builder().productsDetail(productsDetail).build();
+    }
+
     private void saveTagList(AssetRequest dto, ProductsEntity savedProductsEntity) {
         List<ProductsTagEntity> tagEntities = new ArrayList<>();
         for (String tag : dto.getTagList()) {
@@ -204,6 +261,9 @@ public class CreatorServiceImpl implements CreatorService {
                 String randomFileName = uploadService.getRandomStringForImageName(8);
                 String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(AssetType.THUMBNAIL,
                     savedProductsId, thumbnail, randomFileName);
+                if (index == 1) {
+                    savedProductsEntity.setThumbnail(uploadedThumbnailUrl);
+                }
                 ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
                     .productsEntity(savedProductsEntity).thumbnailOrd(index++)
                     .thumbnailUrl(uploadedThumbnailUrl)
@@ -299,9 +359,5 @@ public class CreatorServiceImpl implements CreatorService {
         return portfolioRepository.findAllByCreator(creatorEntity);
     }
 
-    @Override
-    public AssetCreatedResponse updateAsset(User user, MultipartFile[] thumbnails,
-        MultipartFile[] views, AssetRequest dto) {
-        return null;
-    }
+
 }

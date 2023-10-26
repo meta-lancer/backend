@@ -8,6 +8,7 @@ import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO;
+import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.service.CreatorReadService;
 import com.metalancer.backend.creators.service.CreatorService;
 import com.metalancer.backend.users.domain.Portfolio;
@@ -57,16 +58,17 @@ public class MyCreatorsController {
             creatorService.createAsset(user.getUser(), thumbnails, views, dto));
     }
 
-    @Operation(summary = "에셋 수정", description = "(미구현) 보낸 이미지들이 없으면 업데이트 하지 않습니다. ")
+    @Operation(summary = "에셋 수정", description = "(미구현 - 썸네일, 3D뷰)보낸 이미지들이 없으면 업데이트 하지 않습니다. 에셋 주정 시 에셋 파일 url은 동일한 것을 사용합니다. 그래서 등록 시때처럼 presignedUrl을 얻으면 같은 url이 제공됩니다. 그러면 기존에 있는 것을 덮어쓰게 됩니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetCreatedResponse.class)))
-    @PatchMapping
-    public BaseResponse<CreatorResponseDTO.AssetCreatedResponse> updateAsset(
+    @PatchMapping("/{productsId}")
+    public BaseResponse<AssetUpdatedResponse> updateAsset(
+        @PathVariable Long productsId,
         @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
         @RequestPart(value = "views", required = false) MultipartFile[] views,
-        @RequestPart(required = true) CreatorRequestDTO.AssetRequest dto,
+        @RequestPart(required = true) CreatorRequestDTO.AssetUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
-        return new BaseResponse<CreatorResponseDTO.AssetCreatedResponse>(
-            creatorService.updateAsset(user.getUser(), thumbnails, views, dto));
+        return new BaseResponse<AssetUpdatedResponse>(
+            creatorService.updateAsset(productsId, user.getUser(), thumbnails, views, dto));
     }
 
     @Operation(summary = "에셋 파일 presignedUrl 획득", description = "유효시간 5분")

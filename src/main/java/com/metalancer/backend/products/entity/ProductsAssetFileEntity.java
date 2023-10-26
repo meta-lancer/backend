@@ -1,7 +1,10 @@
 package com.metalancer.backend.products.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
+import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.products.domain.AssetFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -83,10 +86,33 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
         this.success = true;
     }
 
+    public void update(ProductsEntity productsEntity, AssetUpdate dto) {
+        this.productsEntity = productsEntity;
+        this.productionProgram = String.join(", ", dto.getProductionProgram());
+        this.compatibleProgram = String.join(", ", dto.getCompatibleProgram());
+        this.fileSize = dto.getFileSize();
+        this.animation = dto.getAnimation();
+        this.rigging = dto.getRigging();
+        this.extList = String.join(", ", dto.getExtList());
+        this.support = dto.getSupport();
+        this.copyRight = dto.getCopyRight();
+        this.recentVersion = dto.getRecentVersion();
+    }
+
     public CreatorAssetList toCreatorAssetList() {
         return CreatorAssetList.builder().thumbnail(productsEntity.getThumbnail()).title(
                 productsEntity.getTitle()).price(productsEntity.getPrice()).productsId(
                 productsEntity.getId())
+            .build();
+    }
+
+    public AssetFile toAssetFile() {
+        return AssetFile.builder()
+            .productionProgram(productionProgram).compatibleProgram(compatibleProgram)
+            .fileSize(fileSize)
+            .animationStatus(animation).riggingStatus(rigging)
+            .extensionList(extList).recentReleaseDate(Time.convertDateToString(getCreatedAt()))
+            .copyRight(copyRight).recentVersion(recentVersion)
             .build();
     }
 }

@@ -15,7 +15,7 @@ public interface ProductsAssetFileJpaRepository extends
 
     Optional<ProductsAssetFileEntity> findByProductsEntity(ProductsEntity productsEntity);
 
-    @Query("select paf from products_asset_file paf where paf.productsEntity.creatorEntity = :creator and paf.success = true order by paf.createdAt desc ")
+    @Query("select paf from products_asset_file paf where paf.productsEntity.creatorEntity = :creator and paf.success = true and paf.productsEntity.status = 'ACTIVE' order by paf.createdAt desc ")
     Page<ProductsAssetFileEntity> findAllByCreator(@Param("creator") CreatorEntity creatorEntity,
         Pageable pageable);
 }

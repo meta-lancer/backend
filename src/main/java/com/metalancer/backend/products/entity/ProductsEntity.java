@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
 import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
@@ -43,7 +44,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     @Column(name = "products_id", nullable = false)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "products_category_id", nullable = false)
+    @JoinColumn(name = "products_category_id")
     private ProductsCategoryEntity category;
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
@@ -70,11 +71,12 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         delete();
     }
 
-    public void update() {
-        // 제목
-        // 가격
-        // 상세정보
-        // 이미지
+    public void update(AssetUpdate dto) {
+        this.title = dto.getTitle();
+        this.price = dto.getPrice();
+        this.assetDetail = dto.getAssetDetail();
+        this.assetNotice = dto.getAssetNotice();
+        this.assetCopyRight = dto.getCopyRight();
     }
 
     public void setSharedLink() {
@@ -156,7 +158,9 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         return ProductsDetail.builder().productsId(id).category(category.toDomain()).creator(
                 creatorEntity.toDomain())
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
-            .discount(discount).rate(rate).ratingCnt(ratingCnt).build();
+            .discount(discount).rate(rate).ratingCnt(ratingCnt)
+            .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .build();
     }
 
     public HotPickAsset toHotPickAsset() {

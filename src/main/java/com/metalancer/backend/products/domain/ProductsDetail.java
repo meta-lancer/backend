@@ -1,10 +1,9 @@
 package com.metalancer.backend.products.domain;
 
 import com.metalancer.backend.users.domain.Creator;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 
 @Getter
@@ -28,11 +27,14 @@ public class ProductsDetail {
     private String assetCopyRight;
     private List<String> tagList;
     private AssetFile assetFile;
+    private String thumbnail;
+    private List<String> thumbnailList;
 
     @Builder
     public ProductsDetail(Long productsId, ProductsCategory category, Creator creator,
-                          String sharedLink,
-                          String title, int price, Integer salePrice, double discount, double rate, int ratingCnt) {
+        String sharedLink,
+        String title, int price, Integer salePrice, double discount, double rate, int ratingCnt,
+        String assetDetail, String assetNotice, String assetCopyRight, List<String> thumbnailList) {
         this.productsId = productsId;
         this.category = category;
         this.creator = creator;
@@ -43,6 +45,9 @@ public class ProductsDetail {
         this.discount = discount;
         this.rate = rate;
         this.ratingCnt = ratingCnt;
+        this.assetDetail = assetDetail;
+        this.assetNotice = assetNotice;
+        this.assetCopyRight = assetCopyRight;
     }
 
     public void setHasWish(boolean hasWish) {
@@ -63,5 +68,13 @@ public class ProductsDetail {
 
     public void setAssetFile(AssetFile assetFile) {
         this.assetFile = assetFile;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public void setThumbnailList(List<String> thumbnailList) {
+        this.thumbnailList = thumbnailList;
     }
 }

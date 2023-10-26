@@ -90,7 +90,7 @@ public class ProductsListController {
     @GetMapping("/asset")
     public BaseResponse<Page<FilterAsset>> getFilterAssetList(
         @Parameter(description = "카테고리 옵션") @RequestParam List<String> categoryOption,
-        @Parameter(description = "인기있는 분류 옵션") @RequestParam List<String> trendOption,
+        @Parameter(description = "플랫폼 옵션") @RequestParam List<String> trendOption,
         @Parameter(description = "가격 옵션") @RequestParam List<Integer> priceOption,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("카테고리 옵션-{}, 인기있는 분류 옵션-{}, 가격 옵션-{}, 페이징-{}", categoryOption,

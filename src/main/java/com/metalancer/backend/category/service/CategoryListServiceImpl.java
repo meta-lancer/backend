@@ -3,6 +3,7 @@ package com.metalancer.backend.category.service;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
+import com.metalancer.backend.category.entity.TagsEntity;
 import com.metalancer.backend.category.repository.GenreGalaxyTypeRepository;
 import com.metalancer.backend.category.repository.HotPickTypeRepository;
 import com.metalancer.backend.category.repository.ProductsRequestTypeRepository;
@@ -50,5 +51,17 @@ public class CategoryListServiceImpl implements CategoryListService {
     @Override
     public List<String> getTagRegisterRecommendList(String keyword) {
         return tagsRepository.findAllByKeywordLimit10(keyword);
+    }
+
+    @Override
+    public List<MainCategory> getFilterCategoryList() {
+        return tagsRepository.findAllMainCategoryByParentsTagName("카테고리").stream()
+            .map(TagsEntity::toMainCategory).toList();
+    }
+
+    @Override
+    public List<MainCategory> getFilterPlatformList() {
+        return tagsRepository.findAllMainCategoryByParentsTagName("플랫폼").stream()
+            .map(TagsEntity::toMainCategory).toList();
     }
 }

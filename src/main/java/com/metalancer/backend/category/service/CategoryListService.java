@@ -17,4 +17,8 @@ public interface CategoryListService {
     List<RequestCategory> getRequestCategoryList();
 
     List<String> getTagRegisterRecommendList(String keyword);
+
+    List<MainCategory> getFilterCategoryList();
+
+    List<MainCategory> getFilterPlatformList();
 }

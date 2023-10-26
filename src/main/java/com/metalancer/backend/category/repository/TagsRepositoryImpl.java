@@ -82,4 +82,12 @@ public class TagsRepositoryImpl implements TagsRepository {
                     .thenComparing(name -> name))
             .limit(10).toList();
     }
+
+    @Override
+    public List<TagsEntity> findAllMainCategoryByParentsTagName(String parentsTagName) {
+        TagsEntity tagsEntity = tagsJpaRepository.findByTagName(parentsTagName).orElseThrow(
+            () -> new NotFoundException("TagsEntity: ", ErrorCode.NOT_FOUND)
+        );
+        return tagsJpaRepository.findAllByParentId(tagsEntity.getId());
+    }
 }

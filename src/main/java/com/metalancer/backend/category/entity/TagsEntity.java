@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.entity;
 
+import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,4 +36,8 @@ public class TagsEntity implements Serializable {
     @Column(name = "order", nullable = false)
     private int ord;
     private Long parentId;
+
+    public MainCategory toMainCategory() {
+        return MainCategory.builder().name(tagNameEn).nameKor(tagName).build();
+    }
 }

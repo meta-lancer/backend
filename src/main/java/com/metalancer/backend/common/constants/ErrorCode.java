@@ -79,6 +79,8 @@ public enum ErrorCode {
 
     PRODUCTS_STATUS_ERROR(INVALID_VALUE, "H001", "상품 상태에 문제가 있습니다."),
 
+    TYPE_NOT_FOUND(NOT_FOUND_VALUE, "Z002", "해당 type이 존재하지 않습니다."),
+
     INVALID_PARAMETER(BAD_REQUEST, "Z001", "요청값이 올바르지 않습니다."),
     NOT_FOUND(NOT_FOUND_VALUE, "Z002", "존재하지 않습니다."),
     ILLEGAL_DATA_STATUS(INVALID_VALUE, "Z003", "잘못된 데이터 상태 입니다."),

@@ -78,7 +78,7 @@ public class ProductsListServiceImpl implements ProductsListService {
     public TrendSpotlightResponse getTrendSpotlight(String platformType,
         Pageable pageable) {
         List<String> tagList = null;
-        if (platformType.equals("all")) {
+        if (platformType.equals("all") || platformType.equals("ALL")) {
             tagList = tagsRepository.findAllTrendSpotLightTags();
         } else {
             TrendSpotlightTypeEntity trendSpotlightTypeEntity = trendSpotlightTypeRepository.findByName(
@@ -96,7 +96,7 @@ public class ProductsListServiceImpl implements ProductsListService {
     @Override
     public GenreGalaxyResponse getGenreGalaxyList(String type, Pageable pageable) {
         List<String> tagList = null;
-        if (type.equals("all")) {
+        if (type.equals("all") || type.equals("ALL")) {
             tagList = tagsRepository.findAllGenreGalaxyTags();
         } else {
             GenreGalaxyTypeEntity genreGalaxyTypeEntity = genreGalaxyTypeRepository.findByName(

@@ -1,13 +1,17 @@
 package com.metalancer.backend.common.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +40,7 @@ public class SecurityConfig {
     private final PrincipalOAuth2UserService principalOAuth2UserService;
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final ApproveLinkRepository approveLinkRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -86,7 +91,7 @@ public class SecurityConfig {
             //OAuth 로그인
             .oauth2Login()
             .loginPage("https://www.metaovis.com") //로그
-            .successHandler(successHandler())
+            .successHandler(oauth2SuccessHandler())
             .userInfoEndpoint()
             .userService(
                 principalOAuth2UserService);//구글 로그인이 완료된(구글회원) 뒤의 후처리가 필요함 . Tip.코드x, (엑세스 토큰+사용자 프로필 정보를 받아옴)
@@ -125,21 +130,24 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationSuccessHandler successHandler() {
+    public AuthenticationSuccessHandler oauth2SuccessHandler() {
+
         return ((request, response, authentication) -> {
-//            DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-//
-//            String id = defaultOAuth2User.getAttributes().get("id").toString();
-//            String body = """
-//                {"id":"%s"}
-//                """.formatted(id);
-//
-//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-//
-//            PrintWriter writer = response.getWriter();
-//            writer.println(body);
-//            writer.flush();
+            PrincipalDetails oAuth2User = (PrincipalDetails) authentication.getPrincipal();
+            User user = oAuth2User.getUser();
+            // 이를 통해 리다이렉트하도록 응답 코드 보낸다.
+            if (DataStatus.PENDING.equals(user.getStatus())) {
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding("UTF-8");
+                // 이미 가입링크 보낸게 있으면 분기점
+                Optional<ApproveLink> approveLink = approveLinkRepository.findByUserAndStatus(user,
+                    DataStatus.ACTIVE);
+                if (approveLink.isPresent()) {
+                    response.setStatus(HttpStatus.PROCESSING.value());
+                } else {
+                    response.setStatus(HttpStatus.PERMANENT_REDIRECT.value());
+                }
+            }
         });
     }
 

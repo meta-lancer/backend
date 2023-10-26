@@ -2,16 +2,19 @@ package com.metalancer.backend.users.service;
 
 import static com.metalancer.backend.common.constants.ObjectText.LOGIN_USER;
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.ApplicationText;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.utils.RandomStringGenerator;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
+import com.metalancer.backend.users.dto.UserRequestDTO.CreateOauthRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateRequest;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.CreatorEntity;
@@ -75,6 +78,29 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void setUserInterests(User foundUser, CreateRequest dto) {
+        List<UserInterestsEntity> userInterestsEntities = new ArrayList<>();
+        for (String interests : dto.getInterests()) {
+            UserInterestsEntity savedUserInterestsEntity = UserInterestsEntity.builder()
+                .user(foundUser)
+                .interestsName(interests).build();
+            userInterestsEntities.add(savedUserInterestsEntity);
+        }
+        if (userInterestsEntities.size() > 0) {
+            userInterestsRepository.saveAll(userInterestsEntities);
+        }
+
+    }
+
+    private void setAgreement(User foundUser, CreateOauthRequest dto) {
+        UserAgreementEntity savedUserAgreementEntity = UserAgreementEntity.builder().user(foundUser)
+            .ageAgree(dto.isAgeAgree())
+            .serviceAgree(dto.isServiceAgree()).infoAgree(dto.isInfoAgree())
+            .marketingAgree(dto.isMarketingAgree()).statusAgree(
+                dto.isStatusAgree()).build();
+        userAgreementRepository.save(savedUserAgreementEntity);
+    }
+
+    private void setUserInterests(User foundUser, CreateOauthRequest dto) {
         List<UserInterestsEntity> userInterestsEntities = new ArrayList<>();
         for (String interests : dto.getInterests()) {
             UserInterestsEntity savedUserInterestsEntity = UserInterestsEntity.builder()
@@ -176,6 +202,22 @@ public class AuthServiceImpl implements AuthService {
         CreatorEntity foundCreator = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.PENDING);
         return foundCreator.getId();
+    }
+
+    @Override
+    public Long createOauthUser(PrincipalDetails user, CreateOauthRequest dto)
+        throws MessagingException {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        setUserInterests(foundUser, dto);
+        setAgreement(foundUser, dto);
+        createdApproveLink(foundUser);
+        if (!dto.isNormalUser()) {
+            createCreator(foundUser);
+        }
+        return foundUser.getId();
     }
 
     private void createCreator(User foundUser) {

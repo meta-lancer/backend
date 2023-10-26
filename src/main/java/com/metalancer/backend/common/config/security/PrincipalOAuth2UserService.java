@@ -1,6 +1,5 @@
 package com.metalancer.backend.common.config.security;
 
-import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.exception.BaseException;
@@ -51,9 +50,8 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
 
     private User saveOrGetUser(OAuth2UserInfo oAuth2UserInfo, LoginType loginType) {
         String oauthId = oAuth2UserInfo.getProviderId();
-        Optional<User> optionalUser = userRepository.findByLoginTypeAndOauthIdAndStatus(loginType,
-            oauthId,
-            DataStatus.ACTIVE);
+        Optional<User> optionalUser = userRepository.findByLoginTypeAndOauthId(loginType,
+            oauthId);
         User user = null;
 
         if (optionalUser.isEmpty()) {
@@ -67,6 +65,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
                 .loginType(loginType)
                 .username(username)
                 .build();
+            user.setPending();
             user = userRepository.save(user);
             userRepository.findById(user.getId()).orElseThrow(
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)

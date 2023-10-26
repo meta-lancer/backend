@@ -50,6 +50,16 @@ public class AuthController {
         return new BaseResponse<Long>(authService.createCreator(dto));
     }
 
+    @Operation(summary = "소셜SNS 회원가입 마무리", description = "일반(normalUser - true)/크리에이터(false) 구분, 이메일, 직업, 관심분야, 약관동의 필요. Response - 회원고유번호")
+    @ApiResponse(responseCode = "200", description = "회원고유번호", content = @Content(schema = @Schema(implementation = Long.class)))
+    @PostMapping("/oauth")
+    public BaseResponse<Long> createOauthUser(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.CreateOauthRequest dto)
+        throws Exception {
+        return new BaseResponse<Long>(authService.createOauthUser(user, dto));
+    }
+
 
     @Operation(summary = "가입 승인처리", description = "")
     @ApiResponse(responseCode = "200", description = "승인 성공", content = @Content(schema = @Schema(implementation = AuthResponseDTO.userInfo.class)))

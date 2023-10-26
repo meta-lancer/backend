@@ -76,6 +76,15 @@ public class TagsRepositoryImpl implements TagsRepository {
     }
 
     @Override
+    public String findStringByTagName(String tagName) {
+        TagsEntity tagsEntity = tagsJpaRepository.findByTagNameOrTagNameEn(tagName)
+            .orElseThrow(
+                () -> new NotFoundException("TagsEntity: ", ErrorCode.NOT_FOUND)
+            );
+        return tagsEntity.getTagName();
+    }
+
+    @Override
     public List<String> findAllByKeywordLimit10(String keyword) {
         List<TagsEntity> tagsList = tagsJpaRepository.findAllByTagNameContains("%" + keyword + "%");
         return tagsList.stream().map(TagsEntity::getTagName).sorted(

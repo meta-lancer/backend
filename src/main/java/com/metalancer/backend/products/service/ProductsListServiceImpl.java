@@ -144,7 +144,9 @@ public class ProductsListServiceImpl implements ProductsListService {
 
     private void setTagListByOption(List<String> categoryOption, List<String> tagList) {
         for (String category : categoryOption) {
+            String categoryTag = tagsRepository.findStringByTagName(category);
             List<String> categoryTagList = tagsRepository.findAllByParentsTagName(category);
+            tagList.add(categoryTag);
             tagList.addAll(categoryTagList);
         }
     }

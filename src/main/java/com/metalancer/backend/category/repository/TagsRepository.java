@@ -20,4 +20,6 @@ public interface TagsRepository {
     List<String> findAllByKeywordLimit10(String keyword);
 
     List<TagsEntity> findAllMainCategoryByParentsTagName(String parentsTagName);
+
+    String findStringByTagName(String tagName);
 }

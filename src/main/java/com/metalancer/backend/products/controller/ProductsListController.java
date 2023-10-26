@@ -54,8 +54,7 @@ public class ProductsListController {
     @GetMapping("/trend-spotlight")
     public BaseResponse<TrendSpotlightResponse> getTrendSpotlight(
         @Parameter(name = "platformType", description =
-            "ALL(전체), VRCHAT(VR CHAT), MINECRAFT(마인크래프트), ZEPETO(제페토), "
-                + "ROBLOX(로블룩스), MIDDLEAGE(중세), FUTURE(미래), CARTOON(카툰), ACTUAL(실사)") @RequestParam String platformType,
+            "플랫폼 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String platformType,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("종류 옵션-{},  페이징-{}", platformType, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
@@ -67,16 +66,7 @@ public class ProductsListController {
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = GenreGalaxyResponse.class)))
     @GetMapping("/genre-galaxy")
     public BaseResponse<GenreGalaxyResponse> getGenreGalaxyList(
-        @Parameter(name = "type", description = "ALL(전체), \n " +
-            "      MODEL(\"모델\"), \n"
-            + "    ANIMAL(\"동물\"),\n"
-            + "    PLANT(\"식물\"),\n"
-            + "    BACKGROUND(\"배경\"),\n"
-            + "    FOOD(\"음식\"),\n"
-            + "    OBJECTS(\"사물\"),\n"
-            + "    ROBOT(\"로봇\"),\n"
-            + "    VFX(\"VFX\"),\n"
-            + "    ETC(\"기타\")") @RequestParam String type,
+        @Parameter(name = "type", description = "Genre Galaxy 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String type,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("종류 옵션-{},  페이징-{}", type, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);

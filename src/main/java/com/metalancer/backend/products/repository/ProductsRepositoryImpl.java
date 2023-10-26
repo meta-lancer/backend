@@ -32,9 +32,14 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public ProductsEntity findProductById(Long productsId) {
-        return productsJpaRepository.findById(productsId).orElseThrow(
-            () -> new NotFoundException(ErrorCode.NOT_FOUND)
-        );
+        Optional<ProductsEntity> productsEntity = productsJpaRepository.findById(productsId);
+        if (productsEntity.isEmpty()) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND);
+        }
+        if (!productsEntity.get().getStatus().equals(DataStatus.ACTIVE)) {
+            throw new NotFoundException(ErrorCode.PRODUCTS_STATUS_ERROR);
+        }
+        return productsEntity.get();
     }
 
     @Override

@@ -77,7 +77,7 @@ public enum ErrorCode {
      * 상품
      */
 
-    PRODUCTS_STATUS_ERROR(INVALID_VALUE, "H001", "상품 상태에 문제가 있습니다."),
+    PRODUCTS_STATUS_ERROR(INVALID_VALUE, "H001", "상품이 삭제되었거나 제한되었습니다."),
 
     TYPE_NOT_FOUND(NOT_FOUND_VALUE, "Z002", "해당 type이 존재하지 않습니다."),
 

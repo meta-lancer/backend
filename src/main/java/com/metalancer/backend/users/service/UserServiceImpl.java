@@ -22,27 +22,28 @@ import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerRequest;
 import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
 import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
+import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.CareerEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
+import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.CareerRepository;
 import com.metalancer.backend.users.repository.PayedAssetsRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
     private final OrdersRepository ordersRepository;
     private final OrderProductsRepository orderProductsRepository;
     private final OrderPaymentRepository orderPaymentRepository;
+    private final ApproveLinkRepository approveLinkRepository;
 
     @Override
     public boolean updateToCreator(PrincipalDetails user) {
@@ -77,12 +79,12 @@ public class UserServiceImpl implements UserService {
     public BasicInfo getBasicInfo(PrincipalDetails userPrincipalDetails) {
         User foundUser = userPrincipalDetails.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         List<UserInterestsEntity> userInterestsEntityList = userInterestsRepository.findAllByUser(
-                foundUser);
+            foundUser);
         List<Interests> interests = userInterestsEntityList.stream()
-                .map(UserInterestsEntity::toDomain).toList();
+            .map(UserInterestsEntity::toDomain).toList();
         return foundUser.toBasicInfo(interests);
     }
 
@@ -90,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public BasicInfo updateBasicInfo(PrincipalDetails user, UpdateBasicInfo dto) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         if (nicknameUpdateValidate(dto, foundUser)) {
             throw new BaseException(ErrorCode.NICKNAME_UPDATE_COUNT_PROHIBIT);
@@ -99,22 +101,22 @@ public class UserServiceImpl implements UserService {
         saveUpdatedInterests(dto, foundUser);
         List<Interests> interests = userInterestsRepository.findAllDomainByUser(foundUser);
         foundUser.updateBasicInfo(dto.getProfileImg(), dto.getNickname(), dto.getIntroduction(),
-                dto.getLink(), dto.getJob());
+            dto.getLink(), dto.getJob());
         foundUser = userRepository.save(foundUser);
         return foundUser.toBasicInfo(interests);
     }
 
     @Override
     public Page<PayedOrder> getPaymentList(PrincipalDetails user, String type, String beginDate,
-                                           String endDate, Pageable pageable) {
+        String endDate, Pageable pageable) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         LocalDateTime beginAt = convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = convertDateToLocalDateTime(endDate);
         return orderPaymentRepository.findAllByUserWithDateOption(
-                foundUser, pageable, beginAt, endAt);
+            foundUser, pageable, beginAt, endAt);
     }
 
     @Override
@@ -132,10 +134,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<PayedAssets> getPayedAssetList(String status, String beginDate, String endDate,
-                                               PrincipalDetails user, Pageable pageable) {
+        PrincipalDetails user, Pageable pageable) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         LocalDateTime beginAt = convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = convertDateToLocalDateTime(endDate);
@@ -143,21 +145,29 @@ public class UserServiceImpl implements UserService {
 
         if (orderStatus != null) {
             return payedAssetsRepository.findAllPayedAssetListWithStatusAndDateOption(foundUser,
-                    pageable, beginAt, endAt, orderStatus);
+                pageable, beginAt, endAt, orderStatus);
         }
         return payedAssetsRepository.findAllPayedAssetListWithStatusAndDateOption(foundUser,
-                pageable, beginAt, endAt);
+            pageable, beginAt, endAt);
     }
 
     @Override
     public AuthResponseDTO.userInfo getUserInfo(PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         AuthResponseDTO.userInfo response = new AuthResponseDTO.userInfo(foundUser);
-        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(foundUser,
+
+        if (DataStatus.PENDING.equals(foundUser.getStatus())) {
+            // 이미 가입링크 보낸게 있으면 분기점
+            Optional<ApproveLink> approveLink = approveLinkRepository.findByUserAndStatus(foundUser,
                 DataStatus.ACTIVE);
+            response.setHasApproveLink(approveLink.isPresent());
+        }
+
+        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
         creator.ifPresent(creatorEntity -> response.setCreatorId(creatorEntity.getId()));
         return response;
     }
@@ -170,14 +180,14 @@ public class UserServiceImpl implements UserService {
 
     private static boolean nicknameUpdateValidate(UpdateBasicInfo dto, User foundUser) {
         return !dto.getNickname().equals(foundUser.getNickname())
-                && foundUser.checkNicknameUpdatedBefore();
+            && foundUser.checkNicknameUpdatedBefore();
     }
 
     private void saveUpdatedInterests(UpdateBasicInfo dto, User foundUser) {
         List<UserInterestsEntity> newUserInterestsEntityList = new ArrayList<>();
         for (String interest : dto.getInterestsList()) {
             UserInterestsEntity userInterestsEntity = UserInterestsEntity.builder().user(foundUser)
-                    .interestsName(interest).build();
+                .interestsName(interest).build();
             newUserInterestsEntityList.add(userInterestsEntity);
         }
         userInterestsRepository.saveAll(newUserInterestsEntityList);
@@ -187,7 +197,7 @@ public class UserServiceImpl implements UserService {
     public IntroAndCareer getIntroAndCareer(PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         return getIntroAndExperience(foundUser);
     }
@@ -195,10 +205,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public IntroAndCareer updateCareer(Long careerId, PrincipalDetails user,
-                                       UpdateCareerRequest dto) {
+        UpdateCareerRequest dto) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         CareerEntity careerEntity = careerRepository.findByIdAndUser(careerId, foundUser);
         careerEntity.update(dto.getTitle(), dto.getDescription(), dto.getBeginAt(), dto.getEndAt());
@@ -209,7 +219,7 @@ public class UserServiceImpl implements UserService {
     public IntroAndCareer deleteCareer(Long careerId, PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         careerRepository.deleteCareer(careerId, foundUser);
         return getIntroAndExperience(foundUser);
@@ -219,11 +229,11 @@ public class UserServiceImpl implements UserService {
     public IntroAndCareer createCareer(PrincipalDetails user, CreateCareerRequest dto) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         CareerEntity createdCareerEntity = CareerEntity.builder().user(foundUser).title(
-                        dto.getTitle()).description(dto.getDescription())
-                .beginAt(dto.getBeginAt()).endAt(dto.getEndAt()).build();
+                dto.getTitle()).description(dto.getDescription())
+            .beginAt(dto.getBeginAt()).endAt(dto.getEndAt()).build();
         careerRepository.save(createdCareerEntity);
         return getIntroAndExperience(foundUser);
     }
@@ -232,7 +242,7 @@ public class UserServiceImpl implements UserService {
     public IntroAndCareer updateCareerIntro(PrincipalDetails user, UpdateCareerIntroRequest dto) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         foundUser.setCareerIntroduction(dto.getIntro());
         userRepository.save(foundUser);
@@ -243,7 +253,7 @@ public class UserServiceImpl implements UserService {
         List<CareerEntity> careerEntities = careerRepository.findAllByUser(foundUser);
         List<Career> careerList = careerEntities.stream().map(CareerEntity::toDomain).toList();
         return IntroAndCareer.builder().introduction(foundUser.getCareerIntroduction())
-                .careerList(careerList).build();
+            .careerList(careerList).build();
     }
 
 }

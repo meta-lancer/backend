@@ -24,6 +24,7 @@ public class AuthResponseDTO {
         private DataStatus status;
         private Role role;
         private Long creatorId;
+        private boolean hasApproveLink;
 
         public userInfo(User user) {
             this.userId = user.getId();

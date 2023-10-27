@@ -11,11 +11,11 @@ import com.metalancer.backend.request.dto.ProductsRequestDTO.Create;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Update;
 import com.metalancer.backend.request.entity.ProductsRequestAndTypeEntity;
 import com.metalancer.backend.request.entity.ProductsRequestEntity;
-import com.metalancer.backend.request.entity.QProductsRequestAndTypeEntity;
 import com.metalancer.backend.request.entity.QProductsRequestEntity;
 import com.metalancer.backend.users.entity.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,8 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         QProductsRequestEntity qProductsRequestEntity = QProductsRequestEntity.productsRequestEntity;
         BooleanBuilder whereClause = new BooleanBuilder();
         DataStatus activeStatus = DataStatus.ACTIVE;
-        setWhereClauseWithRequestTypeOptions(requestTypeOptions, whereClause);
+        setWhereClauseWithRequestTypeOptions(requestTypeOptions,
+            whereClause);
         whereClause.and(qProductsRequestEntity.status.eq(activeStatus));
         List<ProductsRequestEntity> productsRequests = queryFactory.selectFrom(
                 qProductsRequestEntity)
@@ -54,8 +55,16 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
             .fetch();
         long total = queryFactory.selectFrom(qProductsRequestEntity).where(whereClause)
             .fetchCount();
-        List<ProductsRequest> response = productsRequests.stream()
-            .map(ProductsRequestEntity::toDomain).toList();
+
+        List<ProductsRequest> response = new ArrayList<>();
+        for (ProductsRequestEntity productsRequestEntity : productsRequests) {
+            List<RequestCategory> requestCategoryList = getRequestCategories(
+                productsRequestEntity);
+            ProductsRequest productsRequest = productsRequestEntity.toDomain();
+            productsRequest.setProductionRequestTypeList(requestCategoryList);
+            response.add(productsRequest);
+        }
+
         return new PageImpl<>(response, pageable, total);
     }
 
@@ -153,14 +162,15 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         }
     }
 
-    private void setWhereClauseWithRequestTypeOptions(List<String> requestTypeOptions,
+    private void setWhereClauseWithRequestTypeOptions(
+        List<String> requestTypeOptions,
         BooleanBuilder whereClause) {
         for (String requestTypeOption : requestTypeOptions) {
             Optional<ProductsRequestTypeEntity> typeEntity = productsRequestTypeJpaRepository.findByName(
                 requestTypeOption);
-            typeEntity.ifPresent(productsRequestTypeEntity -> whereClause.or(
-                QProductsRequestAndTypeEntity.productsRequestAndTypeEntity.productsRequestTypeEn.eq(
-                    productsRequestTypeEntity.getName())));
+//            typeEntity.ifPresent(productsRequestTypeEntity -> whereClause.or(
+//                qProductsRequestAndTypeEntity.productsRequestTypeEn.eq(
+//                    productsRequestTypeEntity.getName())));
         }
     }
 }

@@ -25,7 +25,7 @@ import lombok.ToString;
 public class ProductsRequestAndTypeEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 7483443261999515L;
+    private static final long serialVersionUID = 7483443243299515L;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

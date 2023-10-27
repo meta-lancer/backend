@@ -5,7 +5,9 @@ import com.metalancer.backend.common.constants.ProductsRequestStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 public class ProductsRequest {
 
     private final Long writerId;

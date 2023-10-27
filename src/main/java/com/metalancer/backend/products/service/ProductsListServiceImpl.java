@@ -59,7 +59,7 @@ public class ProductsListServiceImpl implements ProductsListService {
                 hotPickAssets = productsRepository.findChargeProductList(period, pageable);
             }
         }
-        if (hotPickAssets.getContent().size() > 0) {
+        if (hotPickAssets != null && hotPickAssets.getContent().size() > 0) {
             for (Asset hotPickAsset : hotPickAssets) {
                 setTagList(hotPickAsset);
             }

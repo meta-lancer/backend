@@ -104,7 +104,8 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public Page<HotPickAsset> findSaleProductList(Pageable pageable) {
-        return null;
+        return productsJpaRepository.findAllBySalePriceNotNullAndStatusOrderByCreatedAtDesc(
+            DataStatus.ACTIVE, pageable).map(ProductsEntity::toHotPickAsset);
     }
 
     @Override

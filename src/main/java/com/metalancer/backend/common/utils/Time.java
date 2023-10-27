@@ -45,7 +45,7 @@ public class Time {
 
         String time;
         if (diffTime < TIME_MAX.SEC) {
-            time = diffTime + "방금 전";
+            time = "방금 전";
         } else if ((diffTime /= TIME_MAX.SEC) < TIME_MAX.MIN) {
             time = diffTime + "분 전";
         } else if ((diffTime /= TIME_MAX.MIN) < TIME_MAX.HOUR) {
@@ -54,6 +54,27 @@ public class Time {
             time = dateTime.format(formatter);
         } else {
             time = (diffTime / TIME_MAX.MONTH) + "년 전";
+        }
+        return time;
+    }
+
+    public static String convertDateToEngForRequest(LocalDateTime dateTime) {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(dateTime, now);
+        long diffTime = duration.getSeconds();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M.d");
+
+        String time;
+        if (diffTime < TIME_MAX.SEC) {
+            time = "recent";
+        } else if ((diffTime /= TIME_MAX.SEC) < TIME_MAX.MIN) {
+            time = diffTime + "mins ago";
+        } else if ((diffTime /= TIME_MAX.MIN) < TIME_MAX.HOUR) {
+            time = (diffTime) + "hrs ago";
+        } else if ((diffTime /= TIME_MAX.HOUR) < TIME_MAX.DAY) {
+            time = dateTime.format(formatter);
+        } else {
+            time = (diffTime / TIME_MAX.MONTH) + "years ago";
         }
         return time;
     }

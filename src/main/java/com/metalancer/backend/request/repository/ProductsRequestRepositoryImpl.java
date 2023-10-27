@@ -118,10 +118,12 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
     private void createProductsRequestAndType(ProductsRequestEntity createdProductsRequestEntity,
         String productsRequestType) {
         ProductsRequestTypeEntity productsRequestTypeEntity = productsRequestTypeJpaRepository.findByName(
-            productsRequestType).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+                productsRequestType)
+            .orElseThrow(() -> new NotFoundException("제작요청 카테고리: ", ErrorCode.NOT_FOUND));
         ProductsRequestAndTypeEntity productsRequestAndTypeEntity = ProductsRequestAndTypeEntity.builder()
             .productsRequestEntity(createdProductsRequestEntity)
-            .productsRequestTypeEntity(productsRequestTypeEntity)
+            .productsRequestTypeEn(productsRequestTypeEntity.getName())
+            .productsRequestTypeKor(productsRequestTypeEntity.getNameKor())
             .build();
         productsRequestAndTypeJpaRepository.save(productsRequestAndTypeEntity);
     }
@@ -147,8 +149,8 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
             Optional<ProductsRequestTypeEntity> typeEntity = productsRequestTypeJpaRepository.findByName(
                 requestTypeOption);
             typeEntity.ifPresent(productsRequestTypeEntity -> whereClause.or(
-                QProductsRequestAndTypeEntity.productsRequestAndTypeEntity.productsRequestTypeEntity.eq(
-                    productsRequestTypeEntity)));
+                QProductsRequestAndTypeEntity.productsRequestAndTypeEntity.productsRequestTypeEn.eq(
+                    productsRequestTypeEntity.getName())));
         }
     }
 }

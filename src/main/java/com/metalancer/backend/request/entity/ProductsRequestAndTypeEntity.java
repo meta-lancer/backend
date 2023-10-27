@@ -1,7 +1,6 @@
 package com.metalancer.backend.request.entity;
 
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
-import com.metalancer.backend.category.entity.ProductsRequestTypeEntity;
 import com.metalancer.backend.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,19 +34,23 @@ public class ProductsRequestAndTypeEntity extends BaseTimeEntity implements Seri
     @ManyToOne
     @JoinColumn(name = "products_request_id", nullable = false)
     private ProductsRequestEntity productsRequestEntity;
-    @ManyToOne
-    @JoinColumn(name = "products_request_type_id", nullable = false)
-    private ProductsRequestTypeEntity productsRequestTypeEntity;
+
+    @Column(nullable = false)
+    private String productsRequestTypeEn;
+
+    @Column(nullable = false)
+    private String productsRequestTypeKor;
 
     @Builder
     public ProductsRequestAndTypeEntity(ProductsRequestEntity productsRequestEntity,
-        ProductsRequestTypeEntity productsRequestTypeEntity) {
+        String productsRequestTypeEn, String productsRequestTypeKor) {
         this.productsRequestEntity = productsRequestEntity;
-        this.productsRequestTypeEntity = productsRequestTypeEntity;
+        this.productsRequestTypeEn = productsRequestTypeEn;
+        this.productsRequestTypeKor = productsRequestTypeKor;
     }
 
     public RequestCategory toRequestCategory() {
-        return RequestCategory.builder().name(productsRequestTypeEntity.getName()).nameKor(
-            productsRequestTypeEntity.getNameKor()).build();
+        return RequestCategory.builder().name(productsRequestTypeEn).nameKor(
+            productsRequestTypeKor).build();
     }
 }

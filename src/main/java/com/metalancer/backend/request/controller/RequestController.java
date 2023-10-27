@@ -51,6 +51,7 @@ public class RequestController {
             "제작요청 카테고리로 조회받은 데이터 영문으로 type 보내주세요.")
         @RequestParam List<String> requestTypeOptions,
         Pageable pageable) {
+        log.info("카테고리 옵션-{},  페이징-{}", requestTypeOptions, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(
             requestService.getProductsRequestList(requestTypeOptions, adjustedPageable));

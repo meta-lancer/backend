@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 public class ProductsRequest {
 
+    private final Long productsRequestId;
     private final Long writerId;
     private final String nickname;
     private final String profileImg;
@@ -19,15 +20,20 @@ public class ProductsRequest {
     private final String content;
     private final String createdAtKor;
     private final String updatedAtKor;
+    private final String createdAtEng;
+    private final String updatedAtEng;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private Integer commentCnt;
 
     @Builder
-    public ProductsRequest(Long writerId, String nickname, String profileImg,
+    public ProductsRequest(Long productsRequestId, Long writerId, String nickname,
+        String profileImg,
         ProductsRequestStatus productsRequestStatus, String title, String content,
         String createdAtKor, String updatedAtKor,
-        LocalDateTime createdAt, LocalDateTime updatedAt) {
+        String createdAtEng, String updatedAtEng, LocalDateTime createdAt,
+        LocalDateTime updatedAt) {
+        this.productsRequestId = productsRequestId;
         this.writerId = writerId;
         this.nickname = nickname;
         this.profileImg = profileImg;
@@ -36,6 +42,8 @@ public class ProductsRequest {
         this.content = content;
         this.createdAtKor = createdAtKor;
         this.updatedAtKor = updatedAtKor;
+        this.createdAtEng = createdAtEng;
+        this.updatedAtEng = updatedAtEng;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

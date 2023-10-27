@@ -133,6 +133,7 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         ProductsRequestEntity productsRequestEntity) {
         productsRequestEntity.update(dto.getTitle(),
             dto.getContent(), dto.getProductsRequestStatus());
+        updateRequestTypeList(dto, productsRequestEntity);
         ProductsRequest response = productsRequestEntity.toDomain();
         List<RequestCategory> requestCategoryList = getRequestCategories(
             productsRequestEntity);
@@ -141,6 +142,15 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         response.setCommentCnt(commentCnt);
 
         return response;
+    }
+
+    private void updateRequestTypeList(Update dto, ProductsRequestEntity productsRequestEntity) {
+        List<ProductsRequestAndTypeEntity> productsRequestAndTypeEntities = productsRequestAndTypeJpaRepository.findAllByProductsRequestEntity(
+            productsRequestEntity);
+        productsRequestAndTypeJpaRepository.deleteAll(productsRequestAndTypeEntities);
+        for (String requestType : dto.getProductionRequestTypeList()) {
+            createProductsRequestAndType(productsRequestEntity, requestType);
+        }
     }
 
     private void setWhereClauseWithRequestTypeOptions(List<String> requestTypeOptions,

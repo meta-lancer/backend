@@ -16,14 +16,15 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.UserRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -38,26 +39,25 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Override
     public List<MemberList> getAdminMemberList() {
         return userRepository.findAll().stream().map(User::toAdminMemberList)
-            .filter(user -> !user.getStatus().equals(DataStatus.PENDING))
-            .collect(Collectors.toList());
+                .filter(user -> !user.getStatus().equals(DataStatus.PENDING))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<RegisterList> getAdminRegisterList() {
         List<RegisterList> response = userRepository.findAll().stream()
-            .map(User::toAdminRegisterList)
-            .filter(user -> user.getStatus().equals(DataStatus.PENDING))
-            .toList();
+                .map(User::toAdminRegisterList)
+                .filter(user -> user.getStatus().equals(DataStatus.PENDING))
+                .toList();
         for (RegisterList registerMember : response) {
-            ApproveLink foundApproveLink = approveLinkRepository.findByEmail(
-                    registerMember.getEmail())
-                .orElseThrow(
-                    () -> new BaseException(ErrorCode.NOT_FOUND)
-                );
-            String approveLink = foundApproveLink.getApproveLink();
-            String receivedEmail = foundApproveLink.getEmail();
-            boolean approveStatus = foundApproveLink.isApproved();
-            registerMember.setApproveInfo(approveLink, receivedEmail, approveStatus);
+            Optional<ApproveLink> foundApproveLink = approveLinkRepository.findByEmail(
+                    registerMember.getEmail());
+            if (foundApproveLink.isPresent()) {
+                String approveLink = foundApproveLink.get().getApproveLink();
+                String receivedEmail = foundApproveLink.get().getEmail();
+                boolean approveStatus = foundApproveLink.get().isApproved();
+                registerMember.setApproveInfo(approveLink, receivedEmail, approveStatus);
+            }
         }
         return response;
     }
@@ -65,8 +65,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Override
     public List<CreatorList> getAdminCreatorList() {
         return creatorRepository.findAll().stream().map(CreatorEntity::toAdminCreatorList)
-            .filter(user -> user.getRole().equals(Role.ROLE_SELLER))
-            .collect(Collectors.toList());
+                .filter(user -> user.getRole().equals(Role.ROLE_SELLER))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -82,10 +82,10 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Override
     public MemberList updateMember(UpdateUser dto) {
         User user = userRepository.findById(dto.getMemberId()).orElseThrow(
-            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+                () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
         user.update(dto.getName(), dto.getUsername(), dto.getMobile(), dto.getJob(), dto.getRole(),
-            dto.getStatus());
+                dto.getStatus());
         User updatedUser = userRepository.save(user);
         return updatedUser.toAdminMemberList();
     }
@@ -95,7 +95,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         for (User user : userList) {
             user.setActive();
             Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApprovedAtIsNull(
-                user.getEmail());
+                    user.getEmail());
             if (approveLink.isPresent()) {
                 approveLink.get().approve();
                 count++;

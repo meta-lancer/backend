@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.dto;
 
 import com.metalancer.backend.common.constants.ValidationText;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -83,6 +84,7 @@ public class UserRequestDTO {
     @NoArgsConstructor
     public static class CreateOauthRequest {
 
+        @Schema(description = "유저-true, 크리에이터-false")
         private boolean isNormalUser;
         @Email(regexp = "", message = ValidationText.EMAIL_INVALID_REGEX)
         private String email;

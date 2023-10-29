@@ -28,4 +28,8 @@ public abstract class Asset {
     public void setSalePrice(Integer salePrice) {
         this.salePrice = salePrice;
     }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 }

@@ -1,7 +1,5 @@
 package com.metalancer.backend.common.config.redis;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +9,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @Configuration
 @EnableRedisHttpSession
@@ -40,9 +41,24 @@ public class RedisConfig extends AbstractHttpSessionApplicationInitializer {
 //            // ... any other local configurations
 //        }
 //        else {
+
         serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // Match main domain
 //        }
         return serializer;
+
+
+//        if (isLocalEnvironment()) {
+//            // Local environment-specific configurations
+//            serializer.setUseSecureCookie(false); // Use non-secure cookies for HTTP in local env
+//            serializer.setSameSite(null);  // This might help in some local scenarios
+//        } else {
+//            // Production or non-local environment-specific configurations
+//            serializer.setUseSecureCookie(true); // Ensure cookies are sent over HTTPS only
+//            serializer.setSameSite("none");     // Set SameSite to 'none'
+//            serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // Match main domain
+//        }
+//        return serializer;
+
     }
 
     private boolean isLocalEnvironment() {

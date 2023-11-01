@@ -19,12 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "장바구니", description = "")
 @RestController
@@ -37,13 +32,13 @@ public class CartController {
 
     @Operation(summary = "장바구니 조회", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = {
-        @Content(array = @ArraySchema(schema = @Schema(implementation = Cart.class)))
+            @Content(array = @ArraySchema(schema = @Schema(implementation = Cart.class)))
     })
     @GetMapping
     public BaseResponse<Page<Cart>> getAllCart(
-        HttpSession session,
-        @AuthenticationPrincipal PrincipalDetails user,
-        @Parameter(description = "페이징") Pageable pageable) {
+            HttpSession session,
+            @AuthenticationPrincipal PrincipalDetails user,
+            @Parameter(description = "페이징") Pageable pageable) {
         log.info("로그인되어있는 유저: {}", user);
         log.info("세션: {}", session);
         log.info("세션 LOGIN_USER: {}", session.getAttribute("LOGIN_USER"));
@@ -55,30 +50,31 @@ public class CartController {
     @ApiResponse(responseCode = "200", description = "생성 성공. true면 새롭게 생성, false면 이미 존재함", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PostMapping("/asset/{assetId}")
     public BaseResponse<Boolean> createCart(
-        @AuthenticationPrincipal PrincipalDetails user,
-        @Parameter @PathVariable Long assetId) {
+            @AuthenticationPrincipal PrincipalDetails user,
+            @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
         return new BaseResponse<>(
-            cartService.createCart(user.getUser(), assetId));
+                cartService.createCart(user.getUser(), assetId));
     }
 
     @Operation(summary = "장바구니 삭제", description = "")
     @ApiResponse(responseCode = "200", description = "삭제 성공. true면 삭제 완료, false면 애초에 존재 x", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @DeleteMapping("/asset/{assetId}")
     public BaseResponse<Boolean> deleteCart(
-        @AuthenticationPrincipal PrincipalDetails user,
-        @Parameter @PathVariable Long assetId) {
+            @AuthenticationPrincipal PrincipalDetails user,
+            @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
         return new BaseResponse<>(
-            cartService.deleteCart(user.getUser(), assetId));
+                cartService.deleteCart(user.getUser(), assetId));
     }
 
     @Operation(summary = "장바구니 전체 삭제", description = "")
     @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @DeleteMapping
     public BaseResponse<Boolean> deleteAllCart(
-        @AuthenticationPrincipal PrincipalDetails user) {
+            @AuthenticationPrincipal PrincipalDetails user) {
         log.info("로그인되어있는 유저: {}", user);
         return new BaseResponse<>(cartService.deleteAllCart(user.getUser()));
     }
+
 }

@@ -1,17 +1,8 @@
 package com.metalancer.backend.common.constants;
 
-import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
-import static com.metalancer.backend.common.constants.HttpStatus.CREATED;
-import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
-import static com.metalancer.backend.common.constants.HttpStatus.FORBIDDEN;
-import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
-import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
-import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
-import static com.metalancer.backend.common.constants.HttpStatus.SUCCESS;
-import static com.metalancer.backend.common.constants.HttpStatus.UNAUTHORIZED;
-import static com.metalancer.backend.common.constants.HttpStatus.UNEXPECTED_ERROR;
-
 import java.util.Arrays;
+
+import static com.metalancer.backend.common.constants.HttpStatus.*;
 
 public enum ErrorCode {
     /**
@@ -28,7 +19,7 @@ public enum ErrorCode {
     LOGOUT_OK(SUCCESS, "B003", "로그아웃 성공"),
     LOGOUT_STATE(UNAUTHORIZED, "B004", "로그아웃 상태"),
     LOGIN_DENIED(NOT_FOUND_VALUE, "B005", "로그인 불가"),
-
+    LOGIN_REQUIRED(UNAUTHORIZED, "B006", "로그인 필요"),
     /**
      * 회원정보
      */
@@ -121,8 +112,8 @@ public enum ErrorCode {
 
     public static ErrorCode findExceptionCodeByCode(String code) {
         return Arrays.stream(ErrorCode.values())
-            .filter(x -> x.getCode().equals(code))
-            .findFirst()
-            .orElse(EMPTY);
+                .filter(x -> x.getCode().equals(code))
+                .findFirst()
+                .orElse(EMPTY);
     }
 }

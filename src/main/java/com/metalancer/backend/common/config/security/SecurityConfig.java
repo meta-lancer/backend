@@ -81,9 +81,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/swagger-ui/index.html").denyAll()
                 .requestMatchers("/h2-console",
-                        "/loginForm")
+                        "/loginForm", "/api/products/{productId}/wish")
                 .authenticated()
-                .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
+                .requestMatchers("/api/products/**").permitAll()
+                .requestMatchers("/api/cart/**", "/api/orders/**").hasAnyRole("USER", "SELLER", "ADMIN")
                 .requestMatchers("/api/creator/**").hasAnyRole("SELLER", "ADMIN")
 //            .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()

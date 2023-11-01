@@ -1,7 +1,5 @@
 package com.metalancer.backend.users.service;
 
-import static com.metalancer.backend.common.constants.ObjectText.LOGIN_USER;
-
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.ApplicationText;
 import com.metalancer.backend.common.constants.DataStatus;
@@ -16,27 +14,26 @@ import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateOauthRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateRequest;
-import com.metalancer.backend.users.entity.ApproveLink;
-import com.metalancer.backend.users.entity.CreatorEntity;
-import com.metalancer.backend.users.entity.User;
-import com.metalancer.backend.users.entity.UserAgreementEntity;
-import com.metalancer.backend.users.entity.UserInterestsEntity;
+import com.metalancer.backend.users.entity.*;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.UserAgreementRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import static com.metalancer.backend.common.constants.ObjectText.LOGIN_USER;
 
 @Service
 @Slf4j
@@ -60,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
         User createdUser = createEmailUser(dto);
         createdUser = userRepository.save(createdUser);
         User foundUser = userRepository.findById(createdUser.getId()).orElseThrow(
-            () -> new BaseException(ErrorCode.SIGNUP_FAILED)
+                () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
@@ -70,10 +67,10 @@ public class AuthServiceImpl implements AuthService {
 
     private void setAgreement(User foundUser, CreateRequest dto) {
         UserAgreementEntity savedUserAgreementEntity = UserAgreementEntity.builder().user(foundUser)
-            .ageAgree(dto.isAgeAgree())
-            .serviceAgree(dto.isServiceAgree()).infoAgree(dto.isInfoAgree())
-            .marketingAgree(dto.isMarketingAgree()).statusAgree(
-                dto.isStatusAgree()).build();
+                .ageAgree(dto.isAgeAgree())
+                .serviceAgree(dto.isServiceAgree()).infoAgree(dto.isInfoAgree())
+                .marketingAgree(dto.isMarketingAgree()).statusAgree(
+                        dto.isStatusAgree()).build();
         userAgreementRepository.save(savedUserAgreementEntity);
     }
 
@@ -81,8 +78,8 @@ public class AuthServiceImpl implements AuthService {
         List<UserInterestsEntity> userInterestsEntities = new ArrayList<>();
         for (String interests : dto.getInterests()) {
             UserInterestsEntity savedUserInterestsEntity = UserInterestsEntity.builder()
-                .user(foundUser)
-                .interestsName(interests).build();
+                    .user(foundUser)
+                    .interestsName(interests).build();
             userInterestsEntities.add(savedUserInterestsEntity);
         }
         if (userInterestsEntities.size() > 0) {
@@ -93,10 +90,10 @@ public class AuthServiceImpl implements AuthService {
 
     private void setAgreement(User foundUser, CreateOauthRequest dto) {
         UserAgreementEntity savedUserAgreementEntity = UserAgreementEntity.builder().user(foundUser)
-            .ageAgree(dto.isAgeAgree())
-            .serviceAgree(dto.isServiceAgree()).infoAgree(dto.isInfoAgree())
-            .marketingAgree(dto.isMarketingAgree()).statusAgree(
-                dto.isStatusAgree()).build();
+                .ageAgree(dto.isAgeAgree())
+                .serviceAgree(dto.isServiceAgree()).infoAgree(dto.isInfoAgree())
+                .marketingAgree(dto.isMarketingAgree()).statusAgree(
+                        dto.isStatusAgree()).build();
         userAgreementRepository.save(savedUserAgreementEntity);
     }
 
@@ -104,8 +101,8 @@ public class AuthServiceImpl implements AuthService {
         List<UserInterestsEntity> userInterestsEntities = new ArrayList<>();
         for (String interests : dto.getInterests()) {
             UserInterestsEntity savedUserInterestsEntity = UserInterestsEntity.builder()
-                .user(foundUser)
-                .interestsName(interests).build();
+                    .user(foundUser)
+                    .interestsName(interests).build();
             userInterestsEntities.add(savedUserInterestsEntity);
         }
         if (userInterestsEntities.size() > 0) {
@@ -117,13 +114,13 @@ public class AuthServiceImpl implements AuthService {
     private void createdApproveLink(User foundUser) throws MessagingException {
         String approveLink = getApproveLink();
         ApproveLink createdApproveLink = ApproveLink.builder().user(foundUser)
-            .email(foundUser.getEmail())
-            .approveLink(approveLink).build();
+                .email(foundUser.getEmail())
+                .approveLink(approveLink).build();
         createdApproveLink = approveLinkRepository.save(createdApproveLink);
         ApproveLink foundApproveLink = approveLinkRepository.findById(createdApproveLink.getId())
-            .orElseThrow(
-                () -> new BaseException(ErrorCode.SIGNUP_FAILED)
-            );
+                .orElseThrow(
+                        () -> new BaseException(ErrorCode.SIGNUP_FAILED)
+                );
         sendApproveEmailToUser(foundUser, foundApproveLink);
     }
 
@@ -132,12 +129,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void sendApproveEmailToUser(User foundUser, ApproveLink foundApproveLink)
-        throws MessagingException {
+            throws MessagingException {
         String approveLink = foundApproveLink.getApproveLink();
         HashMap<String, String> emailValues = new HashMap<>();
         emailValues.put("url", approveLink);
         emailService.sendMail(foundUser.getEmail(), ApplicationText.REGISTER_LINK_EMAIL_TITLE,
-            "approve", emailValues);
+                "approve", emailValues);
     }
 
     private User createEmailUser(UserRequestDTO.CreateRequest dto) {
@@ -147,7 +144,7 @@ public class AuthServiceImpl implements AuthService {
         }
         String encryptedPassword = dto.setPasswordEncrypted(passwordEncoder);
         User createdUser = User.builder().email(dto.getEmail()).password(encryptedPassword)
-            .loginType(LoginType.NORMAL).job(dto.getJob()).build();
+                .loginType(LoginType.NORMAL).job(dto.getJob()).build();
         createdUser.setNormalUsername();
         createdUser.setPending();
         return createdUser;
@@ -158,15 +155,15 @@ public class AuthServiceImpl implements AuthService {
         link = urlBase + link;
         log.info("승인 링크 - {}", link);
         ApproveLink foundApproveLink = approveLinkRepository.findByApproveLink(link).orElseThrow(
-            () -> new BaseException(ErrorCode.SIGNUP_FAILED)
+                () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
         foundApproveLink.approve();
         User foundUser = userRepository.findByEmail(foundApproveLink.getEmail())
-            .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
+                .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
         foundUser.setActive();
 
         Optional<CreatorEntity> foundCreator = creatorRepository.findOptionalByUserAndStatus(
-            foundUser, DataStatus.PENDING);
+                foundUser, DataStatus.PENDING);
         foundCreator.ifPresent(CreatorEntity::setActive);
 
         return new AuthResponseDTO.userInfo(foundUser);
@@ -175,7 +172,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean emailLogin(HttpSession session, AuthRequestDTO.LoginRequest dto) {
         User user = userRepository.findByEmail(dto.getEmail())
-            .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_NOT_FOUND_ID_PW));
+                .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_NOT_FOUND_ID_PW));
         user.isUserStatusEqualsActive();
         user.isPasswordMatch(passwordEncoder, dto.getPassword());
         session.setAttribute(LOGIN_USER, user);
@@ -193,23 +190,23 @@ public class AuthServiceImpl implements AuthService {
         User createdUser = createEmailUser(dto);
         createdUser = userRepository.save(createdUser);
         User foundUser = userRepository.findById(createdUser.getId()).orElseThrow(
-            () -> new BaseException(ErrorCode.SIGNUP_FAILED)
+                () -> new BaseException(ErrorCode.SIGNUP_FAILED)
         );
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
         createdApproveLink(foundUser);
         createCreator(foundUser);
         CreatorEntity foundCreator = creatorRepository.findByUserAndStatus(foundUser,
-            DataStatus.PENDING);
+                DataStatus.PENDING);
         return foundCreator.getId();
     }
 
     @Override
     public Long createOauthUser(PrincipalDetails user, CreateOauthRequest dto)
-        throws MessagingException {
+            throws MessagingException {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
@@ -222,8 +219,14 @@ public class AuthServiceImpl implements AuthService {
 
     private void createCreator(User foundUser) {
         CreatorEntity createdCreator = CreatorEntity.builder().user(foundUser)
-            .email(foundUser.getEmail()).build();
+                .email(foundUser.getEmail()).build();
         creatorRepository.save(createdCreator);
         createdCreator.setPending();
+    }
+
+    public void hasPrincipalDetails(PrincipalDetails user) {
+        if (user == null) {
+            throw new BaseException(ErrorCode.LOGIN_REQUIRED);
+        }
     }
 }

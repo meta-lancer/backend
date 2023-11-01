@@ -23,4 +23,5 @@ public interface AuthService {
 
     Long createOauthUser(PrincipalDetails user, CreateOauthRequest dto) throws MessagingException;
 
+    void hasPrincipalDetails(PrincipalDetails user);
 }

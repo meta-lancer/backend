@@ -18,10 +18,10 @@ public enum ErrorCode {
     GOOGLE_SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A008", "already google signup"),
 
     LOGIN_OK(SUCCESS, "B001", "로그인 성공"),
-    LOGIN_NOT_FOUND_ID_PW(NOT_FOUND_VALUE, "B002", "아이디 존재하지않거나 비밀번호가 일치하지않습니다."),
+    LOGIN_NOT_FOUND_ID_PW(UNAUTHORIZED, "B002", "아이디 존재하지않거나 비밀번호가 일치하지않습니다."),
     LOGOUT_OK(SUCCESS, "B003", "로그아웃 성공"),
     LOGOUT_STATE(UNAUTHORIZED, "B004", "로그아웃 상태"),
-    LOGIN_DENIED(NOT_FOUND_VALUE, "B005", "로그인 불가"),
+    LOGIN_DENIED(UNAUTHORIZED, "B005", "로그인 불가"),
     LOGIN_REQUIRED(UNAUTHORIZED, "B006", "로그인 필요"),
     /**
      * 회원정보

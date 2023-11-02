@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
     private User createEmailUser(UserRequestDTO.CreateRequest dto) {
         Optional<User> foundUser = userRepository.findByEmail(dto.getEmail());
         if (foundUser.isPresent()) {
-            throw new BaseException(ErrorCode.SIGNUP_DUPLICATED);
+            throw new BaseException(ErrorCode.EMAIL_SIGNUP_DUPLICATED);
         }
         String encryptedPassword = dto.setPasswordEncrypted(passwordEncoder);
         User createdUser = User.builder().email(dto.getEmail()).password(encryptedPassword)
@@ -208,6 +208,8 @@ public class AuthServiceImpl implements AuthService {
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
                 () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
+        Optional<User> emailFoundUser = userRepository.findByEmail(dto.getEmail());
+        foundUser.setEmailIfNotDuplicated(dto.getEmail(), emailFoundUser);
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
         createdApproveLink(foundUser);

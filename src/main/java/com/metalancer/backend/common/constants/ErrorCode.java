@@ -9,10 +9,13 @@ public enum ErrorCode {
      * 회원가입 및 로그인
      */
     SIGNUP_CREATED_OK(CREATED, "A001", "회원가입 성공"),
-    SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A002", "이미 존재하는 회원"),
+    EMAIL_SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A002", "already email signup"),
     SIGNUP_DUPLICATED_ID(DUPLICATED_VALUE, "A003", "ID 중복"),
     SIGNUP_DUPLICATED_USERNAME(DUPLICATED_VALUE, "A004", "USERNAME 중복"),
     SIGNUP_FAILED(BAD_REQUEST, "A005", "회원가입 실패"),
+    KAKAO_SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A006", "already kakao signup"),
+    NAVER_SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A007", "already naver signup"),
+    GOOGLE_SIGNUP_DUPLICATED(DUPLICATED_VALUE, "A008", "already google signup"),
 
     LOGIN_OK(SUCCESS, "B001", "로그인 성공"),
     LOGIN_NOT_FOUND_ID_PW(NOT_FOUND_VALUE, "B002", "아이디 존재하지않거나 비밀번호가 일치하지않습니다."),

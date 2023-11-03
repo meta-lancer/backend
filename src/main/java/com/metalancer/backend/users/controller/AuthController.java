@@ -78,12 +78,14 @@ public class AuthController {
         return session.getAttribute(key);
     }
 
-//    @Operation(summary = "비밀번호 찾기", description = "이메일과 링크 일치 여부 판단 -> 비밀번호 변경")
-//    @PatchMapping("/password/reset")
-//    public BaseResponse<Boolean> resetPasswordFromFindPW(
-//        @Valid @RequestBody MemberDto.ResetPwdFromFindPwRequest dto) {
-//        return new BaseResponse<>(loginService.resetPasswordFromFindPw(dto));
-//    }
+    @Operation(summary = "비밀번호 찾기", description = "이메일과 링크 일치 여부 판단 -> 비밀번호 변경")
+    @PatchMapping("/password/reset")
+    public BaseResponse<Boolean> resetPassword(
+        @RequestParam("email") String email
+    ) {
+
+        return new BaseResponse<Boolean>(authService.resetPassword(email));
+    }
 
 //    @Operation(summary = "이메일 로그인", description = "")
 //    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))

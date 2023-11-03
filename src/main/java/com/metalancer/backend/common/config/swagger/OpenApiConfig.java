@@ -97,4 +97,12 @@ public class OpenApiConfig {
             .pathsToMatch("/api/request/**")
             .build();
     }
+
+    @Bean
+    public GroupedOpenApi group9() {
+        return GroupedOpenApi.builder()
+            .group("관리자페이지")
+            .pathsToMatch("/api/admin/**")
+            .build();
+    }
 }

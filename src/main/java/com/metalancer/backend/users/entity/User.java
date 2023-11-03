@@ -13,16 +13,25 @@ import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.interests.domain.Interests;
 import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
 import com.metalancer.backend.users.dto.UserResponseDTO.OtherCreatorBasicInfo;
-import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Getter
@@ -61,7 +70,7 @@ public class User extends BaseEntity implements Serializable {
 
     @Builder
     public User(String email, String oauthId, String mobile, String password,
-                LoginType loginType, String name, String username, String job) {
+        LoginType loginType, String name, String username, String job) {
         this.email = email;
         this.oauthId = oauthId;
         this.mobile = mobile;
@@ -73,8 +82,8 @@ public class User extends BaseEntity implements Serializable {
     }
 
     public void update(String name, String username, String mobile, String job,
-                       Role role,
-                       DataStatus status) {
+        Role role,
+        DataStatus status) {
         this.mobile = mobile;
         this.name = name;
         this.username = username;
@@ -122,7 +131,7 @@ public class User extends BaseEntity implements Serializable {
 
     public void setNormalUsername() {
         this.username = loginType.getProvider() + "_"
-                + UUID.randomUUID().toString().substring(0, 10);
+            + UUID.randomUUID().toString().substring(0, 10);
     }
 
     public void setPending() {
@@ -139,6 +148,10 @@ public class User extends BaseEntity implements Serializable {
 
     public void update() {
 
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setRole(Role role) {
@@ -158,9 +171,12 @@ public class User extends BaseEntity implements Serializable {
         DataStatus status = getStatus();
         String USER_STATUS_ERROR = "user status error";
         switch (status) {
-            case DELETED -> throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_DELETED);
-            case PENDING -> throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_PENDING);
-            case BANNED -> throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_BANNED);
+            case DELETED ->
+                throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_DELETED);
+            case PENDING ->
+                throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_PENDING);
+            case BANNED ->
+                throw new DataStatusException(USER_STATUS_ERROR, ErrorCode.STATUS_BANNED);
         }
     }
 
@@ -173,36 +189,36 @@ public class User extends BaseEntity implements Serializable {
 
     public MemberList toAdminMemberList() {
         return MemberList.builder()
-                .memberId(id)
-                .email(email)
-                .mobile(mobile)
-                .name(name)
-                .username(username)
-                .job(job)
-                .loginType(loginType)
-                .role(role)
-                .status(getStatus())
-                .createdAt(getCreatedAt())
-                .updatedAt(getUpdatedAt())
-                .build();
+            .memberId(id)
+            .email(email)
+            .mobile(mobile)
+            .name(name)
+            .username(username)
+            .job(job)
+            .loginType(loginType)
+            .role(role)
+            .status(getStatus())
+            .createdAt(getCreatedAt())
+            .updatedAt(getUpdatedAt())
+            .build();
     }
 
     public RegisterList toAdminRegisterList() {
         return RegisterList.builder()
-                .memberId(id)
-                .email(email)
-                .mobile(mobile)
-                .name(name)
-                .username(username)
-                .loginType(loginType)
-                .status(getStatus())
-                .createdAt(getCreatedAt())
-                .updatedAt(getUpdatedAt())
-                .build();
+            .memberId(id)
+            .email(email)
+            .mobile(mobile)
+            .name(name)
+            .username(username)
+            .loginType(loginType)
+            .status(getStatus())
+            .createdAt(getCreatedAt())
+            .updatedAt(getUpdatedAt())
+            .build();
     }
 
     public void updateBasicInfo(String profileImg, String nickname, String introduction,
-                                String link, String job) {
+        String link, String job) {
         setNicknameUpdatedAt(this.nickname, nickname);
         this.profileImg = profileImg;
         this.nickname = nickname;
@@ -213,18 +229,18 @@ public class User extends BaseEntity implements Serializable {
 
     public BasicInfo toBasicInfo(List<Interests> interests) {
         return BasicInfo.builder().profileImg(profileImg)
-                .nickname(nickname)
-                .email(email)
-                .job(job).link(link)
-                .introduction(introduction).interestsList(interests).build();
+            .nickname(nickname)
+            .email(email)
+            .job(job).link(link)
+            .introduction(introduction).interestsList(interests).build();
     }
 
     public OtherCreatorBasicInfo toOtherCreatorBasicInfo() {
         return OtherCreatorBasicInfo.builder().profileImg(profileImg)
-                .nickname(nickname)
-                .email(email)
-                .link(link)
-                .introduction(introduction).build();
+            .nickname(nickname)
+            .email(email)
+            .link(link)
+            .introduction(introduction).build();
     }
 
     public boolean checkNicknameUpdatedBefore() {

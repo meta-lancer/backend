@@ -34,7 +34,7 @@ public class MemberLoginFailService implements AuthenticationFailureHandler {
         String jsonResponse = String.format("{\"error\": \"%s\"}", errorMessage);
         response.getWriter().write(jsonResponse);
         response.sendError(ErrorCode.LOGIN_NOT_FOUND_ID_PW.getStatus().value, ErrorCode.LOGIN_NOT_FOUND_ID_PW.getMessage());
-
+        response.setStatus(ErrorCode.LOGIN_NOT_FOUND_ID_PW.getStatus().value);
         if (errorMessage != null) {
             log.info(errorMessage.getMessage());
         }

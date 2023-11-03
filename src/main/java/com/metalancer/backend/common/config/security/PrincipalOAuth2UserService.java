@@ -58,7 +58,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
         if (optionalUser.isEmpty()) {
             checkIfEmailDuplicatedSignUp(oAuth2UserInfo);
 
-            String email = oAuth2UserInfo.getEmail();
+            String email = oAuth2UserInfo.getEmail() != null ? oAuth2UserInfo.getEmail() : oauthId + "@naver.com";
             String username = loginType.toString() + "_" + oauthId;
             //        String nickname = oAuth2UserInfo.getName();
 

@@ -18,4 +18,8 @@ public interface AdminMemberService {
     String approveUserList(Approve dto);
 
     MemberList updateMember(UpdateUser dto);
+
+    String deleteMember(Long memberId);
+
+    String improveToCreator(Long memberId);
 }

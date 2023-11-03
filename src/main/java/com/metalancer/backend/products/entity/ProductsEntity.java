@@ -7,27 +7,14 @@ import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
-import com.metalancer.backend.products.domain.FilterAsset;
-import com.metalancer.backend.products.domain.GenreGalaxy;
-import com.metalancer.backend.products.domain.HotPickAsset;
-import com.metalancer.backend.products.domain.ProductsDetail;
-import com.metalancer.backend.products.domain.TrendSpotlight;
+import com.metalancer.backend.products.domain.*;
 import com.metalancer.backend.users.entity.CreatorEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.*;
+import org.apache.commons.lang3.RandomStringUtils;
+
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.apache.commons.lang3.RandomStringUtils;
 
 
 @Getter
@@ -43,9 +30,6 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     @Id
     @Column(name = "products_id", nullable = false)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "products_category_id")
-    private ProductsCategoryEntity category;
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private CreatorEntity creatorEntity;
@@ -133,18 +117,15 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         DataStatus status = getStatus();
         String PRODUCTS_STATUS_ERROR = "products status error";
         switch (status) {
-            case DELETED ->
-                throw new DataStatusException(PRODUCTS_STATUS_ERROR, ErrorCode.STATUS_DELETED);
+            case DELETED -> throw new DataStatusException(PRODUCTS_STATUS_ERROR, ErrorCode.STATUS_DELETED);
         }
     }
 
     @Builder
     public ProductsEntity(CreatorEntity creatorEntity,
-        ProductsCategoryEntity productsCategoryEntity,
-        String title, int price, String thumbnail, String assetDetail, String assetNotice,
-        String assetCopyRight) {
+                          String title, int price, String thumbnail, String assetDetail, String assetNotice,
+                          String assetCopyRight) {
         this.creatorEntity = creatorEntity;
-        this.category = productsCategoryEntity;
         this.title = title;
         this.price = price;
         this.thumbnail = thumbnail;
@@ -155,22 +136,22 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     }
 
     public ProductsDetail toProductsDetail() {
-        return ProductsDetail.builder().productsId(id).category(category.toDomain()).creator(
-                creatorEntity.toDomain())
-            .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
-            .discount(discount).rate(rate).ratingCnt(ratingCnt)
-            .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
-            .build();
+        return ProductsDetail.builder().productsId(id).creator(
+                        creatorEntity.toDomain())
+                .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
+                .discount(discount).rate(rate).ratingCnt(ratingCnt)
+                .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+                .build();
     }
 
     public HotPickAsset toHotPickAsset() {
         return HotPickAsset.builder().productsId(id).title(title).price(price).thumbnail("")
-            .build();
+                .build();
     }
 
     public ManageAsset toManageAsset() {
         return ManageAsset.builder().productsId(id).thumbnail(thumbnail).title(title).price(price)
-            .viewCnt(viewCnt).build();
+                .viewCnt(viewCnt).build();
     }
 
     public void setSalePrice(int salePrice) {
@@ -190,16 +171,16 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     public GenreGalaxy toGenreGalaxy() {
         return GenreGalaxy.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
-            .build();
+                .build();
     }
 
     public TrendSpotlight toTrendSpotLight() {
         return TrendSpotlight.builder().productsId(id).title(title).thumbnail(thumbnail)
-            .price(price).build();
+                .price(price).build();
     }
 
     public FilterAsset toFilterAsset() {
         return FilterAsset.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
-            .build();
+                .build();
     }
 }

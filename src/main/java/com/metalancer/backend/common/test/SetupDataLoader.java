@@ -14,15 +14,16 @@ import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.UserAgreementJpaRepository;
 import com.metalancer.backend.users.repository.UserInterestsJpaRepository;
 import com.metalancer.backend.users.repository.UserRepository;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor
@@ -141,14 +142,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     public User createUserIfNotFound(final String email,
-        final String password) {
+                                     final String password) {
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
             User newUser = User.builder().email(email).password(passwordEncoder.encode(password))
-                .loginType(LoginType.NORMAL)
-                .username(LoginType.NORMAL.getProvider() + "_" + UUID.randomUUID()
-                    .toString().substring(0, 8)).build();
+                    .loginType(LoginType.NORMAL)
+                    .username(LoginType.NORMAL.getProvider() + "_" + UUID.randomUUID()
+                            .toString().substring(0, 8)).build();
 
             return userRepository.save(newUser);
         }
@@ -163,20 +164,19 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     public ProductsCategoryEntity createProductsCategory(final String categoryName,
-        final String categoryNameEn, final int seq) {
+                                                         final String categoryNameEn, final int seq) {
         ProductsCategoryEntity newProductsCategoryEntity = ProductsCategoryEntity.builder()
-            .categoryName(categoryName)
-            .categoryNameEn(categoryNameEn).seq(seq).build();
+                .categoryName(categoryName)
+                .categoryNameEn(categoryNameEn).seq(seq).build();
         return productsCategoryRepository.save(newProductsCategoryEntity);
     }
 
     @Transactional
     public ProductsEntity createProduct(final CreatorEntity creatorEntity,
-        final ProductsCategoryEntity productsCategoryEntity, final String title,
-        final int price) {
+                                        final ProductsCategoryEntity productsCategoryEntity, final String title,
+                                        final int price) {
         ProductsEntity newProduct = ProductsEntity.builder().creatorEntity(creatorEntity)
-            .productsCategoryEntity(productsCategoryEntity)
-            .title(title).price(price).build();
+                .title(title).price(price).build();
         return productsJpaRepository.save(newProduct);
     }
 }

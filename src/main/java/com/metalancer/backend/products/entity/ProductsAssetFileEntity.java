@@ -115,4 +115,12 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
             .copyRight(copyRight).recentVersion(recentVersion)
             .build();
     }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }

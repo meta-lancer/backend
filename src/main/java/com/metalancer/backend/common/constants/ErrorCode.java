@@ -1,8 +1,17 @@
 package com.metalancer.backend.common.constants;
 
-import java.util.Arrays;
+import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
+import static com.metalancer.backend.common.constants.HttpStatus.CREATED;
+import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.FORBIDDEN;
+import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
+import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.NOT_FOUND_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.SUCCESS;
+import static com.metalancer.backend.common.constants.HttpStatus.UNAUTHORIZED;
+import static com.metalancer.backend.common.constants.HttpStatus.UNEXPECTED_ERROR;
 
-import static com.metalancer.backend.common.constants.HttpStatus.*;
+import java.util.Arrays;
 
 public enum ErrorCode {
     /**
@@ -81,6 +90,7 @@ public enum ErrorCode {
     SYSTEM_ERROR(UNEXPECTED_ERROR, "Z004", "일시적 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
     FAIL_TO_CREATE(INVALID_VALUE, "Z005", "등록에 실패했습니다."),
     FAIL_TO_UPDATE(INVALID_VALUE, "Z006", "수정에 실패했습니다."),
+    NOT_EXIST_ASSET(INVALID_VALUE, "Z007", "에셋 파일이 등록되지 않은 상품입니다."),
 
     STATUS_DELETED(INVALID_VALUE, "Z101", "삭제된 상태입니다."),
     STATUS_PENDING(INVALID_VALUE, "Z102", "승인대기 상태입니다."),
@@ -115,8 +125,8 @@ public enum ErrorCode {
 
     public static ErrorCode findExceptionCodeByCode(String code) {
         return Arrays.stream(ErrorCode.values())
-                .filter(x -> x.getCode().equals(code))
-                .findFirst()
-                .orElse(EMPTY);
+            .filter(x -> x.getCode().equals(code))
+            .findFirst()
+            .orElse(EMPTY);
     }
 }

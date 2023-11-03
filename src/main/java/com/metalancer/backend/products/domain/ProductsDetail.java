@@ -1,16 +1,16 @@
 package com.metalancer.backend.products.domain;
 
 import com.metalancer.backend.users.domain.Creator;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 
 @Getter
 public class ProductsDetail {
 
     private final Long productsId;
-    private final ProductsCategory category;
     private final Creator creator;
     private final String sharedLink;
     private final String title;
@@ -31,12 +31,11 @@ public class ProductsDetail {
     private List<String> thumbnailList;
 
     @Builder
-    public ProductsDetail(Long productsId, ProductsCategory category, Creator creator,
-        String sharedLink,
-        String title, int price, Integer salePrice, double discount, double rate, int ratingCnt,
-        String assetDetail, String assetNotice, String assetCopyRight, List<String> thumbnailList) {
+    public ProductsDetail(Long productsId, Creator creator,
+                          String sharedLink,
+                          String title, int price, Integer salePrice, double discount, double rate, int ratingCnt,
+                          String assetDetail, String assetNotice, String assetCopyRight, List<String> thumbnailList) {
         this.productsId = productsId;
-        this.category = category;
         this.creator = creator;
         this.sharedLink = sharedLink;
         this.title = title;

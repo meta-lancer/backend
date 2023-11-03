@@ -4,6 +4,7 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
@@ -102,7 +103,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
 
         ProductsDetail productsDetail = foundProductsEntity.toProductsDetail();
         getProductsDetailTagList(foundProductsEntity, productsDetail);
-        AssetFile assetFile = getProductsDetailAssetFile(foundProductsEntity,
+        AssetFile assetFile = getProductsDetailAssetFileAfterUploaded(foundProductsEntity,
             productsDetail);
         productsDetail.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
@@ -157,6 +158,28 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
         assetFile.setZipFileUrl("");
+        return assetFile;
+    }
+
+    private AssetFile getProductsDetailAssetFileAfterUploaded(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> thumbnailUrlList = getProductsThumbnailList(savedProductsEntity,
+            productsDetail);
+        log.info("썸네일 목록 조회");
+        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
+            savedProductsEntity);
+        log.info("3D 뷰 데이터 조회");
+        ProductsAssetFileEntity productsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            savedProductsEntity);
+
+        if (!productsAssetFileEntity.getSuccess()) {
+            throw new InvalidParamException(ErrorCode.NOT_EXIST_ASSET);
+        }
+
+        AssetFile assetFile = productsAssetFileEntity.toAssetFile();
+        assetFile.setThumbnailUrlList(thumbnailUrlList);
+        assetFile.setViewUrlList(viewUrlList);
+        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
         return assetFile;
     }
 

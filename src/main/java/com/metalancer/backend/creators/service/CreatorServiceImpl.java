@@ -73,11 +73,16 @@ public class CreatorServiceImpl implements CreatorService {
             CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(user,
                 DataStatus.ACTIVE);
             ProductsEntity savedProductsEntity = createProductsEntity(dto, creatorEntity);
+            log.info("에셋 등록 - products 생성");
             createProductsAssetFileEntity(dto, savedProductsEntity);
+            log.info("에셋 등록 - ProductsAssetFile 생성");
             Long savedProductsId = savedProductsEntity.getId();
             saveTagList(dto, savedProductsEntity);
+            log.info("에셋 등록 - tagList 생성");
             uploadThumbnailImages(savedProductsId, savedProductsEntity, thumbnails);
+            log.info("에셋 등록 - 썸네일 업로드");
             upload3DViews(savedProductsId, savedProductsEntity, views);
+            log.info("에셋 등록 - 3D 뷰 업로드");
             ProductsDetail productsDetail = savedProductsEntity.toProductsDetail();
             getProductsDetailTagList(savedProductsEntity, productsDetail);
             AssetFile assetFile = getProductsDetailAssetFile(savedProductsEntity,
@@ -132,6 +137,8 @@ public class CreatorServiceImpl implements CreatorService {
         ProductsAssetFileEntity createdProductsAssetFileEntity = ProductsAssetFileEntity.builder().
             productsEntity(savedProductsEntity)
             .productionProgram(String.join(", ", dto.getProductionProgram()))
+            .fileName("")
+            .url("")
             .compatibleProgram(
                 String.join(", ", dto.getCompatibleProgram())).support(dto.getSupport())
             .animation(dto.getAnimation()).rigging(dto.getRigging()).copyRight(dto.getCopyRight())
@@ -146,21 +153,26 @@ public class CreatorServiceImpl implements CreatorService {
         Optional<ProductsAssetFileEntity> productsAssetFileEntity = productsAssetFileRepository.findOptionalEntityByProducts(
             productsEntity);
         if (productsAssetFileEntity.isEmpty()) {
-            String randomFileName = UUID.randomUUID().toString().substring(0, 10) + ".zip";
-            String uploadedZipFileUrl = uploadService.getAssetFilePresignedUrl(productsId,
-                randomFileName);
-            String shortUrl = uploadService.extractBaseUrl(uploadedZipFileUrl);
-            ProductsAssetFileEntity createdProductsAssetFileEntity = ProductsAssetFileEntity.builder()
-                .productsEntity(productsEntity).url(shortUrl)
-                .fileName(randomFileName)
-                .build();
-            productsAssetFileRepository.save(createdProductsAssetFileEntity);
-            return uploadedZipFileUrl;
+            throw new NotFoundException("등록된 상품이 없습니다.", ErrorCode.NOT_FOUND);
+        } else {
+            ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileEntity.get();
+            String url = foundProductsAssetFileEntity.getUrl();
+            if (url == null || url.equals("")) {
+                String randomFileName = UUID.randomUUID().toString().substring(0, 10) + ".zip";
+                String uploadedZipFileUrl = uploadService.getAssetFilePresignedUrl(productsId,
+                    randomFileName);
+                String shortUrl = uploadService.extractBaseUrl(uploadedZipFileUrl);
+                foundProductsAssetFileEntity.setUrl(shortUrl);
+                foundProductsAssetFileEntity.setFileName(randomFileName);
+                productsAssetFileRepository.save(foundProductsAssetFileEntity);
+                return uploadedZipFileUrl;
+            } else {
+                String savedFileName = foundProductsAssetFileEntity.getFileName();
+                return uploadService.getAssetFilePresignedUrl(productsId, savedFileName);
+            }
         }
 
-        ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileEntity.get();
-        String savedFileName = foundProductsAssetFileEntity.getFileName();
-        return uploadService.getAssetFilePresignedUrl(productsId, savedFileName);
+
     }
 
     @Override

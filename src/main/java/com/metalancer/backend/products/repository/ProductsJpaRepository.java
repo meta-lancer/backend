@@ -50,4 +50,6 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
     Page<ProductsEntity> findDistinctProductsByTagNamesAndStatus(
         @Param("tagList") List<String> tagList, @Param("status") DataStatus status,
         Pageable pageable);
+
+    long countAllBy();
 }

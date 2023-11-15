@@ -266,4 +266,14 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     public Page<ProductsEntity> findAllByStatus(DataStatus status, Pageable pageable) {
         return productsJpaRepository.findAllByStatusOrderByCreatedAtDesc(status, pageable);
     }
+
+    @Override
+    public Page<ProductsEntity> findAllAdminProductsList(Pageable pageable) {
+        return productsJpaRepository.findAll(pageable);
+    }
+
+    @Override
+    public Long countAllProducts() {
+        return productsJpaRepository.countAllBy();
+    }
 }

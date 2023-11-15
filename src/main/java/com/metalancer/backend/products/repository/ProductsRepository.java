@@ -51,4 +51,8 @@ public interface ProductsRepository {
         DataStatus dataStatus, List<Integer> priceOption, Pageable pageable);
 
     Page<ProductsEntity> findAllByStatus(DataStatus status, Pageable pageable);
+
+    Page<ProductsEntity> findAllAdminProductsList(Pageable pageable);
+
+    Long countAllProducts();
 }

@@ -94,7 +94,11 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         User user = userRepository.findById(memberId).orElseThrow(
             () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
-        userRepository.delete(user);
+//        userRepository.delete(user);
+        user.deleteUser();
+        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(user,
+            DataStatus.ACTIVE);
+        creator.ifPresent(CreatorEntity::deleteCreator);
         return "삭제했습니다.";
     }
 
@@ -110,17 +114,24 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return "판매자 전환했습니다.";
     }
 
+    @Override
+    public User getAdminMemberDetail(Long memberId) {
+        return userRepository.findById(memberId).orElseThrow(
+            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+        );
+    }
+
     private String adminApproveMember(List<User> userList) {
         int count = 0;
         for (User user : userList) {
             user.setActive();
             Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApprovedAtIsNull(
                 user.getEmail());
-            if (approveLink.isPresent()) {
-                approveLink.get().approve();
-                count++;
-            }
+            approveLink.ifPresent(ApproveLink::approve);
+            count++;
         }
         return count + "명 승인 완료했습니다.";
     }
+
+
 }

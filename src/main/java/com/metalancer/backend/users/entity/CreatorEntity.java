@@ -74,6 +74,10 @@ public class CreatorEntity extends BaseEntity implements Serializable {
         pend();
     }
 
+    public void deleteCreator() {
+        delete();
+    }
+
     public Creator toDomain() {
         return Creator.builder().creatorId(id).nickName(user.getName()).profileImg("").email(email)
             .introduction(introduction).introductionShort(introductionShort).satisficationRate(0.0)

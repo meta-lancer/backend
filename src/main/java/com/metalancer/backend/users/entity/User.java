@@ -252,4 +252,8 @@ public class User extends BaseEntity implements Serializable {
             this.nicknameUpdatedAt = LocalDateTime.now();
         }
     }
+
+    public void deleteUser() {
+        delete();
+    }
 }

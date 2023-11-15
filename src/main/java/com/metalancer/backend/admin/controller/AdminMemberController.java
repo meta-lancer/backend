@@ -2,12 +2,12 @@ package com.metalancer.backend.admin.controller;
 
 
 import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.MemberDetail;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.admin.dto.AdminMemberDTO;
 import com.metalancer.backend.admin.service.AdminMemberService;
 import com.metalancer.backend.common.response.BaseResponse;
-import com.metalancer.backend.users.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +33,9 @@ public class AdminMemberController {
     }
 
     @GetMapping("/{memberId}")
-    public BaseResponse<User> getAdminMemberDetail(@PathVariable("memberId") Long memberId) {
-        return new BaseResponse<User>(adminMemberService.getAdminMemberDetail(memberId));
+    public BaseResponse<MemberDetail> getAdminMemberDetail(
+        @PathVariable("memberId") Long memberId) {
+        return new BaseResponse<MemberDetail>(adminMemberService.getAdminMemberDetail(memberId));
     }
 
     @GetMapping("/register")

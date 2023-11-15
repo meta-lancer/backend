@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.MemberDetail;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.admin.dto.AdminMemberDTO.Approve;
@@ -115,10 +116,14 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     }
 
     @Override
-    public User getAdminMemberDetail(Long memberId) {
-        return userRepository.findById(memberId).orElseThrow(
+    public MemberDetail getAdminMemberDetail(Long memberId) {
+        User user = userRepository.findById(memberId).orElseThrow(
             () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
+        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(user,
+            DataStatus.ACTIVE);
+        boolean isCreator = creator.isPresent();
+        return MemberDetail.builder().user(user).isCreator(isCreator).build();
     }
 
     private String adminApproveMember(List<User> userList) {

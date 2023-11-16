@@ -79,9 +79,13 @@ public class CreatorEntity extends BaseEntity implements Serializable {
     }
 
     public Creator toDomain() {
-        return Creator.builder().creatorId(id).nickName(user.getName()).profileImg("").email(email)
-            .introduction(introduction).introductionShort(introductionShort).satisficationRate(0.0)
-            .userType("일반회원").cnt(0).build();
+        String userType = user.getRole().getGrantedAuthority().equals("ROLE_SELLER") ? "크리에이터" :
+            user.getRole().getGrantedAuthority().equals("ROLE_ADMIN") ? "관리자" :
+                user.getRole().getGrantedAuthority().equals("ROLE_USER") ? "일반회원" : null;
+        return Creator.builder().creatorId(id).nickName(user.getName())
+            .profileImg(user.getProfileImg()).email(email)
+            .introduction(introduction).introductionShort(introductionShort)
+            .userType(userType).build();
     }
 
     public CreatorList toAdminCreatorList() {

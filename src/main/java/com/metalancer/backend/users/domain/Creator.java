@@ -19,7 +19,7 @@ public class Creator {
 
     @Builder
     public Creator(Long creatorId, String profileImg, String nickName, String email,
-        String introduction, String introductionShort, int cnt, double satisficationRate,
+        String introduction, String introductionShort,
         String userType) {
         this.creatorId = creatorId;
         this.profileImg = profileImg;
@@ -27,8 +27,14 @@ public class Creator {
         this.email = email;
         this.introduction = introduction;
         this.introductionShort = introductionShort;
-        this.taskCnt = cnt;
-        this.satisficationRate = satisficationRate;
         this.userType = userType;
+    }
+
+    public void setTaskCnt(long taskCnt) {
+        this.taskCnt = (int) taskCnt;
+    }
+
+    public void setSatisficationRate(double satisficationRate) {
+        this.satisficationRate = satisficationRate;
     }
 }

@@ -13,6 +13,7 @@ import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.domain.TrendSpotlight;
+import com.metalancer.backend.users.domain.Creator;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -150,9 +151,22 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         setSharedLink();
     }
 
-    public ProductsDetail toProductsDetail() {
+    public ProductsDetail toProductsDetail(long taskCnt, double satisficationRate) {
+        Creator creator = creatorEntity.toDomain();
+        creator.setTaskCnt(taskCnt);
+        creator.setSatisficationRate(satisficationRate);
         return ProductsDetail.builder().productsId(id).creator(
-                creatorEntity.toDomain())
+                creator)
+            .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
+            .discount(discount).rate(rate).ratingCnt(ratingCnt)
+            .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .build();
+    }
+
+    public ProductsDetail toProductsDetail() {
+        Creator creator = creatorEntity.toDomain();
+        return ProductsDetail.builder().productsId(id).creator(
+                creator)
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt)
             .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)

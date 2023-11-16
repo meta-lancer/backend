@@ -18,6 +18,7 @@ import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
 import com.metalancer.backend.users.entity.CartEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
 import com.metalancer.backend.users.repository.UserRepository;
@@ -83,7 +84,10 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
             DataStatus.ACTIVE);
         foundProductsEntity.addViewCnt();
-        ProductsDetail response = foundProductsEntity.toProductsDetail();
+        CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail response = foundProductsEntity.toProductsDetail(taskCnt, satisficationRate);
         if (user != null) {
             User foundUser = user.getUser();
             foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
@@ -101,11 +105,10 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
 
-        ProductsDetail productsDetail = foundProductsEntity.toProductsDetail();
-        getProductsDetailTagList(foundProductsEntity, productsDetail);
+        getProductsDetailTagList(foundProductsEntity, response);
         AssetFile assetFile = getProductsDetailAssetFileAfterUploaded(foundProductsEntity,
-            productsDetail);
-        productsDetail.setAssetFile(assetFile);
+            response);
+        response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
     }
@@ -116,7 +119,10 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             link,
             DataStatus.ACTIVE);
         foundProductsEntity.addViewCnt();
-        ProductsDetail response = foundProductsEntity.toProductsDetail();
+        CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail response = foundProductsEntity.toProductsDetail(taskCnt, satisficationRate);
         if (user != null) {
             User foundUser = user.getUser();
             foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
@@ -134,11 +140,10 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
 
-        ProductsDetail productsDetail = foundProductsEntity.toProductsDetail();
-        getProductsDetailTagList(foundProductsEntity, productsDetail);
+        getProductsDetailTagList(foundProductsEntity, response);
         AssetFile assetFile = getProductsDetailAssetFile(foundProductsEntity,
-            productsDetail);
-        productsDetail.setAssetFile(assetFile);
+            response);
+        response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
     }

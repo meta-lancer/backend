@@ -17,6 +17,9 @@ public interface ProductsRepository {
 
     ProductsEntity findProductByIdAndStatus(Long productsId, DataStatus status);
 
+    ProductsEntity findAdminProductById(Long productsId);
+
+
     Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity, Pageable pageable);
 
     Page<ProductsEntity> findProductsListByCreatorAndStatus(CreatorEntity creatorEntity,

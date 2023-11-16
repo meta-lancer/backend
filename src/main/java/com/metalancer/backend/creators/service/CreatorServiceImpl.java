@@ -83,7 +83,10 @@ public class CreatorServiceImpl implements CreatorService {
             log.info("에셋 등록 - 썸네일 업로드");
             upload3DViews(savedProductsId, savedProductsEntity, views);
             log.info("에셋 등록 - 3D 뷰 업로드");
-            ProductsDetail productsDetail = savedProductsEntity.toProductsDetail();
+            long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+            double satisficationRate = 0.0;
+            ProductsDetail productsDetail = savedProductsEntity.toProductsDetail(taskCnt,
+                satisficationRate);
             getProductsDetailTagList(savedProductsEntity, productsDetail);
             AssetFile assetFile = getProductsDetailAssetFile(savedProductsEntity,
                 productsDetail);
@@ -233,8 +236,10 @@ public class CreatorServiceImpl implements CreatorService {
 //        }
 
         productsAssetFileRepository.save(foundProductsAssetFileEntity);
-
-        ProductsDetail productsDetail = productsEntity.toProductsDetail();
+        CreatorEntity creatorEntity = productsEntity.getCreatorEntity();
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail productsDetail = productsEntity.toProductsDetail(taskCnt, satisficationRate);
         getProductsDetailTagList(productsEntity, productsDetail);
         AssetFile assetFile = getProductsDetailAssetFile(productsEntity,
             productsDetail);

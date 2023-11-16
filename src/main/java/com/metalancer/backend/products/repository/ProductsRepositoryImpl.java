@@ -68,6 +68,15 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
+    public ProductsEntity findAdminProductById(Long productsId) {
+        Optional<ProductsEntity> productsEntity = productsJpaRepository.findById(productsId);
+        if (productsEntity.isEmpty()) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND);
+        }
+        return productsEntity.get();
+    }
+
+    @Override
     public Page<ProductsEntity> findProductsListByCreator(CreatorEntity creatorEntity,
         Pageable pageable) {
         return productsJpaRepository.findAllByCreatorEntityAndStatus(creatorEntity, pageable,
@@ -148,7 +157,8 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public long countAllByCreatorEntity(CreatorEntity creatorEntity) {
-        return productsJpaRepository.countAllByCreatorEntity(creatorEntity);
+        return productsJpaRepository.countAllByCreatorEntityAndStatus(creatorEntity,
+            DataStatus.ACTIVE);
     }
 
     @Override

@@ -5,12 +5,14 @@ import com.metalancer.backend.admin.domain.ProductsList;
 import com.metalancer.backend.admin.service.AdminProductsService;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
+import com.metalancer.backend.products.domain.ProductsDetail;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,4 +32,10 @@ public class AdminProductsController {
             adminProductsService.getAdminProductsList(pageable));
     }
 
+    @GetMapping("/{productId}")
+    public BaseResponse<ProductsDetail> getAdminProductDetail(
+        @PathVariable("productId") Long productId
+    ) {
+        return new BaseResponse<ProductsDetail>(adminProductsService.getProductDetail(productId));
+    }
 }

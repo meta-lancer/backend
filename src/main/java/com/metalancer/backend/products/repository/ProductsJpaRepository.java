@@ -16,7 +16,7 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
 
     Optional<ProductsEntity> findBySharedLinkContains(String sharedLink);
 
-    int countAllByCreatorEntity(CreatorEntity creatorEntity);
+    int countAllByCreatorEntityAndStatus(CreatorEntity creatorEntity, DataStatus status);
 
     Page<ProductsEntity> findAllByCreatorEntityAndStatus(CreatorEntity creatorEntity,
         Pageable pageable, DataStatus status);

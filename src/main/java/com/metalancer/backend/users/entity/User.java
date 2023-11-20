@@ -254,6 +254,7 @@ public class User extends BaseEntity implements Serializable {
     }
 
     public void deleteUser() {
+        this.email = "(deleted)" + email;
         delete();
     }
 }

@@ -96,6 +96,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
 //        userRepository.delete(user);
+        Optional<ApproveLink> approveLink = approveLinkRepository.findByEmail(user.getEmail());
+        approveLink.ifPresent(ApproveLink::deleteLink);
         user.deleteUser();
         Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(user,
             DataStatus.ACTIVE);

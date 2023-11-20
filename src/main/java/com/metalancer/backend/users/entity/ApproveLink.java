@@ -58,5 +58,9 @@ public class ApproveLink extends BaseEntity {
         this.isApproved = true;
         this.approvedAt = LocalDateTime.now();
     }
-    
+
+    public void deleteLink() {
+        this.email = "(deleted)" + email;
+        this.approveLink = null;
+    }
 }

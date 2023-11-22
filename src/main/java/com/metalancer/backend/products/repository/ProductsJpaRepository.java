@@ -21,6 +21,11 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
     Page<ProductsEntity> findAllByCreatorEntityAndStatus(CreatorEntity creatorEntity,
         Pageable pageable, DataStatus status);
 
+    Page<ProductsEntity> findAllByCreatorEntityAndProductsAssetFileEntitySuccessAndStatus(
+        CreatorEntity creatorEntity,
+        Boolean success,
+        Pageable pageable, DataStatus status);
+
     Page<ProductsEntity> findAllByCreatorEntityAndStatus(CreatorEntity creatorEntity,
         DataStatus status,
         Pageable pageable);

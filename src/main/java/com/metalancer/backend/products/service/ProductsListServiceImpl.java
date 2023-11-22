@@ -100,14 +100,14 @@ public class ProductsListServiceImpl implements ProductsListService {
             tagList, DataStatus.ACTIVE, pageable);
         Page<TrendSpotlight> trendSpotlights = productsEntities.map(
             ProductsEntity::toTrendSpotLight);
-//        if (genreGalaxies.getContent().size() > 0) {
-//            for (Asset genreGalaxyAsset : genreGalaxies) {
-//                ProductsEntity productsEntity = productsRepository.findProductById(
-//                        genreGalaxyAsset.getProductsId());
-//                setTagList(productsEntity, genreGalaxyAsset);
-//                setThumbnail(genreGalaxyAsset, productsEntity);
-//            }
-//        }
+        if (trendSpotlights.getContent().size() > 0) {
+            for (Asset trendSpotlight : trendSpotlights) {
+                ProductsEntity productsEntity = productsRepository.findProductById(
+                    trendSpotlight.getProductsId());
+                setTagList(productsEntity, trendSpotlight);
+                setThumbnail(trendSpotlight, productsEntity);
+            }
+        }
         return TrendSpotlightResponse.builder().trendSpotlightType(platformType)
             .trendSpotlightList(trendSpotlights).build();
     }
@@ -125,14 +125,14 @@ public class ProductsListServiceImpl implements ProductsListService {
         Page<ProductsEntity> productsEntities = productsRepository.findAllDistinctByTagListAndStatus(
             tagList, DataStatus.ACTIVE, pageable);
         Page<GenreGalaxy> genreGalaxies = productsEntities.map(ProductsEntity::toGenreGalaxy);
-        //        if (genreGalaxies.getContent().size() > 0) {
-//            for (Asset genreGalaxyAsset : genreGalaxies) {
-//                ProductsEntity productsEntity = productsRepository.findProductById(
-//                        genreGalaxyAsset.getProductsId());
-//                setTagList(productsEntity, genreGalaxyAsset);
-//                setThumbnail(genreGalaxyAsset, productsEntity);
-//            }
-//        }
+        if (genreGalaxies.getContent().size() > 0) {
+            for (Asset genreGalaxyAsset : genreGalaxies) {
+                ProductsEntity productsEntity = productsRepository.findProductById(
+                    genreGalaxyAsset.getProductsId());
+                setTagList(productsEntity, genreGalaxyAsset);
+                setThumbnail(genreGalaxyAsset, productsEntity);
+            }
+        }
         return GenreGalaxyResponse.builder().genreGalaxyType(type).genreGalaxyList(genreGalaxies)
             .build();
     }

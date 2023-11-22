@@ -57,7 +57,7 @@ public class ProductsListController {
             "플랫폼 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String platformType,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("종류 옵션-{},  페이징-{}", platformType, pageable);
-        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(
             productsListService.getTrendSpotlight(platformType, adjustedPageable));
     }
@@ -69,7 +69,7 @@ public class ProductsListController {
         @Parameter(name = "type", description = "Genre Galaxy 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String type,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("종류 옵션-{},  페이징-{}", type, pageable);
-        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(productsListService.getGenreGalaxyList(type, adjustedPageable));
     }
 

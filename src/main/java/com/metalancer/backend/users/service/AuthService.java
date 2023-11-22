@@ -2,6 +2,7 @@ package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
+import com.metalancer.backend.users.dto.AuthRequestDTO.PasswordRequest;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateOauthRequest;
@@ -26,4 +27,6 @@ public interface AuthService {
     void hasPrincipalDetails(PrincipalDetails user);
 
     boolean resetPassword(String email);
+
+    Boolean resetMyPassword(PrincipalDetails user, PasswordRequest dto);
 }

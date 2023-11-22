@@ -8,10 +8,12 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.utils.RandomStringGenerator;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
+import com.metalancer.backend.users.dto.AuthRequestDTO.PasswordRequest;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateOauthRequest;
@@ -256,5 +258,19 @@ public class AuthServiceImpl implements AuthService {
 
         }
         return false;
+    }
+
+    @Override
+    public Boolean resetMyPassword(PrincipalDetails user, PasswordRequest dto) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        foundUser.isOriginalPasswordMatch(passwordEncoder, dto.getOriginalPassword());
+        if (!dto.newPasswordEquals()) {
+            throw new InvalidParamException(ErrorCode.NEW_PASSWORD_NOT_MATCHED);
+        }
+        foundUser.changeNewPassword(passwordEncoder, dto.getNewPassword1());
+        return passwordEncoder.matches(dto.getNewPassword1(), foundUser.getPassword());
     }
 }

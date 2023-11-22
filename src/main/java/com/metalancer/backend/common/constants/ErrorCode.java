@@ -32,6 +32,8 @@ public enum ErrorCode {
     LOGOUT_STATE(UNAUTHORIZED, "B004", "로그아웃 상태"),
     LOGIN_DENIED(UNAUTHORIZED, "B005", "로그인 불가"),
     LOGIN_REQUIRED(UNAUTHORIZED, "B006", "로그인 필요"),
+    PASSWORD_NOT_MATCHED(UNAUTHORIZED, "B007", "비밀번호 불일치"),
+    NEW_PASSWORD_NOT_MATCHED(UNAUTHORIZED, "B008", "변경할 비밀번호 불일치"),
     /**
      * 회원정보
      */

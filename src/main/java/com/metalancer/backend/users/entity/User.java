@@ -187,6 +187,17 @@ public class User extends BaseEntity implements Serializable {
         ;
     }
 
+    public void isOriginalPasswordMatch(PasswordEncoder passwordEncoder, String password) {
+        if (!passwordEncoder.matches(password, this.password)) {
+            throw new BaseException((ErrorCode.PASSWORD_NOT_MATCHED));
+        }
+        ;
+    }
+
+    public void changeNewPassword(PasswordEncoder passwordEncoder, String newPassword) {
+        this.password = passwordEncoder.encode(newPassword);
+    }
+
     public MemberList toAdminMemberList() {
         return MemberList.builder()
             .memberId(id)

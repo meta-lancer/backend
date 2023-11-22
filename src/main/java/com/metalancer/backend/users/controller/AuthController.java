@@ -3,6 +3,7 @@ package com.metalancer.backend.users.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.users.dto.AuthRequestDTO;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.service.AuthService;
@@ -83,8 +84,16 @@ public class AuthController {
     public BaseResponse<Boolean> resetPassword(
         @RequestParam("email") String email
     ) {
-
         return new BaseResponse<Boolean>(authService.resetPassword(email));
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "성공여부에 따라 리턴값")
+    @PatchMapping("/password")
+    public BaseResponse<Boolean> resetMyPassword(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody AuthRequestDTO.PasswordRequest dto
+    ) {
+        return new BaseResponse<Boolean>(authService.resetMyPassword(user, dto));
     }
 
 //    @Operation(summary = "이메일 로그인", description = "")

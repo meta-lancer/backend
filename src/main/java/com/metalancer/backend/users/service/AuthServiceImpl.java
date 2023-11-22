@@ -212,7 +212,8 @@ public class AuthServiceImpl implements AuthService {
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
-        Optional<User> emailFoundUser = userRepository.findByEmail(dto.getEmail());
+        Optional<User> emailFoundUser = foundUser.getLoginType().equals(LoginType.NAVER) ? null
+            : userRepository.findByEmail(dto.getEmail());
         foundUser.setEmailIfNotDuplicated(dto.getEmail(), emailFoundUser);
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);

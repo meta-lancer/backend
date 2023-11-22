@@ -56,6 +56,7 @@ public class ProductsListController {
         @Parameter(name = "platformType", description =
             "플랫폼 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String platformType,
         @Parameter(description = "페이징") Pageable pageable) {
+        platformType = platformType.toLowerCase();
         log.info("종류 옵션-{},  페이징-{}", platformType, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(
@@ -68,6 +69,7 @@ public class ProductsListController {
     public BaseResponse<GenreGalaxyResponse> getGenreGalaxyList(
         @Parameter(name = "type", description = "Genre Galaxy 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String type,
         @Parameter(description = "페이징") Pageable pageable) {
+        type = type.toLowerCase();
         log.info("종류 옵션-{},  페이징-{}", type, pageable);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(productsListService.getGenreGalaxyList(type, adjustedPageable));

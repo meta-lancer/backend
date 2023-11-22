@@ -1,5 +1,6 @@
 package com.metalancer.backend.products.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.metalancer.backend.common.BaseTimeEntity;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
@@ -12,7 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
@@ -36,7 +37,9 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
     @Column(name = "products_asset_file_id", nullable = false)
     private Long id;
 
-    @ManyToOne
+
+    @JsonBackReference
+    @OneToOne
     @JoinColumn(name = "products_id", nullable = false)
     private ProductsEntity productsEntity;
 

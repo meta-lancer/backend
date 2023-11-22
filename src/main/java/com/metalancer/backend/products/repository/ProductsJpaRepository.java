@@ -25,22 +25,30 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
         DataStatus status,
         Pageable pageable);
 
-    Page<ProductsEntity> findAllByStatusOrderByCreatedAtDesc(DataStatus status, Pageable pageable);
+    Page<ProductsEntity> findAllByStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByCreatedAtDesc(
+        DataStatus status, Boolean success,
+        LocalDateTime startDate,
+        LocalDateTime endDate, Pageable pageable);
 
-    Page<ProductsEntity> findAllBySalePriceNotNullAndStatusOrderByCreatedAtDesc(DataStatus status,
+    Page<ProductsEntity> findAllBySalePriceNotNullAndStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByCreatedAtDesc(
+        DataStatus status, Boolean success,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
         Pageable pageable);
 
-    Page<ProductsEntity> findAllByPriceAndStatusAndCreatedAtBetweenOrderByViewCntDesc(
+    Page<ProductsEntity> findAllByPriceAndStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByViewCntDesc(
         int price,
         DataStatus status,
+        Boolean success,
         LocalDateTime startDate,
         LocalDateTime endDate,
         Pageable pageable
     );
 
-    Page<ProductsEntity> findAllByPriceIsGreaterThanAndStatusAndCreatedAtBetweenOrderByViewCntDesc(
+    Page<ProductsEntity> findAllByPriceIsGreaterThanAndStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByViewCntDesc(
         int price,
         DataStatus status,
+        Boolean success,
         LocalDateTime startDate,
         LocalDateTime endDate,
         Pageable pageable);
@@ -52,4 +60,6 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
         Pageable pageable);
 
     long countAllBy();
+
+    Page<ProductsEntity> findAllByStatusOrderByCreatedAtDesc(DataStatus status, Pageable pageable);
 }

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -105,29 +106,34 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
-    public Page<HotPickAsset> findNewProductList(Pageable pageable) {
-        return productsJpaRepository.findAllByStatusOrderByCreatedAtDesc(DataStatus.ACTIVE,
+    public Page<HotPickAsset> findNewProductList(PeriodType period, Pageable pageable) {
+        LocalDateTime endDateTime = LocalDateTime.now();
+        LocalDateTime startDateTime = getStartDateTimeWeeklyOrMonthly(period, endDateTime);
+        return productsJpaRepository.findAllByStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByCreatedAtDesc(
+                DataStatus.ACTIVE,
+                true, startDateTime, endDateTime,
                 pageable)
             .map(ProductsEntity::toHotPickAsset);
     }
 
+
     @Override
-    public Page<HotPickAsset> findSaleProductList(Pageable pageable) {
-        return productsJpaRepository.findAllBySalePriceNotNullAndStatusOrderByCreatedAtDesc(
-            DataStatus.ACTIVE, pageable).map(ProductsEntity::toHotPickAsset);
+    public Page<HotPickAsset> findSaleProductList(PeriodType period, Pageable pageable) {
+        LocalDateTime endDateTime = LocalDateTime.now();
+        LocalDateTime startDateTime = getStartDateTimeWeeklyOrMonthly(period, endDateTime);
+        return productsJpaRepository.findAllBySalePriceNotNullAndStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByCreatedAtDesc(
+                DataStatus.ACTIVE, true, startDateTime, endDateTime, pageable)
+            .map(ProductsEntity::toHotPickAsset);
     }
 
     @Override
     public Page<HotPickAsset> findFreeProductList(PeriodType period, Pageable pageable) {
         LocalDateTime endDateTime = LocalDateTime.now();
-        LocalDateTime startDateTime = null;
-        if (period.equals(PeriodType.WEEKLY)) {
-            startDateTime = endDateTime.minusWeeks(1);
-        } else {
-            startDateTime = endDateTime.minusMonths(1);
-        }
-        return productsJpaRepository.findAllByPriceAndStatusAndCreatedAtBetweenOrderByViewCntDesc(0,
+        LocalDateTime startDateTime = getStartDateTimeWeeklyOrMonthly(period, endDateTime);
+        return productsJpaRepository.findAllByPriceAndStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByViewCntDesc(
+                0,
                 DataStatus.ACTIVE,
+                true,
                 startDateTime, endDateTime, pageable)
             .map(ProductsEntity::toHotPickAsset);
     }
@@ -135,15 +141,11 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     @Override
     public Page<HotPickAsset> findChargeProductList(PeriodType period, Pageable pageable) {
         LocalDateTime endDateTime = LocalDateTime.now();
-        LocalDateTime startDateTime = null;
-        if (period.equals(PeriodType.WEEKLY)) {
-            startDateTime = endDateTime.minusWeeks(1);
-        } else {
-            startDateTime = endDateTime.minusMonths(1);
-        }
-        return productsJpaRepository.findAllByPriceIsGreaterThanAndStatusAndCreatedAtBetweenOrderByViewCntDesc(
+        LocalDateTime startDateTime = getStartDateTimeWeeklyOrMonthly(period, endDateTime);
+        return productsJpaRepository.findAllByPriceIsGreaterThanAndStatusAndProductsAssetFileEntitySuccessAndCreatedAtBetweenOrderByViewCntDesc(
                 0,
                 DataStatus.ACTIVE,
+                true,
                 startDateTime,
                 endDateTime,
                 pageable)
@@ -285,5 +287,17 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     @Override
     public Long countAllProducts() {
         return productsJpaRepository.countAllBy();
+    }
+
+    @NotNull
+    private static LocalDateTime getStartDateTimeWeeklyOrMonthly(PeriodType period,
+        LocalDateTime endDateTime) {
+        LocalDateTime startDateTime = null;
+        if (period.equals(PeriodType.WEEKLY)) {
+            startDateTime = endDateTime.minusWeeks(1);
+        } else {
+            startDateTime = endDateTime.minusMonths(1);
+        }
+        return startDateTime;
     }
 }

@@ -9,7 +9,11 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.exception.BaseException;
-import com.metalancer.backend.products.domain.*;
+import com.metalancer.backend.products.domain.Asset;
+import com.metalancer.backend.products.domain.FilterAsset;
+import com.metalancer.backend.products.domain.GenreGalaxy;
+import com.metalancer.backend.products.domain.HotPickAsset;
+import com.metalancer.backend.products.domain.TrendSpotlight;
 import com.metalancer.backend.products.dto.ProductsDto.GenreGalaxyResponse;
 import com.metalancer.backend.products.dto.ProductsDto.HotPickResponse;
 import com.metalancer.backend.products.dto.ProductsDto.TrendSpotlightResponse;
@@ -17,6 +21,8 @@ import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,9 +30,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -46,10 +49,10 @@ public class ProductsListServiceImpl implements ProductsListService {
         Page<HotPickAsset> hotPickAssets = new PageImpl<>(new ArrayList<>(), pageable, 0);
         switch (type) {
             case NEW -> {
-                hotPickAssets = productsRepository.findNewProductList(pageable);
+                hotPickAssets = productsRepository.findNewProductList(period, pageable);
             }
             case SALE -> {
-                hotPickAssets = productsRepository.findSaleProductList(pageable);
+                hotPickAssets = productsRepository.findSaleProductList(period, pageable);
             }
             case FREE -> {
                 hotPickAssets = productsRepository.findFreeProductList(period, pageable);
@@ -61,7 +64,7 @@ public class ProductsListServiceImpl implements ProductsListService {
         if (hotPickAssets != null && hotPickAssets.getContent().size() > 0) {
             for (Asset hotPickAsset : hotPickAssets) {
                 ProductsEntity productsEntity = productsRepository.findProductById(
-                        hotPickAsset.getProductsId());
+                    hotPickAsset.getProductsId());
                 setTagList(productsEntity, hotPickAsset);
                 setThumbnail(hotPickAsset, productsEntity);
             }
@@ -71,7 +74,8 @@ public class ProductsListServiceImpl implements ProductsListService {
     }
 
     private void setThumbnail(Asset hotPickAsset, ProductsEntity productsEntity) {
-        List<String> thumbnailEntityList = productsThumbnailRepository.findAllUrlByProduct(productsEntity);
+        List<String> thumbnailEntityList = productsThumbnailRepository.findAllUrlByProduct(
+            productsEntity);
         hotPickAsset.setThumbnail(thumbnailEntityList.size() > 0 ? thumbnailEntityList.get(0) : "");
     }
 
@@ -82,19 +86,20 @@ public class ProductsListServiceImpl implements ProductsListService {
 
     @Override
     public TrendSpotlightResponse getTrendSpotlight(String platformType,
-                                                    Pageable pageable) {
+        Pageable pageable) {
         List<String> tagList = null;
         if (platformType.isBlank() || platformType.equals("all") || platformType.equals("ALL")) {
             tagList = tagsRepository.findAllTrendSpotLightTags();
         } else {
             TrendSpotlightTypeEntity trendSpotlightTypeEntity = trendSpotlightTypeRepository.findByName(
-                    platformType);
+                platformType);
             tagList = tagsRepository.findAllByTrendSpotLight(trendSpotlightTypeEntity);
         }
 
         Page<ProductsEntity> productsEntities = productsRepository.findAllDistinctByTagListAndStatus(
-                tagList, DataStatus.ACTIVE, pageable);
-        Page<TrendSpotlight> trendSpotlights = productsEntities.map(ProductsEntity::toTrendSpotLight);
+            tagList, DataStatus.ACTIVE, pageable);
+        Page<TrendSpotlight> trendSpotlights = productsEntities.map(
+            ProductsEntity::toTrendSpotLight);
 //        if (genreGalaxies.getContent().size() > 0) {
 //            for (Asset genreGalaxyAsset : genreGalaxies) {
 //                ProductsEntity productsEntity = productsRepository.findProductById(
@@ -104,7 +109,7 @@ public class ProductsListServiceImpl implements ProductsListService {
 //            }
 //        }
         return TrendSpotlightResponse.builder().trendSpotlightType(platformType)
-                .trendSpotlightList(trendSpotlights).build();
+            .trendSpotlightList(trendSpotlights).build();
     }
 
     @Override
@@ -114,11 +119,11 @@ public class ProductsListServiceImpl implements ProductsListService {
             tagList = tagsRepository.findAllGenreGalaxyTags();
         } else {
             GenreGalaxyTypeEntity genreGalaxyTypeEntity = genreGalaxyTypeRepository.findByName(
-                    type);
+                type);
             tagList = tagsRepository.findAllByGenreGalaxy(genreGalaxyTypeEntity);
         }
         Page<ProductsEntity> productsEntities = productsRepository.findAllDistinctByTagListAndStatus(
-                tagList, DataStatus.ACTIVE, pageable);
+            tagList, DataStatus.ACTIVE, pageable);
         Page<GenreGalaxy> genreGalaxies = productsEntities.map(ProductsEntity::toGenreGalaxy);
         //        if (genreGalaxies.getContent().size() > 0) {
 //            for (Asset genreGalaxyAsset : genreGalaxies) {
@@ -129,20 +134,20 @@ public class ProductsListServiceImpl implements ProductsListService {
 //            }
 //        }
         return GenreGalaxyResponse.builder().genreGalaxyType(type).genreGalaxyList(genreGalaxies)
-                .build();
+            .build();
     }
 
     @Override
     public Page<FilterAsset> getFilterAssetList(List<String> categoryOption,
-                                                List<String> trendOption, List<Integer> priceOption,
-                                                Pageable pageable) {
+        List<String> trendOption, List<Integer> priceOption,
+        Pageable pageable) {
         List<String> tagList = new ArrayList<>();
         if (isNullOrEmpty(categoryOption) && isNullOrEmpty(trendOption)) {
             Page<ProductsEntity> productsEntities =
-                    priceOption == null || priceOption.size() == 0 ?
-                            productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
-                            productsRepository.findAllByStatusWithPriceOption(DataStatus.ACTIVE,
-                                    priceOption, pageable);
+                priceOption == null || priceOption.size() == 0 ?
+                    productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
+                    productsRepository.findAllByStatusWithPriceOption(DataStatus.ACTIVE,
+                        priceOption, pageable);
             return productsEntities.map(ProductsEntity::toFilterAsset);
         }
 
@@ -155,11 +160,11 @@ public class ProductsListServiceImpl implements ProductsListService {
 
         // tagList를 가져온다.
         Page<ProductsEntity> productsEntities =
-                priceOption == null || priceOption.size() == 0 ?
-                        productsRepository.findAllDistinctByTagListAndStatus(
-                                tagList, DataStatus.ACTIVE, pageable)
-                        : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
-                        tagList, DataStatus.ACTIVE, priceOption, pageable);
+            priceOption == null || priceOption.size() == 0 ?
+                productsRepository.findAllDistinctByTagListAndStatus(
+                    tagList, DataStatus.ACTIVE, pageable)
+                : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
+                    tagList, DataStatus.ACTIVE, priceOption, pageable);
 
         return productsEntities.map(ProductsEntity::toFilterAsset);
     }

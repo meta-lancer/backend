@@ -15,13 +15,16 @@ import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.domain.TrendSpotlight;
 import com.metalancer.backend.users.domain.Creator;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
@@ -61,6 +64,8 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private String assetDetail;
     private String assetNotice;
     private String assetCopyRight;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productsEntity")
+    private ProductsAssetFileEntity productsAssetFileEntity;
 
     public void setActive() {
         active();

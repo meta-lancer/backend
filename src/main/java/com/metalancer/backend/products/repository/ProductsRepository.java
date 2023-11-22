@@ -31,9 +31,9 @@ public interface ProductsRepository {
     Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
         Pageable pageable);
 
-    Page<HotPickAsset> findNewProductList(Pageable pageable);
+    Page<HotPickAsset> findNewProductList(PeriodType period, Pageable pageable);
 
-    Page<HotPickAsset> findSaleProductList(Pageable pageable);
+    Page<HotPickAsset> findSaleProductList(PeriodType period, Pageable pageable);
 
     Page<HotPickAsset> findFreeProductList(PeriodType period, Pageable pageable);
 

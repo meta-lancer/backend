@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IamportResponseException.class)
-    protected ResponseEntity<ErrorResponse> handleBaseException(IamportResponseException ex) {
+    public ResponseEntity<ErrorResponse> handleBaseException(IamportResponseException ex) {
         ErrorCode code = ErrorCode.PORTONE_ERROR;
         log.info(ex.getHttpStatusCode() + "-" + code.getMessage() + ": " + ex.getMessage());
         log.error(code + ": ", ex);
@@ -74,7 +74,6 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleBaseException(BaseException ex,
         WebRequest request) {
         String message = getUrlExceptionBrokeOut((ServletWebRequest) request);
-
         log.error(ex.getErrorCode() + ": ", ex);
         log.info(ex.getMessage());
         ErrorCode code = ex.getErrorCode();

@@ -179,6 +179,8 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         DataStatus activeStatus = DataStatus.ACTIVE;
         // 가격 옵션
         setWhereClauseWithPriceOptions(priceOption, whereClause);
+        // 에셋파일 업로드 true
+        setWhereClauseWithAssetUploadedSuccess(whereClause);
         whereClause.and(qProductsEntity.status.eq(activeStatus));
         List<ProductsEntity> response = queryFactory.selectFrom(
                 qProductsEntity)
@@ -205,6 +207,8 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         setWhereClauseWithTagList(tagList, whereClause);
         // 가격 옵션
         setWhereClauseWithPriceOptions(priceOption, whereClause);
+        // 에셋파일 업로드 true인 것들만
+        setWhereClauseWithAssetUploadedSuccess(whereClause);
 
         whereClause.and(qProductsEntity.status.eq(activeStatus));
         List<ProductsEntity> response = queryFactory.selectFrom(
@@ -264,6 +268,11 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         }
     }
 
+    private void setWhereClauseWithAssetUploadedSuccess(
+        BooleanBuilder whereClause) {
+        whereClause.and(QProductsEntity.productsEntity.productsAssetFileEntity.success.eq(true));
+    }
+
     private List<ProductsEntity> getProductsForTag(String tag) {
         return queryFactory
             .selectFrom(QProductsTagEntity.productsTagEntity)
@@ -277,7 +286,8 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public Page<ProductsEntity> findAllByStatus(DataStatus status, Pageable pageable) {
-        return productsJpaRepository.findAllByStatusOrderByCreatedAtDesc(status, pageable);
+        return productsJpaRepository.findAllByStatusAndProductsAssetFileEntitySuccessOrderByCreatedAtDesc(
+            status, true, pageable);
     }
 
     @Override

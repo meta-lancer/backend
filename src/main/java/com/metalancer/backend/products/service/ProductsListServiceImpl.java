@@ -148,7 +148,11 @@ public class ProductsListServiceImpl implements ProductsListService {
                     productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
                     productsRepository.findAllByStatusWithPriceOption(DataStatus.ACTIVE,
                         priceOption, pageable);
-            return productsEntities.map(ProductsEntity::toFilterAsset);
+
+            Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
+            setProductsTagList(response);
+
+            return response;
         }
 
         if (!isNullOrEmpty(categoryOption)) {
@@ -166,7 +170,22 @@ public class ProductsListServiceImpl implements ProductsListService {
                 : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
                     tagList, DataStatus.ACTIVE, priceOption, pageable);
 
-        return productsEntities.map(ProductsEntity::toFilterAsset);
+        Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
+
+        setProductsTagList(response);
+
+        return response;
+    }
+
+    private void setProductsTagList(Page<FilterAsset> response) {
+        if (response.getContent().size() > 0) {
+            for (Asset filterAsset : response) {
+                ProductsEntity productsEntity = productsRepository.findProductById(
+                    filterAsset.getProductsId());
+                setTagList(productsEntity, filterAsset);
+                setThumbnail(filterAsset, productsEntity);
+            }
+        }
     }
 
     private void setTagListByOption(List<String> categoryOption, List<String> tagList) {

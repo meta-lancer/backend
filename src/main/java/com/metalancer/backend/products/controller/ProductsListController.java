@@ -75,7 +75,7 @@ public class ProductsListController {
         return new BaseResponse<>(productsListService.getGenreGalaxyList(type, adjustedPageable));
     }
 
-    @Operation(summary = "모두보기-필터 에셋", description = "카테고리, 분류 옵션들은 한글로 그대로 넣으면 됩니다. 가격 옵션은 순서대로 1부터 시작")
+    @Operation(summary = "모두보기-필터 에셋", description = "카테고리, 분류 옵션들은 한글로 그대로 넣으면 됩니다. 가격 옵션은 순서대로 1(무료)부터 7(100만원이상)까지")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = FilterAsset.class)))
     })

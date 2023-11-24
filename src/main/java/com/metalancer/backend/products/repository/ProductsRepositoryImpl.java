@@ -231,24 +231,27 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         for (Integer priceOption : priceOptions) {
             switch (priceOption) {
                 case 1 -> {
-                    wherePriceClause.or(QProductsEntity.productsEntity.price.between(0, 10000));
+                    wherePriceClause.or(QProductsEntity.productsEntity.price.eq(0));
                 }
                 case 2 -> {
-                    wherePriceClause.or(QProductsEntity.productsEntity.price.between(10000, 50000));
+                    wherePriceClause.or(QProductsEntity.productsEntity.price.between(1, 10000));
                 }
                 case 3 -> {
-                    wherePriceClause.or(
-                        QProductsEntity.productsEntity.price.between(50000, 100000));
+                    wherePriceClause.or(QProductsEntity.productsEntity.price.between(10000, 50000));
                 }
                 case 4 -> {
                     wherePriceClause.or(
-                        QProductsEntity.productsEntity.price.between(100000, 500000));
+                        QProductsEntity.productsEntity.price.between(50000, 100000));
                 }
                 case 5 -> {
                     wherePriceClause.or(
-                        QProductsEntity.productsEntity.price.between(500000, 1000000));
+                        QProductsEntity.productsEntity.price.between(100000, 500000));
                 }
                 case 6 -> {
+                    wherePriceClause.or(
+                        QProductsEntity.productsEntity.price.between(500000, 1000000));
+                }
+                case 7 -> {
                     wherePriceClause.or(QProductsEntity.productsEntity.price.goe(1000000));
                 }
             }

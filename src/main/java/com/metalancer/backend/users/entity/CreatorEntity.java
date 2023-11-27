@@ -75,6 +75,7 @@ public class CreatorEntity extends BaseEntity implements Serializable {
     }
 
     public void deleteCreator() {
+        this.email = "(deleted)" + email;
         delete();
     }
 

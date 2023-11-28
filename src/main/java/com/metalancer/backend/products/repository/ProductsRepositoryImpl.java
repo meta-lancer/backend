@@ -172,6 +172,33 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
+    public Page<ProductsEntity> findAllByStatusWithKeywordAndPriceOption(DataStatus dataStatus,
+        List<Integer> priceOption, String keyword, Pageable pageable) {
+        QProductsEntity qProductsEntity = QProductsEntity.productsEntity;
+        BooleanBuilder whereClause = new BooleanBuilder();
+        DataStatus activeStatus = DataStatus.ACTIVE;
+        // 키워드 옵션
+        setWhereClauseWithKeywordContains(whereClause, keyword);
+        // 가격 옵션
+        setWhereClauseWithPriceOptions(priceOption, whereClause);
+        // 에셋파일 업로드 true
+        setWhereClauseWithAssetUploadedSuccess(whereClause);
+        whereClause.and(qProductsEntity.status.eq(activeStatus));
+        List<ProductsEntity> response = queryFactory.selectFrom(
+                qProductsEntity)
+            .where(whereClause)
+            .offset(pageable.getOffset())
+            .orderBy(
+                qProductsEntity.createdAt.desc()
+            )
+            .limit(pageable.getPageSize())
+            .fetch();
+        long total = queryFactory.selectFrom(qProductsEntity).where(whereClause)
+            .fetchCount();
+        return new PageImpl<>(response, pageable, total);
+    }
+
+    @Override
     public Page<ProductsEntity> findAllByStatusWithPriceOption(DataStatus dataStatus,
         List<Integer> priceOption, Pageable pageable) {
         QProductsEntity qProductsEntity = QProductsEntity.productsEntity;
@@ -198,7 +225,7 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public Page<ProductsEntity> findAllDistinctByTagListAndStatusWithPriceOption(
-        List<String> tagList, DataStatus dataStatus, List<Integer> priceOption, Pageable pageable) {
+        List<String> tagList, DataStatus status, List<Integer> priceOption, Pageable pageable) {
         QProductsEntity qProductsEntity = QProductsEntity.productsEntity;
         BooleanBuilder whereClause = new BooleanBuilder();
         DataStatus activeStatus = DataStatus.ACTIVE;
@@ -223,6 +250,12 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         long total = queryFactory.selectFrom(qProductsEntity).where(whereClause)
             .fetchCount();
         return new PageImpl<>(response, pageable, total);
+    }
+
+    private void setWhereClauseWithKeywordContains(
+        BooleanBuilder whereClause,
+        String keyword) {
+        whereClause.and(QProductsEntity.productsEntity.title.contains(keyword));
     }
 
     private void setWhereClauseWithPriceOptions(List<Integer> priceOptions,
@@ -296,7 +329,8 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     @Override
     public Page<ProductsEntity> findAllByStatusWithKeyword(DataStatus status, String keyword,
         Pageable pageable) {
-        return null;
+        return productsJpaRepository.findAllByStatusAndProductsAssetFileEntitySuccessAndTitleContainsOrderByCreatedAtDesc(
+            status, true, keyword, pageable);
     }
 
     @Override
@@ -309,23 +343,46 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         return productsJpaRepository.countAllBy();
     }
 
-    @Override
-    public Page<ProductsEntity> findAllByStatusWithKeywordAndPriceOption(DataStatus dataStatus,
-        List<Integer> priceOption, String keyword, Pageable pageable) {
-        return null;
-    }
 
     @Override
     public Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatus(List<String> tagList,
-        DataStatus dataStatus, String keyword, Pageable pageable) {
-        return null;
+        DataStatus status, String keyword, Pageable pageable) {
+        return productsJpaRepository.findDistinctProductsByTagNamesAndStatusAndKeyword(tagList,
+            status,
+            keyword,
+            pageable);
     }
 
     @Override
     public Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
-        List<String> tagList, DataStatus dataStatus, List<Integer> priceOption, String keyword,
+        List<String> tagList, DataStatus status, List<Integer> priceOption, String keyword,
         Pageable pageable) {
-        return null;
+        QProductsEntity qProductsEntity = QProductsEntity.productsEntity;
+        BooleanBuilder whereClause = new BooleanBuilder();
+        DataStatus activeStatus = DataStatus.ACTIVE;
+
+        // 키워드 옵션
+        setWhereClauseWithKeywordContains(whereClause, keyword);
+        // tagList에 맞게
+        setWhereClauseWithTagList(tagList, whereClause);
+        // 가격 옵션
+        setWhereClauseWithPriceOptions(priceOption, whereClause);
+        // 에셋파일 업로드 true인 것들만
+        setWhereClauseWithAssetUploadedSuccess(whereClause);
+
+        whereClause.and(qProductsEntity.status.eq(activeStatus));
+        List<ProductsEntity> response = queryFactory.selectFrom(
+                qProductsEntity)
+            .where(whereClause)
+            .offset(pageable.getOffset())
+            .orderBy(
+                qProductsEntity.createdAt.desc()
+            )
+            .limit(pageable.getPageSize())
+            .fetch();
+        long total = queryFactory.selectFrom(qProductsEntity).where(whereClause)
+            .fetchCount();
+        return new PageImpl<>(response, pageable, total);
     }
 
     @NotNull

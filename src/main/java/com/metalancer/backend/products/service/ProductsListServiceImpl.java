@@ -184,11 +184,17 @@ public class ProductsListServiceImpl implements ProductsListService {
         List<String> tagList = new ArrayList<>();
         if (isNullOrEmpty(categoryOption) && isNullOrEmpty(trendOption)) {
             Page<ProductsEntity> productsEntities =
-                priceOption == null || priceOption.size() == 0 ?
-                    productsRepository.findAllByStatusWithKeyword(DataStatus.ACTIVE, keyword,
-                        pageable) :
-                    productsRepository.findAllByStatusWithKeywordAndPriceOption(DataStatus.ACTIVE,
-                        priceOption, keyword, pageable);
+                keyword != null && !keyword.isEmpty() ? (
+                    priceOption == null || priceOption.isEmpty() ?
+                        productsRepository.findAllByStatusWithKeyword(DataStatus.ACTIVE, keyword,
+                            pageable) :
+                        productsRepository.findAllByStatusWithKeywordAndPriceOption(
+                            DataStatus.ACTIVE,
+                            priceOption, keyword, pageable))
+                    : priceOption == null || priceOption.isEmpty() ?
+                        productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
+                        productsRepository.findAllByStatusWithPriceOption(DataStatus.ACTIVE,
+                            priceOption, pageable);
 
             Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
             setProductsTagList(response);
@@ -196,7 +202,7 @@ public class ProductsListServiceImpl implements ProductsListService {
             return response;
         }
 
-        if (!isNullOrEmpty(categoryOption)) {
+        if (!categoryOption.contains("전체") && !isNullOrEmpty(categoryOption)) {
             setTagListByOption(categoryOption, tagList);
         }
         if (!isNullOrEmpty(trendOption)) {
@@ -205,11 +211,18 @@ public class ProductsListServiceImpl implements ProductsListService {
 
         // tagList를 가져온다.
         Page<ProductsEntity> productsEntities =
-            priceOption == null || priceOption.size() == 0 ?
-                productsRepository.findAllDistinctByTagListAndKeywordAndStatus(
-                    tagList, DataStatus.ACTIVE, keyword, pageable)
-                : productsRepository.findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
-                    tagList, DataStatus.ACTIVE, priceOption, keyword, pageable);
+            keyword != null && !keyword.isEmpty() ? (
+                priceOption == null || priceOption.isEmpty() ?
+                    productsRepository.findAllDistinctByTagListAndKeywordAndStatus(
+                        tagList, DataStatus.ACTIVE, keyword, pageable)
+                    : productsRepository.findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
+                        tagList, DataStatus.ACTIVE, priceOption, keyword, pageable))
+                :
+                    priceOption == null || priceOption.isEmpty() ?
+                        productsRepository.findAllDistinctByTagListAndStatus(
+                            tagList, DataStatus.ACTIVE, pageable)
+                        : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
+                            tagList, DataStatus.ACTIVE, priceOption, pageable);
 
         Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
 

@@ -294,6 +294,12 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
+    public Page<ProductsEntity> findAllByStatusWithKeyword(DataStatus status, String keyword,
+        Pageable pageable) {
+        return null;
+    }
+
+    @Override
     public Page<ProductsEntity> findAllAdminProductsList(Pageable pageable) {
         return productsJpaRepository.findAll(pageable);
     }
@@ -301,6 +307,25 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     @Override
     public Long countAllProducts() {
         return productsJpaRepository.countAllBy();
+    }
+
+    @Override
+    public Page<ProductsEntity> findAllByStatusWithKeywordAndPriceOption(DataStatus dataStatus,
+        List<Integer> priceOption, String keyword, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatus(List<String> tagList,
+        DataStatus dataStatus, String keyword, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
+        List<String> tagList, DataStatus dataStatus, List<Integer> priceOption, String keyword,
+        Pageable pageable) {
+        return null;
     }
 
     @NotNull

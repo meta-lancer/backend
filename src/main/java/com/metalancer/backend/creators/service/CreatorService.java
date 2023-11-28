@@ -32,7 +32,7 @@ public interface CreatorService {
 
     List<Portfolio> updateMyPortfolio(Long portfolioId, PortfolioUpdate dto, PrincipalDetails user);
 
-    AssetUpdatedResponse updateAsset(Long productsId, User user, MultipartFile[] thumbnails,
-        MultipartFile[] views,
-        AssetUpdate dto);
+    AssetUpdatedResponse updateAsset(Long productsId, User user, AssetUpdate dto);
+
+    String getThumbnailPreSignedUrl(Long productsId, String extension);
 }

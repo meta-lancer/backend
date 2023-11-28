@@ -55,7 +55,20 @@ public interface ProductsRepository {
 
     Page<ProductsEntity> findAllByStatus(DataStatus status, Pageable pageable);
 
+    Page<ProductsEntity> findAllByStatusWithKeyword(DataStatus status, String keyword,
+        Pageable pageable);
+
     Page<ProductsEntity> findAllAdminProductsList(Pageable pageable);
 
     Long countAllProducts();
+
+    Page<ProductsEntity> findAllByStatusWithKeywordAndPriceOption(DataStatus dataStatus,
+        List<Integer> priceOption, String keyword, Pageable pageable);
+
+    Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatus(List<String> tagList,
+        DataStatus dataStatus, String keyword, Pageable pageable);
+
+    Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
+        List<String> tagList, DataStatus dataStatus, List<Integer> priceOption,
+        String keyword, Pageable pageable);
 }

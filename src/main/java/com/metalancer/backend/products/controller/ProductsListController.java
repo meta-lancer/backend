@@ -75,6 +75,26 @@ public class ProductsListController {
         return new BaseResponse<>(productsListService.getGenreGalaxyList(type, adjustedPageable));
     }
 
+//    @Operation(summary = "모두보기-필터 에셋", description = "카테고리, 분류 옵션들은 한글로 그대로 넣으면 됩니다. 가격 옵션은 순서대로 1(무료)부터 7(100만원이상)까지")
+//    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+//        @Content(array = @ArraySchema(schema = @Schema(implementation = FilterAsset.class)))
+//    })
+//    @GetMapping("/asset")
+//    public BaseResponse<Page<FilterAsset>> getFilterAssetList(
+//        @Parameter(description = "카테고리 옵션") @RequestParam List<String> categoryOption,
+//        @Parameter(description = "플랫폼 옵션") @RequestParam List<String> trendOption,
+//        @Parameter(description = "가격 옵션") @RequestParam List<Integer> priceOption,
+//        @Parameter(description = "검색어") String keyword,
+//        @Parameter(description = "페이징") Pageable pageable) {
+//        log.info("카테고리 옵션-{}, 인기있는 분류 옵션-{}, 가격 옵션-{}, 페이징-{}", categoryOption,
+//            trendOption, priceOption, pageable);
+//        // 최신 등록일순으로
+//        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+//        return new BaseResponse<Page<FilterAsset>>(
+//            productsListService.getFilterAssetListWithKeyword(categoryOption, trendOption,
+//                priceOption, keyword, adjustedPageable));
+//    }
+
     @Operation(summary = "모두보기-필터 에셋", description = "카테고리, 분류 옵션들은 한글로 그대로 넣으면 됩니다. 가격 옵션은 순서대로 1(무료)부터 7(100만원이상)까지")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = FilterAsset.class)))

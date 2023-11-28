@@ -177,6 +177,47 @@ public class ProductsListServiceImpl implements ProductsListService {
         return response;
     }
 
+    @Override
+    public Page<FilterAsset> getFilterAssetListWithKeyword(List<String> categoryOption,
+        List<String> trendOption, List<Integer> priceOption, String keyword,
+        Pageable pageable) {
+        List<String> tagList = new ArrayList<>();
+        if (isNullOrEmpty(categoryOption) && isNullOrEmpty(trendOption)) {
+            Page<ProductsEntity> productsEntities =
+                priceOption == null || priceOption.size() == 0 ?
+                    productsRepository.findAllByStatusWithKeyword(DataStatus.ACTIVE, keyword,
+                        pageable) :
+                    productsRepository.findAllByStatusWithKeywordAndPriceOption(DataStatus.ACTIVE,
+                        priceOption, keyword, pageable);
+
+            Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
+            setProductsTagList(response);
+
+            return response;
+        }
+
+        if (!isNullOrEmpty(categoryOption)) {
+            setTagListByOption(categoryOption, tagList);
+        }
+        if (!isNullOrEmpty(trendOption)) {
+            setTagListByOption(trendOption, tagList);
+        }
+
+        // tagList를 가져온다.
+        Page<ProductsEntity> productsEntities =
+            priceOption == null || priceOption.size() == 0 ?
+                productsRepository.findAllDistinctByTagListAndKeywordAndStatus(
+                    tagList, DataStatus.ACTIVE, keyword, pageable)
+                : productsRepository.findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
+                    tagList, DataStatus.ACTIVE, priceOption, keyword, pageable);
+
+        Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
+
+        setProductsTagList(response);
+
+        return response;
+    }
+
     private void setProductsTagList(Page<FilterAsset> response) {
         if (response.getContent().size() > 0) {
             for (Asset filterAsset : response) {

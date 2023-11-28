@@ -113,7 +113,7 @@ public class CreatorServiceImpl implements CreatorService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl("");
+        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
         return assetFile;
     }
 
@@ -174,8 +174,6 @@ public class CreatorServiceImpl implements CreatorService {
                 return uploadService.getAssetFilePresignedUrl(productsId, savedFileName);
             }
         }
-
-
     }
 
     @Override
@@ -215,36 +213,74 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
-    public AssetUpdatedResponse updateAsset(Long productsId, User user, MultipartFile[] thumbnails,
-        MultipartFile[] views, AssetUpdate dto) {
+    public AssetUpdatedResponse updateAsset(Long productsId, User user, AssetUpdate dto) {
         ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        // 본인만 접근 가능
+        CreatorEntity creatorEntity = productsEntity.getCreatorEntity();
+        if (!creatorEntity.getUser().getId().equals(user.getId())) {
+            throw new BaseException(ErrorCode.IS_NOT_WRITER);
+        }
+
         productsEntity.update(dto);
         productsEntity = productsRepository.findProductById(productsId);
+        // 혹시 몰라서 save까지
         productsRepository.save(productsEntity);
         productsEntity = productsRepository.findProductById(productsId);
+        // 에셋 파일 조회
         ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileRepository.findByProducts(
             productsEntity);
+        // 에셋 파일 업데이트
         foundProductsAssetFileEntity.update(productsEntity, dto);
-
-        // 어떤 건 그대로고, 어떤 건 수정하려고 하면 정신나감
-//        if (thumbnails) {
-//
-//        }
-//
-//        if (views) {
-//
-//        }
-
         productsAssetFileRepository.save(foundProductsAssetFileEntity);
-        CreatorEntity creatorEntity = productsEntity.getCreatorEntity();
+
+        // 썸네일 수정. 만약 보낸다면 기존에 갖고있던 거 싹 다 없애버리고..!
+        List<String> thumbnailList = dto.getThumbnailList();
+        if (thumbnailList != null && !thumbnailList.isEmpty()) {
+            productsThumbnailRepository.deleteAllUrlByProduct(productsEntity);
+            setUpdatedThumbnailList(thumbnailList, productsEntity);
+        }
+
+        // 태그 수정
+        List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
+            productsEntity);
+        productsTagRepository.deleteAll(productsTagEntities);
+        updateTagList(dto, productsEntity);
+
+        // 작업 수, 에셋 평점
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
         double satisficationRate = 0.0;
         ProductsDetail productsDetail = productsEntity.toProductsDetail(taskCnt, satisficationRate);
+        // tag 목록
         getProductsDetailTagList(productsEntity, productsDetail);
+        // 에셋 파일
         AssetFile assetFile = getProductsDetailAssetFile(productsEntity,
             productsDetail);
         productsDetail.setAssetFile(assetFile);
         return AssetUpdatedResponse.builder().productsDetail(productsDetail).build();
+    }
+
+    @Override
+    public String getThumbnailPreSignedUrl(Long productsId, String extension) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        String randomFileName = uploadService.getRandomStringForImageName(8);
+        return uploadService.getThumbnailPresignedUrl(productsId, randomFileName, extension);
+    }
+
+    private void setUpdatedThumbnailList(List<String> thumbnailList,
+        ProductsEntity productsEntity) {
+        int index = 1;
+        List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
+        for (String thumbnailUrl : thumbnailList) {
+            if (index == 1) {
+                productsEntity.setThumbnail(thumbnailUrl);
+            }
+            ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
+                .productsEntity(productsEntity).thumbnailOrd(index++)
+                .thumbnailUrl(thumbnailUrl)
+                .build();
+            productsThumbnailEntities.add(createdProductsThumbnailEntity);
+        }
+        productsThumbnailRepository.saveAll(productsThumbnailEntities);
     }
 
     private void saveTagList(AssetRequest dto, ProductsEntity savedProductsEntity) {
@@ -252,6 +288,17 @@ public class CreatorServiceImpl implements CreatorService {
         for (String tag : dto.getTagList()) {
             ProductsTagEntity createdProductsTagEntity = ProductsTagEntity.builder()
                 .productsEntity(savedProductsEntity).name(tag).build();
+            tagEntities.add(createdProductsTagEntity);
+        }
+        productsTagRepository.saveAll(tagEntities);
+    }
+
+
+    private void updateTagList(AssetUpdate dto, ProductsEntity productsEntity) {
+        List<ProductsTagEntity> tagEntities = new ArrayList<>();
+        for (String tag : dto.getTagList()) {
+            ProductsTagEntity createdProductsTagEntity = ProductsTagEntity.builder()
+                .productsEntity(productsEntity).name(tag).build();
             tagEntities.add(createdProductsTagEntity);
         }
         productsTagRepository.saveAll(tagEntities);

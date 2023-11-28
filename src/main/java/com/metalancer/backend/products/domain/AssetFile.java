@@ -16,6 +16,7 @@ public class AssetFile {
     private boolean animationStatus;
     private boolean riggingStatus;
     private String extensionList;
+    // 수정일 기준!
     private String recentReleaseDate;
     private String support;
     private String copyRight;

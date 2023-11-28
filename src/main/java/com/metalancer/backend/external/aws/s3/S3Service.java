@@ -65,6 +65,17 @@ public class S3Service {
         return url.toString();
     }
 
+    public String getThumbnailPresignedUrl(Long productsId, String randomFileName,
+        String extension) {
+        String fileName = randomFileName + "." + extension;
+        String prefix = "asset/" + productsId + "/thumbnail";
+        fileName = prefix + "/" + fileName;
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(
+            fileName);
+        URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
     private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String fileName) {
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(assetBucket, fileName)

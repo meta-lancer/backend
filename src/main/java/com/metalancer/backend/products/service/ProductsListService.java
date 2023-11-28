@@ -20,4 +20,8 @@ public interface ProductsListService {
 
     Page<FilterAsset> getFilterAssetList(List<String> categoryOption,
         List<String> trendOption, List<Integer> priceOption, Pageable adjustedPageable);
+
+    Page<FilterAsset> getFilterAssetListWithKeyword(List<String> categoryOption,
+        List<String> trendOption, List<Integer> priceOption, String keyword,
+        Pageable adjustedPageable);
 }

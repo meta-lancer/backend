@@ -68,6 +68,7 @@ public enum ErrorCode {
     THUMBNAILS_UPLOAD_FAILED(UNEXPECTED_ERROR, "G005", "썸네일 등록에 실패했습니다"),
     VIEWS_UPLOAD_FAILED(UNEXPECTED_ERROR, "G006", "3D 뷰 등록에 실패했습니다"),
     SHORTEN_URL_FAILED(UNEXPECTED_ERROR, "G007", "presigned url 축약에 실패했습니다"),
+    INVALID_EXTENSION(BAD_REQUEST, "G008", "올바르지 않은 파일 형식입니다. "),
     /**
      * 토큰
      */

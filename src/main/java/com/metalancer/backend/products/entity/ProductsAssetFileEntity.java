@@ -114,8 +114,9 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
             .productionProgram(productionProgram).compatibleProgram(compatibleProgram)
             .fileSize(fileSize)
             .animationStatus(animation).riggingStatus(rigging)
-            .extensionList(extList).recentReleaseDate(Time.convertDateToString(getCreatedAt()))
+            .extensionList(extList).recentReleaseDate(Time.convertDateToString(getUpdatedAt()))
             .copyRight(copyRight).recentVersion(recentVersion)
+            .support(support)
             .build();
     }
 

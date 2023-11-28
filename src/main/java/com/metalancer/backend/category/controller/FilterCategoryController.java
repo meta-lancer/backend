@@ -25,15 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class FilterCategoryController {
 
     private final CategoryListService categoryListService;
-
-    @Operation(summary = "필터 에셋 목록-카테고리", description = "")
+    
+    @Operation(summary = "필터 에셋 목록-카테고리", description = "GenreGalaxyCategory에서 전체만 없습니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = MainCategory.class)))
     })
     @GetMapping("/category")
     public BaseResponse<List<MainCategory>> getFilterCategoryList() {
         return new BaseResponse<List<MainCategory>>(
-            categoryListService.getFilterCategoryList());
+            categoryListService.getGenreGalaxyCategoryListWithOutAll());
     }
 
     @Operation(summary = "필터 에셋 목록-플랫폼", description = "")

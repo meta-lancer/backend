@@ -21,4 +21,6 @@ public interface CategoryListService {
     List<MainCategory> getFilterCategoryList();
 
     List<MainCategory> getFilterPlatformList();
+
+    List<MainCategory> getGenreGalaxyCategoryListWithOutAll();
 }

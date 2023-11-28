@@ -29,4 +29,12 @@ public class GenreGalaxyTypeRepositoryImpl implements GenreGalaxyTypeRepository 
             () -> new NotFoundException("GenreGalaxy: ", ErrorCode.TYPE_NOT_FOUND)
         );
     }
+
+    @Override
+    public List<MainCategory> getGenreGalaxyCategoryListWithOutAll() {
+        return genreGalaxyTypeJpaRepository.findAllByTagsEntityIsNotNull().stream()
+            .map(GenreGalaxyTypeEntity::ToMainCategory)
+            .collect(
+                Collectors.toList());
+    }
 }

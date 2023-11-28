@@ -64,4 +64,9 @@ public class CategoryListServiceImpl implements CategoryListService {
         return tagsRepository.findAllMainCategoryByParentsTagName("플랫폼").stream()
             .map(TagsEntity::toMainCategory).toList();
     }
+
+    @Override
+    public List<MainCategory> getGenreGalaxyCategoryListWithOutAll() {
+        return genreGalaxyTypeRepository.getGenreGalaxyCategoryListWithOutAll();
+    }
 }

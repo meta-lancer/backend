@@ -98,7 +98,7 @@ public class User extends BaseEntity implements Serializable {
     }
 
     public void setEmailIfNotDuplicated(String email, Optional<User> optionalUser) {
-        if (optionalUser.isPresent()) {
+        if (optionalUser.isPresent() && optionalUser.get().getStatus().equals(DataStatus.ACTIVE)) {
             switch (optionalUser.get().getLoginType()) {
                 case NORMAL -> throw new BaseException(ErrorCode.EMAIL_SIGNUP_DUPLICATED);
                 case KAKAO -> throw new BaseException(ErrorCode.KAKAO_SIGNUP_DUPLICATED);

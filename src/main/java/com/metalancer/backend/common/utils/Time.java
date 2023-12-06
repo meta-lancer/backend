@@ -110,6 +110,11 @@ public class Time {
         return dateTime != null ? dateTime.format(outputFormat) : "-";
     }
 
+    public static String convertDateToStringWithDot(LocalDateTime dateTime) {
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return dateTime != null ? dateTime.format(outputFormat) : "-";
+    }
+
     public static String convertDateToStringSlash(LocalDateTime dateTime) {
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         return dateTime != null ? dateTime.format(outputFormat) : "-";

@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.domain;
 
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.utils.Time;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class PayedOrder {
     private OrderStatus orderStatus;
     private String payMethod;
     private int price;
-    private LocalDateTime purchasedAt;
+    private String purchasedAt;
     private String receiptUrl;
 
     @Builder
@@ -28,7 +29,7 @@ public class PayedOrder {
         this.orderStatus = orderStatus;
         this.payMethod = payMethod;
         this.price = price;
-        this.purchasedAt = purchasedAt;
+        this.purchasedAt = Time.convertDateToStringWithDot(purchasedAt);
         this.receiptUrl = receiptUrl;
     }
 }

@@ -20,4 +20,15 @@ public class ProductsWishRepositoryImpl implements ProductsWishRepository {
         return productsWishJpaRepository.findByUserAndProductsEntityAndStatus(foundUser,
             foundProductsEntity, DataStatus.ACTIVE);
     }
+
+    @Override
+    public int countAllByUserAndProduct(User foundUser, ProductsEntity foundProductsEntity) {
+        return productsWishJpaRepository.countAllByUserAndProductsEntityAndStatus(foundUser,
+            foundProductsEntity, DataStatus.ACTIVE);
+    }
+
+    @Override
+    public void save(ProductsWishEntity createdProductsWish) {
+        productsWishJpaRepository.save(createdProductsWish);
+    }
 }

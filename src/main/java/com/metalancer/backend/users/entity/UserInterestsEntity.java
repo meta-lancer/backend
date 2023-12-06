@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.entity;
 
 import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.interests.domain.Interests;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,5 +41,9 @@ public class UserInterestsEntity extends BaseEntity implements Serializable {
     public UserInterestsEntity(User user, String interestsName) {
         this.user = user;
         this.interestsName = interestsName;
+    }
+
+    public Interests toDomain() {
+        return Interests.builder().interestsId(id).interestsName(interestsName).build();
     }
 }

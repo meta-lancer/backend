@@ -9,4 +9,6 @@ public interface ProductsThumbnailRepository {
     void saveAll(List<ProductsThumbnailEntity> productsThumbnailEntities);
 
     List<String> findAllUrlByProduct(ProductsEntity savedProductsEntity);
+
+    void deleteAllUrlByProduct(ProductsEntity productsEntity);
 }

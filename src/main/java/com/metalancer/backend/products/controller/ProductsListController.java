@@ -5,13 +5,14 @@ import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
-import com.metalancer.backend.products.controller.Response.ProductsDto.GenreGalaxyResponse;
-import com.metalancer.backend.products.controller.Response.ProductsDto.HotPickResponse;
-import com.metalancer.backend.products.controller.Response.ProductsDto.TrendSpotlightResponse;
 import com.metalancer.backend.products.domain.FilterAsset;
+import com.metalancer.backend.products.dto.ProductsDto.GenreGalaxyResponse;
+import com.metalancer.backend.products.dto.ProductsDto.HotPickResponse;
+import com.metalancer.backend.products.dto.ProductsDto.TrendSpotlightResponse;
 import com.metalancer.backend.products.service.ProductsListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,7 +37,7 @@ public class ProductsListController {
     private final ProductsListService productsListService;
 
     @Operation(summary = "메인페이지-에셋 Hot Pick", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = HotPickResponse.class)))
     @GetMapping("/hot-pick")
     public BaseResponse<HotPickResponse> getHotPickList(
         @Parameter(description = "종류") @RequestParam HotPickType type,
@@ -49,52 +50,67 @@ public class ProductsListController {
     }
 
     @Operation(summary = "메인페이지-Trend Spotlight", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = TrendSpotlightResponse.class)))
     @GetMapping("/trend-spotlight")
     public BaseResponse<TrendSpotlightResponse> getTrendSpotlight(
-        @Parameter(name = "종류", description =
-            "ALL(전체), VRCHAT(VR CHAT), MINECRAFT(마인크래프트), ZEPETO(제페토), "
-                + "ROBLOX(로블룩스), MIDDLEAGE(중세), FUTURE(미래), CARTOON(카툰), ACTUAL(실사)") @RequestParam String platformType,
+        @Parameter(name = "platformType", description =
+            "플랫폼 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String platformType,
         @Parameter(description = "페이징") Pageable pageable) {
+        platformType = platformType.toLowerCase();
         log.info("종류 옵션-{},  페이징-{}", platformType, pageable);
-        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(
             productsListService.getTrendSpotlight(platformType, adjustedPageable));
     }
 
     @Operation(summary = "메인페이지-Genre Galaxy", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = GenreGalaxyResponse.class)))
     @GetMapping("/genre-galaxy")
     public BaseResponse<GenreGalaxyResponse> getGenreGalaxyList(
-        @Parameter(name = "종류", description = "MODEL(\"모델\"),\n"
-            + "    ANIMAL(\"동물\"),\n"
-            + "    PLANT(\"식물\"),\n"
-            + "    BACKGROUND(\"배경\"),\n"
-            + "    FOOD(\"음식\"),\n"
-            + "    OBJECTS(\"사물\"),\n"
-            + "    ROBOT(\"로봇\"),\n"
-            + "    VFX(\"VFX\"),\n"
-            + "    ETC(\"기타\")") @RequestParam String type,
+        @Parameter(name = "type", description = "Genre Galaxy 카테고리 api로 받은 데이터의 영문으로 조회") @RequestParam String type,
         @Parameter(description = "페이징") Pageable pageable) {
+        type = type.toLowerCase();
         log.info("종류 옵션-{},  페이징-{}", type, pageable);
-        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(productsListService.getGenreGalaxyList(type, adjustedPageable));
     }
 
-    @Operation(summary = "모두보기-필터 에셋", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+//    @Operation(summary = "모두보기-필터 에셋", description = "카테고리, 분류 옵션들은 한글로 그대로 넣으면 됩니다. 가격 옵션은 순서대로 1(무료)부터 7(100만원이상)까지")
+//    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+//        @Content(array = @ArraySchema(schema = @Schema(implementation = FilterAsset.class)))
+//    })
+//    @GetMapping("/asset")
+//    public BaseResponse<Page<FilterAsset>> getFilterAssetList(
+//        @Parameter(description = "카테고리 옵션") @RequestParam List<String> categoryOption,
+//        @Parameter(description = "플랫폼 옵션") @RequestParam List<String> trendOption,
+//        @Parameter(description = "가격 옵션") @RequestParam List<Integer> priceOption,
+//        @Parameter(description = "검색어") String keyword,
+//        @Parameter(description = "페이징") Pageable pageable) {
+//        log.info("카테고리 옵션-{}, 인기있는 분류 옵션-{}, 가격 옵션-{}, 페이징-{}", categoryOption,
+//            trendOption, priceOption, pageable);
+//        // 최신 등록일순으로
+//        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+//        return new BaseResponse<Page<FilterAsset>>(
+//            productsListService.getFilterAssetListWithKeyword(categoryOption, trendOption,
+//                priceOption, keyword, adjustedPageable));
+//    }
+
+    @Operation(summary = "모두보기-필터 에셋", description = "카테고리, 분류 옵션들은 한글로 그대로 넣으면 됩니다. 가격 옵션은 순서대로 1(무료)부터 7(100만원이상)까지")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = FilterAsset.class)))
+    })
     @GetMapping("/asset")
     public BaseResponse<Page<FilterAsset>> getFilterAssetList(
-        @Parameter(description = "정렬 옵션") @RequestParam Integer sortOption,
-        @Parameter(description = "유형 옵션") @RequestParam List<Integer> typeOption,
-        @Parameter(description = "장르 옵션") @RequestParam List<Integer> genreOption,
+        @Parameter(description = "카테고리 옵션") @RequestParam List<String> categoryOption,
+        @Parameter(description = "플랫폼 옵션") @RequestParam List<String> trendOption,
         @Parameter(description = "가격 옵션") @RequestParam List<Integer> priceOption,
         @Parameter(description = "페이징") Pageable pageable) {
-        log.info("정렬 옵션-{}, 유형 옵션-{}, 장르 옵션-{}, 가격 옵션-{}, 페이징-{}", sortOption, typeOption,
-            genreOption, priceOption, pageable);
-        Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
-        return new BaseResponse<>(
-            productsListService.getFilterAssetList(sortOption, typeOption, genreOption, priceOption,
-                adjustedPageable));
+        log.info("카테고리 옵션-{}, 인기있는 분류 옵션-{}, 가격 옵션-{}, 페이징-{}", categoryOption,
+            trendOption, priceOption, pageable);
+        // 최신 등록일순으로
+        Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        return new BaseResponse<Page<FilterAsset>>(
+            productsListService.getFilterAssetList(categoryOption, trendOption,
+                priceOption, adjustedPageable));
     }
 }

@@ -1,25 +1,56 @@
 package com.metalancer.backend.common.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private final PrincipalOAuth2UserService principalOAuth2UserService;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final MemberLoginFailService memberLoginFailService;
+
+    @Value("${spring.security.oauth2.client.targetUrl}")
+    private String targetUrl;
+
+    @Value("${spring.loginPage}")
+    private String loginPage;
+
+    @Value("${spring.successUrl}")
+    private String successUrl;
+
+    @Value("${spring.failUrl}")
+    private String failUrl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,6 +61,7 @@ public class SecurityConfig {
 //    public PasswordEncoder passwordEncoder() {
 //        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 //    }
+
 
     @Bean
     public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
@@ -48,29 +80,36 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests()
             .requestMatchers("/swagger-ui/index.html").denyAll()
-            .requestMatchers("/api/auth/**", "/api/user/**", "/h2-console", "/loginForm",
-                "/api/auth/login")
+            .requestMatchers("/h2-console",
+                "/loginForm", "/api/products/{productId}/wish")
             .authenticated()
-            .requestMatchers("/api/auth/test").hasAnyRole("USER", "SELLER", "ADMIN")
-            .requestMatchers("/api/creators/**").hasAnyRole("SELLER", "ADMIN")
+            .requestMatchers("/api/products/**").permitAll()
+            .requestMatchers("/api/cart/**", "/api/orders/**").hasAnyRole("USER", "SELLER", "ADMIN")
+            .requestMatchers("/api/creator/**").hasAnyRole("SELLER", "ADMIN")
 //            .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().permitAll()
 
             .and()
             //일반 적인 로그인
             .formLogin()
-            .loginPage("http://www.metaovis.com") //로그인 페이지 url //미인증자일경우 해당 uri를 호
+            .loginPage(loginPage) //로그인 페이지 url //미인증자일경우 해당 uri를 호
             .loginProcessingUrl("/api/auth/login") //이 url을 로그인 기능을 담당하게 함
-            .defaultSuccessUrl("http://www.metaovis.com") // 성공하면 이 url로 가게 해라
+            .defaultSuccessUrl(successUrl) // 성공하면 이 url로 가게 해라
             //                .loginProcessingUrl(
 //                        "/login") //login 주소가 호출되면 시큐리티가 낚아 채서(post로 오는것) 대신 로그인 진행 -> 컨트롤러를 안만들어도 된다.
 //                .defaultSuccessUrl("/")
             .successHandler(formLoginSuccessHandler())
+            .failureHandler(memberLoginFailService)
             .and()
             //OAuth 로그인
             .oauth2Login()
-            .loginPage("http://www.metaovis.com") //로그
-            .successHandler(successHandler())
+            .loginPage(loginPage) //로그
+            .defaultSuccessUrl(successUrl)
+//                .authorizationEndpoint()
+//                .authorizationRequestRepository(customAuthorizationRequestRepository())
+            .successHandler(oauth2SuccessHandler())
+            .failureHandler(authenticationFailureHandler())
+            .failureUrl("https://www.metaovis.com?error=duplicated_register")
             .userInfoEndpoint()
             .userService(
                 principalOAuth2UserService);//구글 로그인이 완료된(구글회원) 뒤의 후처리가 필요함 . Tip.코드x, (엑세스 토큰+사용자 프로필 정보를 받아옴)
@@ -88,12 +127,32 @@ public class SecurityConfig {
                 }
             })  // 로그아웃 핸들러 추가
             .logoutSuccessHandler((request, response, authentication) -> {
-                response.sendRedirect("http://www.metaovis.com");
+                response.sendRedirect(loginPage);
             }) // 로그아웃 성공 핸들러
             .deleteCookies("remember-me"); // 로그아웃 후 삭제할 쿠키 지정
-        
+
+        http.exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler);
+
         return http.build();
     }
+
+//    @Bean
+//    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> customAuthorizationRequestRepository() {
+//        return new HttpSessionOAuth2AuthorizationRequestRepository() {
+//            @Override
+//            public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
+//                super.saveAuthorizationRequest(authorizationRequest, request, response);
+//                for (Cookie cookie : response.getCookies()) {
+//                    if ("oauth2_auth_request".equals(cookie.getName())) {
+//                        // Set samesite and secure attributes for the cookie
+//                        response.setHeader("Set-Cookie", cookie.toString() + "; SameSite=none; Secure");
+//                    }
+//                }
+//            }
+//        };
+//    }
 
     @Bean
     public AuthenticationSuccessHandler formLoginSuccessHandler() {
@@ -105,21 +164,77 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationSuccessHandler successHandler() {
+    public AuthenticationSuccessHandler oauth2SuccessHandler() {
+
         return ((request, response, authentication) -> {
-//            DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-//
-//            String id = defaultOAuth2User.getAttributes().get("id").toString();
-//            String body = """
-//                {"id":"%s"}
-//                """.formatted(id);
-//
-//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-//
-//            PrintWriter writer = response.getWriter();
-//            writer.println(body);
-//            writer.flush();
+            PrincipalDetails oAuth2User = (PrincipalDetails) authentication.getPrincipal();
+            User user = oAuth2User.getUser();
+            // 이를 통해 리다이렉트하도록 응답 코드 보낸다.
+            response.sendRedirect(targetUrl);
         });
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return ((request, response, authenticationException) -> {
+            log.info(request.getRequestURI());
+            log.info(request.getPathInfo());
+            log.info(request.getRemoteAddr());
+            log.info(request.getHeader("Referer"));
+            // Extracting request information
+            String userAgent = request.getHeader("User-Agent");
+            String requestURL = request.getRequestURL().toString();
+            String requestURI = request.getRequestURI();
+            String queryString = request.getQueryString();
+
+            // Logging the information
+            log.info("User-Agent: {}", userAgent);
+            log.info("Request URL: {}", requestURL);
+            log.info("Request URI: {}", requestURI);
+            log.info("Query String: {}", queryString);
+
+            // Get the error message from the exception
+            String errorMessage =
+                "이유: " + authenticationException.getCause() + authenticationException.getMessage();
+
+            // Logging the error for debugging purposes
+            log.error("OAuth2 Authentication Failure: {}", errorMessage, authenticationException);
+
+        });
+    }
+
+    @Component
+    @RequiredArgsConstructor
+    public static class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
+        private final ObjectMapper objectMapper;
+
+        @Override
+        public void handle(HttpServletRequest request,
+            HttpServletResponse response,
+            AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            log.error("No Authorities", accessDeniedException);
+            log.error("Request Uri : {}", request.getRequestURI());
+
+//            ApiResponse<ErrorResponse> apiResponse = ApiResponse.createAuthoritiesError();
+//            String responseBody = objectMapper.writeValueAsString(apiResponse);
+
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setCharacterEncoding("UTF-8");
+//            response.getWriter().write(responseBody);
+        }
+    }
+
+    @Component
+    public static class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+        @Override
+        public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) throws IOException, ServletException {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setCharacterEncoding("UTF-8");
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.orders.domain.CreatedOrder;
+import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,13 +55,13 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     private OrderStatus orderStatus = OrderStatus.PAY_ING;
 
     @Builder
-    public OrdersEntity(User orderer, String orderNo, Integer totalPoint, Integer totalPrice,
+    public OrdersEntity(User orderer, String orderNo, Integer totalPrice,
         Integer totalPaymentPrice) {
         this.orderer = orderer;
         this.orderNo = orderNo;
-        this.totalPoint = totalPoint;
+        this.totalPoint = 0;
         this.totalPrice = totalPrice;
-        if (totalPrice - totalPoint == totalPaymentPrice) {
+        if (totalPrice - this.totalPoint == totalPaymentPrice) {
             this.totalPaymentPrice = totalPaymentPrice;
         } else {
             throw new InvalidParamException("check totalPrice, totalPaymentPrice, totalPoint",
@@ -73,6 +75,13 @@ public class OrdersEntity extends BaseEntity implements Serializable {
             .buyerNm(orderer.getName()).buyerPhone(orderer.getMobile())
             .buyerEmail(orderer.getEmail())
             .build();
+    }
+
+    public PayedOrder toPayedOrderDomain(String payMethod, LocalDateTime purchasedAt, String title,
+        String receiptUrl) {
+        return PayedOrder.builder().orderId(id).orderNo(orderNo).orderStatus(orderStatus)
+            .payMethod(payMethod).price(totalPrice).purchasedAt(purchasedAt)
+            .title(title).receiptUrl(receiptUrl).build();
     }
 
     public void completeOrder() {

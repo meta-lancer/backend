@@ -30,9 +30,7 @@ public class HotPickTypeEntity extends BaseTimeEntity implements Serializable {
     @Column(name = "hot_pick_type_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
     private String nameKor;
 
     @Builder

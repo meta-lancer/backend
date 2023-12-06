@@ -12,4 +12,6 @@ public interface ProductsDetailService {
     PrincipalDetails user, Long productId);
 
     ProductsDetail getProductDetail(PrincipalDetails user, Long productId);
+
+    ProductsDetail getProductDetailBySharedLink(PrincipalDetails user, String link);
 }

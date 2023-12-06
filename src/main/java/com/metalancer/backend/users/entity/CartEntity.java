@@ -48,7 +48,7 @@ public class CartEntity extends BaseEntity implements Serializable {
     }
 
     public Cart toDomain() {
-        return Cart.builder().cartId(id).title(products.getTitle())
+        return Cart.builder().cartId(id).assetId(products.getId()).title(products.getTitle())
             .price(products.getPrice()).build();
     }
 

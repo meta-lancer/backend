@@ -1,20 +1,30 @@
 package com.metalancer.backend.products.entity;
 
+import com.metalancer.backend.admin.domain.ProductsList;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
+import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.products.domain.FilterAsset;
+import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.domain.ProductsDetail;
+import com.metalancer.backend.products.domain.TrendSpotlight;
+import com.metalancer.backend.users.domain.Creator;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
@@ -39,11 +49,9 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     @Column(name = "products_id", nullable = false)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "products_category_id", nullable = false)
-    private ProductsCategoryEntity category;
-    @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private CreatorEntity creatorEntity;
+    @Column(unique = true)
     private String sharedLink;
     private String title;
     private int price;
@@ -52,21 +60,12 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private double rate = 5;
     private int ratingCnt = 1;
     private int viewCnt = 0;
-
-    // 이미지
     private String thumbnail;
-    // 태그
-    // 확장자
-    // 제작 프로그램
-    // 호환 프로그램
-    // 상품 저작권 안내
-
     private String assetDetail;
     private String assetNotice;
     private String assetCopyRight;
-    private String website;
-    private String productionProgram;
-    private String compatibleProgram;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productsEntity")
+    private ProductsAssetFileEntity productsAssetFileEntity;
 
     public void setActive() {
         active();
@@ -76,16 +75,18 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         delete();
     }
 
-    public void update() {
-        // 제목
-        // 가격
-        // 상세정보
-        // 이미지
+    public void update(AssetUpdate dto) {
+        this.title = dto.getTitle();
+        this.price = dto.getPrice();
+        this.assetDetail = dto.getAssetDetail();
+        this.assetNotice = dto.getAssetNotice();
+        this.assetCopyRight = dto.getCopyRight();
     }
 
     public void setSharedLink() {
+        String baseLink = "https://www.metaovis.com/details?share_id=";
         int length = 10;
-        this.sharedLink = RandomStringUtils.randomAlphanumeric(length);
+        this.sharedLink = baseLink + RandomStringUtils.randomAlphanumeric(length);
     }
 
     public void setDiscount(double discount) {
@@ -143,34 +144,48 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     @Builder
     public ProductsEntity(CreatorEntity creatorEntity,
-        ProductsCategoryEntity productsCategoryEntity,
-        String title,
-        int price, String thumbnail, String assetDetail, String assetNotice, String assetCopyRight,
-        String website,
-        String productionProgram, String compatibleProgram) {
+        String title, int price, String thumbnail, String assetDetail, String assetNotice,
+        String assetCopyRight) {
         this.creatorEntity = creatorEntity;
-        this.category = productsCategoryEntity;
         this.title = title;
         this.price = price;
         this.thumbnail = thumbnail;
         this.assetDetail = assetDetail;
         this.assetNotice = assetNotice;
         this.assetCopyRight = assetCopyRight;
-        this.website = website;
-        this.productionProgram = productionProgram;
-        this.compatibleProgram = compatibleProgram;
         setSharedLink();
     }
 
-    public ProductsDetail toProductsDetail() {
-        return ProductsDetail.builder().assetId(id).category(category.toDomain()).creator(
-                creatorEntity.toDamain())
+    public ProductsDetail toProductsDetail(long taskCnt, double satisficationRate) {
+        Creator creator = creatorEntity.toDomain();
+        creator.setTaskCnt(taskCnt);
+        creator.setSatisficationRate(satisficationRate);
+        return ProductsDetail.builder().productsId(id).creator(
+                creator)
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
-            .discount(discount).rate(rate).ratingCnt(ratingCnt).build();
+            .discount(discount).rate(rate).ratingCnt(ratingCnt)
+            .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .build();
+    }
+
+    public ProductsDetail toProductsDetail() {
+        Creator creator = creatorEntity.toDomain();
+        return ProductsDetail.builder().productsId(id).creator(
+                creator)
+            .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
+            .discount(discount).rate(rate).ratingCnt(ratingCnt)
+            .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .build();
     }
 
     public HotPickAsset toHotPickAsset() {
-        return HotPickAsset.builder().assetId(id).title(title).price(price).assetUrl("").build();
+        return HotPickAsset.builder().productsId(id).title(title).price(price).thumbnail("")
+            .build();
+    }
+
+    public ManageAsset toManageAsset() {
+        return ManageAsset.builder().productsId(id).thumbnail(thumbnail).title(title).price(price)
+            .viewCnt(viewCnt).build();
     }
 
     public void setSalePrice(int salePrice) {
@@ -181,5 +196,31 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public void deleteProducts() {
+        delete();
+        ;
+    }
+
+    public GenreGalaxy toGenreGalaxy() {
+        return GenreGalaxy.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
+            .build();
+    }
+
+    public TrendSpotlight toTrendSpotLight() {
+        return TrendSpotlight.builder().productsId(id).title(title).thumbnail(thumbnail)
+            .price(price).build();
+    }
+
+    public FilterAsset toFilterAsset() {
+        return FilterAsset.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
+            .build();
+    }
+
+    public ProductsList toAdminProductsList() {
+        return ProductsList.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
+            .dataStatus(getStatus()).createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
+            .build();
     }
 }

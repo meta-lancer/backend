@@ -9,7 +9,7 @@ import lombok.Getter;
 public class ErrorResponse {
 
     private final String code;
-    private final String message;
+    private String message;
     private final Map<String, String> validation;
 
     @Builder
@@ -21,6 +21,10 @@ public class ErrorResponse {
 
     public void addValidation(String fieldName, String errorMessage) {
         this.validation.put(fieldName, errorMessage);
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

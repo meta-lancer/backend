@@ -11,4 +11,6 @@ public interface ProductsThumbnailJpaRepository extends
     List<ProductsThumbnailEntity> findAllByProductsEntityOrderByThumbnailOrdAsc(
         ProductsEntity productsEntity);
 
+    List<ProductsThumbnailEntity> findAllByProductsEntity(
+        ProductsEntity productsEntity);
 }

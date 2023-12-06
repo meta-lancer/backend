@@ -1,4 +1,4 @@
-package com.metalancer.backend.admin.dto;
+package com.metalancer.backend.admin.domain;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
@@ -11,6 +11,7 @@ import lombok.Getter;
 public class CreatorList {
 
     private Long memberId;
+    private Long creatorId;
     private String email;
     private String name;
     private String username;
@@ -23,11 +24,13 @@ public class CreatorList {
     private DataStatus status;
 
     @Builder
-    public CreatorList(Long memberId, String email, String name, String username, String mobile,
+    public CreatorList(Long memberId, Long creatorId, String email, String name, String username,
+        String mobile,
         String job, Role role, LoginType loginType, LocalDateTime createdAt,
         LocalDateTime updatedAt,
         DataStatus status) {
         this.memberId = memberId;
+        this.creatorId = creatorId;
         this.email = email;
         this.name = name;
         this.username = username;

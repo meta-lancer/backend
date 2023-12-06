@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.MemberDetail;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.admin.dto.AdminMemberDTO.Approve;
@@ -18,4 +19,10 @@ public interface AdminMemberService {
     String approveUserList(Approve dto);
 
     MemberList updateMember(UpdateUser dto);
+
+    String deleteMember(Long memberId);
+
+    String improveToCreator(Long memberId);
+
+    MemberDetail getAdminMemberDetail(Long memberId);
 }

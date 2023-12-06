@@ -26,4 +26,11 @@ public class ProductsThumbnailRepositoryImpl implements ProductsThumbnailReposit
             .collect(
                 Collectors.toList());
     }
+
+    @Override
+    public void deleteAllUrlByProduct(ProductsEntity productsEntity) {
+        List<ProductsThumbnailEntity> productsThumbnailEntities = productsThumbnailJpaRepository.findAllByProductsEntity(
+            productsEntity);
+        productsThumbnailJpaRepository.deleteAll(productsThumbnailEntities);
+    }
 }

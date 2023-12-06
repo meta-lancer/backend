@@ -41,13 +41,13 @@ public class OpenApiConfig {
             .build();
     }
 
-    @Bean
-    public GroupedOpenApi group2() {
-        return GroupedOpenApi.builder()
-            .group("게시물")
-            .pathsToMatch("/api/posts/**")
-            .build();
-    }
+//    @Bean
+//    public GroupedOpenApi group2() {
+//        return GroupedOpenApi.builder()
+//            .group("게시물")
+//            .pathsToMatch("/api/posts/**")
+//            .build();
+//    }
 
     @Bean
     public GroupedOpenApi group3() {
@@ -95,6 +95,14 @@ public class OpenApiConfig {
         return GroupedOpenApi.builder()
             .group("제작요청")
             .pathsToMatch("/api/request/**")
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi group9() {
+        return GroupedOpenApi.builder()
+            .group("관리자페이지")
+            .pathsToMatch("/api/admin/**")
             .build();
     }
 }

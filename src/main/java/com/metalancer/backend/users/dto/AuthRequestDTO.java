@@ -14,4 +14,17 @@ public class AuthRequestDTO {
         private String password;
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class PasswordRequest {
+
+        private String originalPassword;
+        private String newPassword1;
+        private String newPassword2;
+
+        public boolean newPasswordEquals() {
+            return newPassword1.equals(newPassword2);
+        }
+    }
+
 }

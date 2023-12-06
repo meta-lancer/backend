@@ -7,7 +7,7 @@ import lombok.Getter;
 public class GenreGalaxy extends Asset {
 
     @Builder
-    public GenreGalaxy(Long assetId, String title, String assetUrl, Integer price) {
-        super(assetId, title, assetUrl, price);
+    public GenreGalaxy(Long productsId, String title, String thumbnail, Integer price) {
+        super(productsId, title, thumbnail, price);
     }
 }

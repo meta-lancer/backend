@@ -25,7 +25,7 @@ public class ProductsController {
     private final ProductsService productsService;
 
     @Operation(summary = "상품 검색", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = String.class)))
     @GetMapping("/search")
     public BaseResponse<String> searchProducts(@Parameter(description = "검색어") String keyword) {
         log.info("검색어: {}", keyword);

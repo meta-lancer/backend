@@ -2,6 +2,7 @@ package com.metalancer.backend.users.dto;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
+import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.users.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,9 @@ public class AuthResponseDTO {
         private String mobile;
         private LoginType loginType;
         private DataStatus status;
+        private Role role;
+        private Long creatorId;
+        private boolean hasApproveLink;
 
         public userInfo(User user) {
             this.userId = user.getId();
@@ -31,6 +35,7 @@ public class AuthResponseDTO {
             this.mobile = user.getMobile();
             this.loginType = user.getLoginType();
             this.status = user.getStatus();
+            this.role = user.getRole();
         }
     }
 

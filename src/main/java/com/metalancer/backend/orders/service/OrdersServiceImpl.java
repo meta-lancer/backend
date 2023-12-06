@@ -68,17 +68,15 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
-        if (user == null) {
-            user = userRepository.findById(1L).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND)
-            );
-        }
+        user = userRepository.findById(user.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         String orderNo = createOrderNo();
         OrdersEntity createdOrdersEntity = OrdersEntity.builder().orderer(user)
             .orderNo(orderNo)
             .totalPrice(dto.getTotalPrice())
             .totalPaymentPrice(dto.getTotalPaymentPrice())
-            .totalPoint(dto.getTotalPoint())
+//            .totalPoint(dto.getTotalPoint())
             .build();
         ordersRepository.save(createdOrdersEntity);
         int index = 1;
@@ -152,10 +150,13 @@ public class OrdersServiceImpl implements OrdersService {
     public PaymentResponse completePayment(User user, CompleteOrder dto)
         throws IamportResponseException, IOException {
         if (user == null) {
-            user = userRepository.findById(1L).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND)
-            );
+            String orderNo = dto.getMerchantUid();
+            OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
+            user = foundOrdersEntity.getOrderer();
         }
+        user = userRepository.findById(user.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         String orderNo = dto.getMerchantUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
         DataStatus dataStatus = foundOrdersEntity.getStatus();
@@ -204,6 +205,8 @@ public class OrdersServiceImpl implements OrdersService {
         OrderPaymentEntity createdOrderPaymentEntity = OrderPaymentEntity.builder()
             .ordersEntity(foundOrdersEntity).impUid(paymentResponse.getImpUid())
             .orderNo(orderNo).paymentPrice(foundOrdersEntity.getTotalPaymentPrice())
+            .title(paymentResponse.getName())
+            .receiptUrl(paymentResponse.getReceiptUrl())
             .type(paymentResponse.getPgProvider())
             .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
             .purchasedAt(paymentResponse.getPaidAt()).build();
@@ -213,6 +216,9 @@ public class OrdersServiceImpl implements OrdersService {
 
     private PaymentResponse getPaymentResponse(User user, OrdersEntity foundOrdersEntity,
         OrderStatus orderStatus, Payment paymentResponse) {
+        user = userRepository.findById(user.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         PaymentResponse response = PaymentResponse.builder().ordererId(user.getId())
             .ordererNm(user.getName())
             .ordererPhone(user.getMobile()).ordererEmail(user.getEmail())
@@ -256,6 +262,9 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public PaymentResponse cancelAllPayment(User user, CancelAllPayment dto)
         throws IamportResponseException, IOException {
+        user = userRepository.findById(user.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         String orderNo = dto.getMerchantUid();
         String impUid = dto.getImpUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);

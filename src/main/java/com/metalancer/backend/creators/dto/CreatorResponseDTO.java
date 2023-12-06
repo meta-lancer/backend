@@ -20,4 +20,16 @@ public class CreatorResponseDTO {
         }
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class AssetUpdatedResponse {
+
+        ProductsDetail productsDetail;
+
+        @Builder
+        public AssetUpdatedResponse(ProductsDetail productsDetail) {
+            this.productsDetail = productsDetail;
+        }
+    }
+
 }

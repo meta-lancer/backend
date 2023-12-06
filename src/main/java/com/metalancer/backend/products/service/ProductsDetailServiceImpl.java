@@ -2,9 +2,13 @@ package com.metalancer.backend.products.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.InvalidParamException;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
+import com.metalancer.backend.products.entity.ProductsAssetFileEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsWishEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
@@ -14,12 +18,15 @@ import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
 import com.metalancer.backend.users.entity.CartEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
+import com.metalancer.backend.users.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,20 +43,40 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     private final ProductsThumbnailRepository productsThumbnailRepository;
     private final ProductsViewsRepository productsViewsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
+    private final UserRepository userRepository;
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
-        // 상품 조회
-        // return 도메인 url + 상품의 공유 고유번호
-        return "";
+        ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
+            DataStatus.ACTIVE);
+        return foundProductsEntity.getSharedLink();
     }
 
     @Override
     public boolean toggleProductWish(PrincipalDetails user, Long productId) {
-        // user와 상품 고유번호를 가지고 찜하기 조회
-        // 데이터가 없다면 추가, 있다면 삭제
-        // return 추가 - true, 삭제 - false
-        return false;
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
+            DataStatus.ACTIVE);
+        Optional<ProductsWishEntity> productsWishEntity = productsWishRepository.findByUserAndProduct(
+            foundUser, foundProductsEntity);
+        if (productsWishEntity.isEmpty()) {
+            ProductsWishEntity createdProductsWish = ProductsWishEntity.builder()
+                .productsEntity(foundProductsEntity)
+                .user(foundUser).build();
+            productsWishRepository.save(createdProductsWish);
+            return true;
+        }
+        ProductsWishEntity foundProductsWish = productsWishEntity.get();
+        if (foundProductsWish.getStatus().equals(DataStatus.ACTIVE)) {
+            foundProductsWish.deleteProductsWish();
+            return false;
+        } else {
+            foundProductsWish.restoreProductsWish();
+            return true;
+        }
     }
 
     @Override
@@ -57,9 +84,15 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
             DataStatus.ACTIVE);
         foundProductsEntity.addViewCnt();
-        ProductsDetail response = foundProductsEntity.toProductsDetail();
+        CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail response = foundProductsEntity.toProductsDetail(taskCnt, satisficationRate);
         if (user != null) {
             User foundUser = user.getUser();
+            foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            );
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
@@ -72,15 +105,104 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
 
-        List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
-            foundProductsEntity);
-        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
-            foundProductsEntity);
-        String zipFileUrl = productsAssetFileRepository.findUrlByProduct(foundProductsEntity);
-        AssetFile assetFile = AssetFile.builder().thumbnailUrlList(thumbnailUrlList)
-            .viewUrlList(viewUrlList).zipFileUrl(zipFileUrl)
-            .build();
+        getProductsDetailTagList(foundProductsEntity, response);
+        AssetFile assetFile = getProductsDetailAssetFileAfterUploaded(foundProductsEntity,
+            response);
+        response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
+    }
+
+    @Override
+    public ProductsDetail getProductDetailBySharedLink(PrincipalDetails user, String link) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductBySharedLinkAndStatus(
+            link,
+            DataStatus.ACTIVE);
+        foundProductsEntity.addViewCnt();
+        CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail response = foundProductsEntity.toProductsDetail(taskCnt, satisficationRate);
+        if (user != null) {
+            User foundUser = user.getUser();
+            foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+                () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+            );
+            Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
+                foundUser, foundProductsEntity);
+            response.setHasWish(foundProductsWishEntity.isPresent());
+            Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(foundUser,
+                foundProductsEntity);
+            response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
+                .equals(DataStatus.ACTIVE));
+            //        response.setHasOrder();
+        }
+        List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
+        response.setTagList(tagList);
+
+        getProductsDetailTagList(foundProductsEntity, response);
+        AssetFile assetFile = getProductsDetailAssetFile(foundProductsEntity,
+            response);
+        response.setAssetFile(assetFile);
+        response.setAssetFile(assetFile);
+        return response;
+    }
+
+    private AssetFile getProductsDetailAssetFile(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> thumbnailUrlList = getProductsThumbnailList(savedProductsEntity,
+            productsDetail);
+        log.info("썸네일 목록 조회");
+        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
+            savedProductsEntity);
+        log.info("3D 뷰 데이터 조회");
+        ProductsAssetFileEntity productsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            savedProductsEntity);
+
+        AssetFile assetFile = productsAssetFileEntity.toAssetFile();
+        assetFile.setThumbnailUrlList(thumbnailUrlList);
+        assetFile.setViewUrlList(viewUrlList);
+        assetFile.setZipFileUrl("");
+        return assetFile;
+    }
+
+    private AssetFile getProductsDetailAssetFileAfterUploaded(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> thumbnailUrlList = getProductsThumbnailList(savedProductsEntity,
+            productsDetail);
+        log.info("썸네일 목록 조회");
+        List<String> viewUrlList = productsViewsRepository.findAllUrlByProduct(
+            savedProductsEntity);
+        log.info("3D 뷰 데이터 조회");
+        ProductsAssetFileEntity productsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            savedProductsEntity);
+
+        if (!productsAssetFileEntity.getSuccess()) {
+            throw new InvalidParamException(ErrorCode.NOT_EXIST_ASSET);
+        }
+
+        AssetFile assetFile = productsAssetFileEntity.toAssetFile();
+        assetFile.setThumbnailUrlList(thumbnailUrlList);
+        assetFile.setViewUrlList(viewUrlList);
+        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
+        return assetFile;
+    }
+
+    @Nullable
+    private List<String> getProductsThumbnailList(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> thumbnailUrlList = productsThumbnailRepository.findAllUrlByProduct(
+            savedProductsEntity);
+        if (thumbnailUrlList != null && thumbnailUrlList.size() > 0) {
+            productsDetail.setThumbnail(thumbnailUrlList.get(0));
+            productsDetail.setThumbnailList(thumbnailUrlList);
+        }
+        return thumbnailUrlList;
+    }
+
+    private void getProductsDetailTagList(ProductsEntity savedProductsEntity,
+        ProductsDetail productsDetail) {
+        List<String> tagList = productsTagRepository.findTagListByProduct(savedProductsEntity);
+        productsDetail.setTagList(tagList);
     }
 }

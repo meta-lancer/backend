@@ -1,7 +1,6 @@
 package com.metalancer.backend.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.metalancer.backend.admin.domain.CreatorList;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.common.BaseEntity;
@@ -11,6 +10,9 @@ import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
+import com.metalancer.backend.interests.domain.Interests;
+import com.metalancer.backend.users.dto.UserResponseDTO.BasicInfo;
+import com.metalancer.backend.users.dto.UserResponseDTO.OtherCreatorBasicInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,6 +22,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,8 +51,14 @@ public class User extends BaseEntity implements Serializable {
     private String email;
     private String name;
     private String username;
+    private String nickname = "";
+    private LocalDateTime nicknameUpdatedAt;
     private String mobile;
     private String job;
+    private String link = "";
+    private String introduction = "";
+    private String careerIntroduction = "";
+    private String profileImg = "https://metaovis-user.s3.ap-northeast-2.amazonaws.com/default_profileImg.png";
     @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER;
     @JsonIgnore
@@ -86,6 +97,38 @@ public class User extends BaseEntity implements Serializable {
         }
     }
 
+    public void setEmailIfNotDuplicated(String email, Optional<User> optionalUser) {
+        if (optionalUser.isPresent() && optionalUser.get().getStatus().equals(DataStatus.ACTIVE)) {
+            switch (optionalUser.get().getLoginType()) {
+                case NORMAL -> throw new BaseException(ErrorCode.EMAIL_SIGNUP_DUPLICATED);
+                case KAKAO -> throw new BaseException(ErrorCode.KAKAO_SIGNUP_DUPLICATED);
+                case NAVER -> throw new BaseException(ErrorCode.NAVER_SIGNUP_DUPLICATED);
+                case GOOGLE -> throw new BaseException(ErrorCode.GOOGLE_SIGNUP_DUPLICATED);
+            }
+        }
+        this.email = email;
+    }
+
+    public void setCareerIntroduction(String careerIntroduction) {
+        this.careerIntroduction = careerIntroduction;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void setProfileImg(String profileImg) {
+        this.profileImg = profileImg;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
     public void setNormalUsername() {
         this.username = loginType.getProvider() + "_"
             + UUID.randomUUID().toString().substring(0, 10);
@@ -105,6 +148,10 @@ public class User extends BaseEntity implements Serializable {
 
     public void update() {
 
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setRole(Role role) {
@@ -140,6 +187,17 @@ public class User extends BaseEntity implements Serializable {
         ;
     }
 
+    public void isOriginalPasswordMatch(PasswordEncoder passwordEncoder, String password) {
+        if (!passwordEncoder.matches(password, this.password)) {
+            throw new BaseException((ErrorCode.PASSWORD_NOT_MATCHED));
+        }
+        ;
+    }
+
+    public void changeNewPassword(PasswordEncoder passwordEncoder, String newPassword) {
+        this.password = passwordEncoder.encode(newPassword);
+    }
+
     public MemberList toAdminMemberList() {
         return MemberList.builder()
             .memberId(id)
@@ -170,20 +228,44 @@ public class User extends BaseEntity implements Serializable {
             .build();
     }
 
-    public CreatorList toAdminCreatorList() {
-        return CreatorList.builder()
-            .memberId(id)
-            .email(email)
-            .mobile(mobile)
-            .name(name)
-            .username(username)
-            .job(job)
-            .loginType(loginType)
-            .role(role)
-            .status(getStatus())
-            .createdAt(getCreatedAt())
-            .updatedAt(getUpdatedAt())
-            .build();
+    public void updateBasicInfo(String profileImg, String nickname, String introduction,
+        String link, String job) {
+        setNicknameUpdatedAt(this.nickname, nickname);
+        this.profileImg = profileImg;
+        this.nickname = nickname;
+        this.introduction = introduction;
+        this.link = link;
+        this.job = job;
     }
 
+    public BasicInfo toBasicInfo(List<Interests> interests) {
+        return BasicInfo.builder().profileImg(profileImg)
+            .nickname(nickname)
+            .email(email)
+            .job(job).link(link)
+            .introduction(introduction).interestsList(interests).build();
+    }
+
+    public OtherCreatorBasicInfo toOtherCreatorBasicInfo() {
+        return OtherCreatorBasicInfo.builder().profileImg(profileImg)
+            .nickname(nickname)
+            .email(email)
+            .link(link)
+            .introduction(introduction).build();
+    }
+
+    public boolean checkNicknameUpdatedBefore() {
+        return nicknameUpdatedAt != null;
+    }
+
+    public void setNicknameUpdatedAt(String originNickname, String newNickname) {
+        if (!originNickname.equals(newNickname)) {
+            this.nicknameUpdatedAt = LocalDateTime.now();
+        }
+    }
+
+    public void deleteUser() {
+        this.email = "(deleted)" + email;
+        delete();
+    }
 }

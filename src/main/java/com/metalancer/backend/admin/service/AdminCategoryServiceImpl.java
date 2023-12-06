@@ -2,6 +2,7 @@ package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
+import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.repository.GenreGalaxyTypeRepository;
 import com.metalancer.backend.category.repository.HotPickTypeRepository;
 import com.metalancer.backend.category.repository.ProductsRequestTypeRepository;
@@ -30,7 +31,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     }
 
     @Override
-    public List<MainCategory> getAdminTrendSpotlightCategoryList() {
+    public List<TrendSpotlightCategory> getAdminTrendSpotlightCategoryList() {
 
         return trendSpotlightTypeRepository.getTrendSpotlightCategoryList();
     }

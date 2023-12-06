@@ -10,6 +10,9 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 @Configuration
 @EnableRedisHttpSession
 public class RedisConfig extends AbstractHttpSessionApplicationInitializer {
@@ -31,8 +34,42 @@ public class RedisConfig extends AbstractHttpSessionApplicationInitializer {
     @Bean
     public DefaultCookieSerializer defaultCookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+
+//        if (isLocalEnvironment()) {
+//            serializer.setUseSecureCookie(false); // Use non-secure cookies for HTTP in local env
+//            serializer.setSameSite(null);  // Might help in some local scenarios
+//            // ... any other local configurations
+//        }
+//        else {
+
         serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // Match main domain
+//        }
         return serializer;
+
+
+//        if (isLocalEnvironment()) {
+//            // Local environment-specific configurations
+//            serializer.setUseSecureCookie(false); // Use non-secure cookies for HTTP in local env
+//            serializer.setSameSite(null);  // This might help in some local scenarios
+//        } else {
+//            // Production or non-local environment-specific configurations
+//            serializer.setUseSecureCookie(true); // Ensure cookies are sent over HTTPS only
+//            serializer.setSameSite("none");     // Set SameSite to 'none'
+//            serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // Match main domain
+//        }
+//        return serializer;
+
     }
 
+    private boolean isLocalEnvironment() {
+        // Your logic to determine if the environment is local,
+        // e.g., based on a specific profile or environment variable.
+        try {
+            String hostname = InetAddress.getLocalHost().getHostName();
+            return "localhost".equalsIgnoreCase(hostname) || "127.0.0.1".equals(hostname);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

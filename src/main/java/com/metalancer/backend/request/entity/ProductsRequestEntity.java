@@ -66,12 +66,15 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
     }
 
     public ProductsRequest toDomain() {
-        return ProductsRequest.builder().writerId(writer.getId()).nickname(writer.getName())
-            .profileImg("")
+        return ProductsRequest.builder().productsRequestId(id).writerId(writer.getId())
+            .nickname(writer.getNickname())
+            .profileImg(writer.getProfileImg())
             .productsRequestStatus(productsRequestStatus)
             .title(title).content(content).createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
             .createdAtKor(Time.convertDateToKorForRequest(getCreatedAt()))
             .updatedAtKor(Time.convertDateToKorForRequest(getUpdatedAt()))
+            .createdAtEng(Time.convertDateToEngForRequest(getCreatedAt()))
+            .updatedAtEng(Time.convertDateToEngForRequest(getUpdatedAt()))
             .build();
     }
 

@@ -1,12 +1,14 @@
 package com.metalancer.backend.category.entity;
 
-import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
+import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.AccessLevel;
@@ -30,18 +32,23 @@ public class TrendSpotlightTypeEntity extends BaseTimeEntity implements Serializ
     @Column(name = "trend_spotlight_type_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-    @Column(nullable = false)
-    private String nameKor;
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private TagsEntity tagsEntity;
+
+    private String thumbnail;
 
     @Builder
-    public TrendSpotlightTypeEntity(String name, String nameKor) {
-        this.name = name;
-        this.nameKor = nameKor;
+    public TrendSpotlightTypeEntity(TagsEntity tagsEntity, String thumbnail) {
+        this.tagsEntity = tagsEntity;
+        this.thumbnail = thumbnail;
     }
 
-    public MainCategory ToMainCategory() {
-        return MainCategory.builder().name(name).nameKor(nameKor).build();
+    public TrendSpotlightCategory ToMainCategory() {
+        String tagName = tagsEntity != null ? tagsEntity.getTagNameEn() : "all";
+        String tagNameKor = tagsEntity != null ? tagsEntity.getTagName() : "전체";
+        return TrendSpotlightCategory.builder().name(tagName)
+            .nameKor(tagNameKor).thumbnail(thumbnail)
+            .build();
     }
 }

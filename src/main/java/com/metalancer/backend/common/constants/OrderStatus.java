@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum OrderStatus {
-    PAY_ING("주문중"), PAY_DONE("주문완료"), PAY_CONFIRM("구매확정"), CLAIM_REQUEST("교환/환불 접수"),
-    CLAIM_ING("교환/환불 처리중"), CLAIM_DONE("교환/환불 완료");
+    PAY_ING("주문중"), PAY_DONE("진행중"), PAY_CONFIRM("구매확정"), CANCEL_DONE("주문 취소"),
+    CLAIM_DONE("취소/문제해결"), CLAIM_ING("분쟁 조정 중");
 
     private final String korName;
 

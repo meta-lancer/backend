@@ -11,17 +11,11 @@ import com.metalancer.backend.request.dto.ProductsRequestDTO.Create;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Update;
 import com.metalancer.backend.request.entity.ProductsRequestAndTypeEntity;
 import com.metalancer.backend.request.entity.ProductsRequestEntity;
-import com.metalancer.backend.request.entity.QProductsRequestAndTypeEntity;
-import com.metalancer.backend.request.entity.QProductsRequestEntity;
 import com.metalancer.backend.users.entity.User;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +24,6 @@ import org.springframework.stereotype.Repository;
 public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
     ProductsRequestRepositoryCustom {
 
-    private final JPAQueryFactory queryFactory;
     private final ProductsRequestJpaRepository productsRequestJpaRepository;
     private final ProductsRequestTypeJpaRepository productsRequestTypeJpaRepository;
     private final ProductsRequestAndTypeJpaRepository productsRequestAndTypeJpaRepository;
@@ -38,25 +31,27 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
     @Override
     public Page<ProductsRequest> findAll(List<String> requestTypeOptions,
         Pageable pageable) {
-        QProductsRequestEntity qProductsRequestEntity = QProductsRequestEntity.productsRequestEntity;
-        BooleanBuilder whereClause = new BooleanBuilder();
-        DataStatus activeStatus = DataStatus.ACTIVE;
-        setWhereClauseWithRequestTypeOptions(requestTypeOptions, whereClause);
-        whereClause.and(qProductsRequestEntity.status.eq(activeStatus));
-        List<ProductsRequestEntity> productsRequests = queryFactory.selectFrom(
-                qProductsRequestEntity)
-            .where(whereClause)
-            .offset(pageable.getOffset())
-            .orderBy(
-                qProductsRequestEntity.createdAt.desc()
-            )
-            .limit(pageable.getPageSize())
-            .fetch();
-        long total = queryFactory.selectFrom(qProductsRequestEntity).where(whereClause)
-            .fetchCount();
-        List<ProductsRequest> response = productsRequests.stream()
-            .map(ProductsRequestEntity::toDomain).toList();
-        return new PageImpl<>(response, pageable, total);
+        Page<ProductsRequest> response = null;
+        if (requestTypeOptions != null && requestTypeOptions.size() > 0) {
+            response = productsRequestJpaRepository.findAllByRequestTypeOptions(
+                requestTypeOptions,
+                pageable).map(ProductsRequestEntity::toDomain);
+        } else {
+            response = productsRequestJpaRepository.findAllByStatusOrderByCreatedAtDesc(
+                    DataStatus.ACTIVE, pageable)
+                .map(ProductsRequestEntity::toDomain);
+        }
+        for (ProductsRequest productsRequest : response) {
+            ProductsRequestEntity productsRequestEntity = productsRequestJpaRepository.findById(
+                productsRequest.getProductsRequestId()).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND)
+            );
+            List<RequestCategory> requestCategoryList = getRequestCategories(
+                productsRequestEntity);
+            productsRequest.setProductionRequestTypeList(requestCategoryList);
+        }
+
+        return response;
     }
 
     @Override
@@ -118,10 +113,12 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
     private void createProductsRequestAndType(ProductsRequestEntity createdProductsRequestEntity,
         String productsRequestType) {
         ProductsRequestTypeEntity productsRequestTypeEntity = productsRequestTypeJpaRepository.findByName(
-            productsRequestType).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+                productsRequestType)
+            .orElseThrow(() -> new NotFoundException("제작요청 카테고리: ", ErrorCode.NOT_FOUND));
         ProductsRequestAndTypeEntity productsRequestAndTypeEntity = ProductsRequestAndTypeEntity.builder()
             .productsRequestEntity(createdProductsRequestEntity)
-            .productsRequestTypeEntity(productsRequestTypeEntity)
+            .productsRequestTypeEn(productsRequestTypeEntity.getName())
+            .productsRequestTypeKor(productsRequestTypeEntity.getNameKor())
             .build();
         productsRequestAndTypeJpaRepository.save(productsRequestAndTypeEntity);
     }
@@ -131,6 +128,7 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         ProductsRequestEntity productsRequestEntity) {
         productsRequestEntity.update(dto.getTitle(),
             dto.getContent(), dto.getProductsRequestStatus());
+        updateRequestTypeList(dto, productsRequestEntity);
         ProductsRequest response = productsRequestEntity.toDomain();
         List<RequestCategory> requestCategoryList = getRequestCategories(
             productsRequestEntity);
@@ -141,14 +139,12 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         return response;
     }
 
-    private void setWhereClauseWithRequestTypeOptions(List<String> requestTypeOptions,
-        BooleanBuilder whereClause) {
-        for (String requestTypeOption : requestTypeOptions) {
-            Optional<ProductsRequestTypeEntity> typeEntity = productsRequestTypeJpaRepository.findByName(
-                requestTypeOption);
-            typeEntity.ifPresent(productsRequestTypeEntity -> whereClause.or(
-                QProductsRequestAndTypeEntity.productsRequestAndTypeEntity.productsRequestTypeEntity.eq(
-                    productsRequestTypeEntity)));
+    private void updateRequestTypeList(Update dto, ProductsRequestEntity productsRequestEntity) {
+        List<ProductsRequestAndTypeEntity> productsRequestAndTypeEntities = productsRequestAndTypeJpaRepository.findAllByProductsRequestEntity(
+            productsRequestEntity);
+        productsRequestAndTypeJpaRepository.deleteAll(productsRequestAndTypeEntities);
+        for (String requestType : dto.getProductionRequestTypeList()) {
+            createProductsRequestAndType(productsRequestEntity, requestType);
         }
     }
 }

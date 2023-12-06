@@ -16,6 +16,7 @@ public class AssetFile {
     private boolean animationStatus;
     private boolean riggingStatus;
     private String extensionList;
+    // 수정일 기준!
     private String recentReleaseDate;
     private String support;
     private String copyRight;
@@ -23,14 +24,11 @@ public class AssetFile {
     // 파일
 
     @Builder
-    public AssetFile(List<String> thumbnailUrlList, List<String> viewUrlList, String zipFileUrl,
+    public AssetFile(
         String productionProgram, String compatibleProgram, double fileSize,
         boolean animationStatus, boolean riggingStatus, String extensionList,
         String recentReleaseDate,
         String support, String copyRight, String recentVersion) {
-        this.thumbnailUrlList = thumbnailUrlList;
-        this.viewUrlList = viewUrlList;
-        this.zipFileUrl = zipFileUrl;
         this.productionProgram = productionProgram;
         this.compatibleProgram = compatibleProgram;
         this.fileSize = fileSize;
@@ -41,5 +39,17 @@ public class AssetFile {
         this.support = support;
         this.copyRight = copyRight;
         this.recentVersion = recentVersion;
+    }
+
+    public void setThumbnailUrlList(List<String> thumbnailUrlList) {
+        this.thumbnailUrlList = thumbnailUrlList;
+    }
+
+    public void setViewUrlList(List<String> viewUrlList) {
+        this.viewUrlList = viewUrlList;
+    }
+
+    public void setZipFileUrl(String zipFileUrl) {
+        this.zipFileUrl = zipFileUrl;
     }
 }

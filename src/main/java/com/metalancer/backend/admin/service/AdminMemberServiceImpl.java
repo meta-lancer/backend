@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.MemberDetail;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.admin.dto.AdminMemberDTO.Approve;
@@ -10,7 +11,9 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.users.entity.ApproveLink;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.UserRepository;
@@ -31,6 +34,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
     private final UserRepository userRepository;
     private final ApproveLinkRepository approveLinkRepository;
+    private final CreatorRepository creatorRepository;
 
     @Override
     public List<MemberList> getAdminMemberList() {
@@ -46,22 +50,21 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             .filter(user -> user.getStatus().equals(DataStatus.PENDING))
             .toList();
         for (RegisterList registerMember : response) {
-            ApproveLink foundApproveLink = approveLinkRepository.findByEmail(
-                    registerMember.getEmail())
-                .orElseThrow(
-                    () -> new BaseException(ErrorCode.NOT_FOUND)
-                );
-            String approveLink = foundApproveLink.getApproveLink();
-            String receivedEmail = foundApproveLink.getEmail();
-            boolean approveStatus = foundApproveLink.isApproved();
-            registerMember.setApproveInfo(approveLink, receivedEmail, approveStatus);
+            Optional<ApproveLink> foundApproveLink = approveLinkRepository.findByEmail(
+                registerMember.getEmail());
+            if (foundApproveLink.isPresent()) {
+                String approveLink = foundApproveLink.get().getApproveLink();
+                String receivedEmail = foundApproveLink.get().getEmail();
+                boolean approveStatus = foundApproveLink.get().isApproved();
+                registerMember.setApproveInfo(approveLink, receivedEmail, approveStatus);
+            }
         }
         return response;
     }
 
     @Override
     public List<CreatorList> getAdminCreatorList() {
-        return userRepository.findAll().stream().map(User::toAdminCreatorList)
+        return creatorRepository.findAll().stream().map(CreatorEntity::toAdminCreatorList)
             .filter(user -> user.getRole().equals(Role.ROLE_SELLER))
             .collect(Collectors.toList());
     }
@@ -87,17 +90,55 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return updatedUser.toAdminMemberList();
     }
 
+    @Override
+    public String deleteMember(Long memberId) {
+        User user = userRepository.findById(memberId).orElseThrow(
+            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+        );
+//        userRepository.delete(user);
+        Optional<ApproveLink> approveLink = approveLinkRepository.findByEmail(user.getEmail());
+        approveLink.ifPresent(ApproveLink::deleteLink);
+        user.deleteUser();
+        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(user,
+            DataStatus.ACTIVE);
+        creator.ifPresent(CreatorEntity::deleteCreator);
+        return "삭제했습니다.";
+    }
+
+    @Override
+    public String improveToCreator(Long memberId) {
+        User user = userRepository.findById(memberId).orElseThrow(
+            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+        );
+        user.changeToCreator();
+        CreatorEntity createdCreator = CreatorEntity.builder().user(user)
+            .email(user.getEmail()).build();
+        creatorRepository.save(createdCreator);
+        return "판매자 전환했습니다.";
+    }
+
+    @Override
+    public MemberDetail getAdminMemberDetail(Long memberId) {
+        User user = userRepository.findById(memberId).orElseThrow(
+            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+        );
+        Optional<CreatorEntity> creator = creatorRepository.findOptionalByUserAndStatus(user,
+            DataStatus.ACTIVE);
+        boolean isCreator = creator.isPresent();
+        return MemberDetail.builder().user(user).isCreator(isCreator).build();
+    }
+
     private String adminApproveMember(List<User> userList) {
         int count = 0;
         for (User user : userList) {
             user.setActive();
-            Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApproved(
-                user.getEmail(), false);
-            if (approveLink.isPresent()) {
-                approveLink.get().approve();
-                count++;
-            }
+            Optional<ApproveLink> approveLink = approveLinkRepository.findByEmailAndApprovedAtIsNull(
+                user.getEmail());
+            approveLink.ifPresent(ApproveLink::approve);
+            count++;
         }
         return count + "명 승인 완료했습니다.";
     }
+
+
 }

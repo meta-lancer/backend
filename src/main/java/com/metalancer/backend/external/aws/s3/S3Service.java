@@ -11,6 +11,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.metalancer.backend.common.constants.AssetType;
+import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.exception.BaseException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
@@ -54,9 +56,19 @@ public class S3Service {
             .build();
     }
 
-    public String getAssetFilePresignedUrl(Long productsId) {
+    public String getAssetFilePresignedUrl(Long productsId, String fileName) {
         String prefix = "asset/" + productsId + "/zip";
-        String fileName = UUID.randomUUID().toString().substring(0, 8) + ".zip";
+        fileName = prefix + "/" + fileName;
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(
+            fileName);
+        URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
+    public String getThumbnailPresignedUrl(Long productsId, String randomFileName,
+        String extension) {
+        String fileName = randomFileName + "." + extension;
+        String prefix = "asset/" + productsId + "/thumbnail";
         fileName = prefix + "/" + fileName;
         GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(
             fileName);
@@ -129,4 +141,14 @@ public class S3Service {
         URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
     }
+
+    public String extractBaseUrl(String signedUrl) {
+        try {
+            URL url = new URL(signedUrl);
+            return url.getProtocol() + "://" + url.getHost() + url.getPath();
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.SHORTEN_URL_FAILED);
+        }
+    }
+
 }

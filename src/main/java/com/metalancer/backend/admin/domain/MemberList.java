@@ -1,4 +1,4 @@
-package com.metalancer.backend.admin.dto;
+package com.metalancer.backend.admin.domain;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
@@ -17,7 +17,7 @@ public class MemberList {
     private String mobile;
     private String job;
     private Role role;
-    private LoginType loginType;
+    private String loginType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private DataStatus status;
@@ -34,7 +34,7 @@ public class MemberList {
         this.mobile = mobile;
         this.job = job;
         this.role = role;
-        this.loginType = loginType;
+        this.loginType = loginType.getProvider();
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.status = status;

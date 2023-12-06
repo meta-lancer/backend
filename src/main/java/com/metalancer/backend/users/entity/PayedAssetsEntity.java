@@ -60,20 +60,24 @@ public class PayedAssetsEntity extends BaseEntity implements Serializable {
     @Builder
     public PayedAssetsEntity(User user, ProductsEntity products,
         OrderProductsEntity orderProductsEntity, OrderPaymentEntity orderPaymentEntity,
-        Integer downloadedCnt, String downloadLink) {
+        String downloadLink) {
         this.user = user;
         this.products = products;
         this.orderProductsEntity = orderProductsEntity;
         this.orderPaymentEntity = orderPaymentEntity;
-        this.downloadedCnt = downloadedCnt;
         this.downloadLink = downloadLink;
     }
 
     public PayedAssets toDomain() {
-        return PayedAssets.builder().payedAssetsId(id).orderNo(orderProductsEntity.getOrderNo())
-            .orderProductNo(orderProductsEntity.getOrderProductNo()).productsId(
-                products.getId()).title(products.getTitle())
-            .purchasedAt(orderPaymentEntity.getPurchasedAt()).thumbnail(products.getThumbnail())
-            .downloadedCnt(downloadedCnt).downloadLink(downloadLink).build();
+        User seller = orderProductsEntity.getProductsEntity().getCreatorEntity().getUser();
+        return PayedAssets.builder()
+            .payedAssetsId(id).orderNo(orderProductsEntity.getOrderNo())
+            .orderProductNo(orderProductsEntity.getOrderProductNo()).productsId(products.getId())
+            .title(products.getTitle()).purchasedAt(orderPaymentEntity.getPurchasedAt())
+            .thumbnail(products.getThumbnail()).downloadedCnt(downloadedCnt)
+            .downloadLink(downloadLink).sellerName(seller.getName())
+            .sellerNickname(seller.getNickname()).sellerPhone(seller.getMobile())
+            .price(orderPaymentEntity.getOrdersEntity().getTotalPrice())
+            .build();
     }
 }

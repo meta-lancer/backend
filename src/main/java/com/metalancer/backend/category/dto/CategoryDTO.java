@@ -23,6 +23,22 @@ public class CategoryDTO {
 
     @Data
     @NoArgsConstructor
+    public static class TrendSpotlightCategory {
+
+        private String name;
+        private String nameKor;
+        private String thumbnail;
+
+        @Builder
+        public TrendSpotlightCategory(String name, String nameKor, String thumbnail) {
+            this.name = name;
+            this.nameKor = nameKor;
+            this.thumbnail = thumbnail;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class RequestCategory {
 
         private String name;

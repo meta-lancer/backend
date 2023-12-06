@@ -14,6 +14,10 @@ public class PayedAssets {
     private String orderProductNo;
     private Long productsId;
     private String title;
+    private int price;
+    private String sellerNickname;
+    private String sellerName;
+    private String sellerPhone;
     private String thumbnail;
     private LocalDateTime purchasedAt;
     private Integer downloadedCnt;
@@ -22,12 +26,17 @@ public class PayedAssets {
     @Builder
     public PayedAssets(Long payedAssetsId, String orderNo, String orderProductNo, Long productsId,
         String title,
+        int price, String sellerNickname, String sellerName, String sellerPhone,
         String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink) {
         this.payedAssetsId = payedAssetsId;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.productsId = productsId;
         this.title = title;
+        this.price = price;
+        this.sellerNickname = sellerNickname;
+        this.sellerName = sellerName;
+        this.sellerPhone = sellerPhone;
         this.thumbnail = thumbnail;
         this.purchasedAt = purchasedAt;
         this.downloadedCnt = downloadedCnt;

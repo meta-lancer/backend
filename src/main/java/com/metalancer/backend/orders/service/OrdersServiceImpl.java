@@ -71,7 +71,9 @@ public class OrdersServiceImpl implements OrdersService {
         user = userRepository.findById(user.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
+        // 포트원용 주문번호 만들기
         String orderNo = createOrderNo();
+        // # 주문서 entity만들기
         OrdersEntity createdOrdersEntity = OrdersEntity.builder().orderer(user)
             .orderNo(orderNo)
             .totalPrice(dto.getTotalPrice())
@@ -79,9 +81,14 @@ public class OrdersServiceImpl implements OrdersService {
 //            .totalPoint(dto.getTotalPoint())
             .build();
         ordersRepository.save(createdOrdersEntity);
+
+        // # 상품 고유번호를 가지고 가격 조회 + 주문상품 생성
+        // 주문상품에 붙일 주문상품번호
         int index = 1;
         for (Long productsId : dto.getProductsIdList()) {
+            // 상품 조회
             ProductsEntity foundProductEntity = productsRepository.findProductById(productsId);
+            // 만약 상품의 할인가가 없다면 원래 금액으로
             Integer price =
                 foundProductEntity.getSalePrice() == null ? foundProductEntity.getPrice()
                     : foundProductEntity.getSalePrice();
@@ -93,6 +100,8 @@ public class OrdersServiceImpl implements OrdersService {
                 .build();
             orderProductsRepository.save(createdOrderProductsEntity);
         }
+
+        // response 만들기
         CreatedOrder response = createdOrdersEntity.toCreatedOrderDomain();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
             createdOrdersEntity);
@@ -268,14 +277,14 @@ public class OrdersServiceImpl implements OrdersService {
         String orderNo = dto.getMerchantUid();
         String impUid = dto.getImpUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
-        cancelPayments(impUid, dto.getMerchantUid(),
+        portoneCancelPayments(impUid, dto.getMerchantUid(),
             BigDecimal.valueOf(foundOrdersEntity.getTotalPaymentPrice()),
             dto.getReason());
         cancelOrder(foundOrdersEntity);
         return null;
     }
 
-    private IamportResponse<Payment> cancelPayments(String impUid, String merchantUid,
+    private IamportResponse<Payment> portoneCancelPayments(String impUid, String merchantUid,
         BigDecimal amount,
         String reason)
         throws IamportResponseException, IOException {

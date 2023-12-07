@@ -1,5 +1,6 @@
 package com.metalancer.backend.users.domain;
 
+import com.metalancer.backend.common.utils.Time;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class PayedAssets {
     private String sellerName;
     private String sellerPhone;
     private String thumbnail;
-    private LocalDateTime purchasedAt;
+    private String purchasedAt;
     private Integer downloadedCnt;
     private String downloadLink;
 
@@ -38,7 +39,7 @@ public class PayedAssets {
         this.sellerName = sellerName;
         this.sellerPhone = sellerPhone;
         this.thumbnail = thumbnail;
-        this.purchasedAt = purchasedAt;
+        this.purchasedAt = Time.convertDateToStringWithDot(purchasedAt);
         this.downloadedCnt = downloadedCnt;
         this.downloadLink = downloadLink;
     }

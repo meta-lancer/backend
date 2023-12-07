@@ -68,6 +68,8 @@ public class AuthServiceImpl implements AuthService {
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
         createdApproveLink(foundUser);
+        // ## 포트원 심사를 위해 크리에이터 전환
+        createCreator(foundUser);
         return foundUser.getId();
     }
 
@@ -167,6 +169,8 @@ public class AuthServiceImpl implements AuthService {
         User foundUser = userRepository.findByEmail(foundApproveLink.getEmail())
             .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
         foundUser.setActive();
+        String randomNickName = "";
+        foundUser.setFirstNickName(randomNickName);
 
         Optional<CreatorEntity> foundCreator = creatorRepository.findOptionalByUserAndStatus(
             foundUser, DataStatus.PENDING);
@@ -222,10 +226,15 @@ public class AuthServiceImpl implements AuthService {
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
         foundUser.setActive();
+        String randomNickName = "";
+        foundUser.setFirstNickName(randomNickName);
 //        createdApproveLink(foundUser);
-        if (!dto.isNormalUser()) {
-            createCreator(foundUser);
-        }
+
+        // # 포트원 심사를 위해 무조건 허용
+//        if (!dto.isNormalUser()) {
+        // 심사 필요없음
+        createCreatorWithOAuthUser(foundUser);
+//        }
         return foundUser.getId();
     }
 
@@ -234,6 +243,13 @@ public class AuthServiceImpl implements AuthService {
             .email(foundUser.getEmail()).build();
         creatorRepository.save(createdCreator);
         createdCreator.setPending();
+    }
+
+    private void createCreatorWithOAuthUser(User foundUser) {
+        CreatorEntity createdCreator = CreatorEntity.builder().user(foundUser)
+            .email(foundUser.getEmail()).build();
+        creatorRepository.save(createdCreator);
+
     }
 
     public void hasPrincipalDetails(PrincipalDetails user) {

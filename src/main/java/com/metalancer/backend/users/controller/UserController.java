@@ -150,7 +150,7 @@ public class UserController {
     @GetMapping("/payment/list")
     public BaseResponse<Page<PayedOrder>> getPaymentList(
         @AuthenticationPrincipal PrincipalDetails user,
-        @RequestParam(value = "type", required = false) String type,
+        @RequestParam(value = "status", required = false) String status,
         @RequestParam("beginDate") String beginDate,
         @RequestParam("endDate") String endDate,
         Pageable pageable) {
@@ -158,7 +158,7 @@ public class UserController {
         log.info("로그인되어있는 유저: {}", user);
         validateUserAuthentication(user);
         return new BaseResponse<Page<PayedOrder>>(
-            userService.getPaymentList(user, type, beginDate, endDate, adjustedPageable));
+            userService.getPaymentList(user, status, beginDate, endDate, adjustedPageable));
     }
 
     @Operation(summary = "마이페이지 - 구매 관리(유저의 구매한 에셋 목록 조회)", description = "구매 상태 api 활용. 전체 상태는 그냥 status=로 보내면 됩니다. 혹은 status=PAY_DONE 처럼")

@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<PayedOrder> getPaymentList(PrincipalDetails user, String type, String beginDate,
+    public Page<PayedOrder> getPaymentList(PrincipalDetails user, String status, String beginDate,
         String endDate, Pageable pageable) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
@@ -115,6 +115,12 @@ public class UserServiceImpl implements UserService {
         );
         LocalDateTime beginAt = convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = convertDateToLocalDateTime(endDate);
+        OrderStatus orderStatus = !status.isEmpty() ? OrderStatus.valueOf(status) : null;
+
+        if (orderStatus != null) {
+            return orderPaymentRepository.findAllByUserWithOrderStatusAndDateOption(
+                foundUser, pageable, beginAt, endAt, orderStatus);
+        }
         return orderPaymentRepository.findAllByUserWithDateOption(
             foundUser, pageable, beginAt, endAt);
     }
@@ -173,7 +179,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private static LocalDateTime convertDateToLocalDateTime(String dateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date = LocalDate.parse(dateString, formatter);
         return date.atStartOfDay();
     }

@@ -34,7 +34,7 @@ public interface UserService {
 
     BasicInfo updateBasicInfo(PrincipalDetails user, UpdateBasicInfo dto);
 
-    Page<PayedOrder> getPaymentList(PrincipalDetails user, String type, String beginDate,
+    Page<PayedOrder> getPaymentList(PrincipalDetails user, String status, String beginDate,
         String endDate,
         Pageable adjustedPageable);
 

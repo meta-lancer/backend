@@ -69,6 +69,7 @@ public class AuthServiceImpl implements AuthService {
         setAgreement(foundUser, dto);
         createdApproveLink(foundUser);
         // ## 포트원 심사를 위해 크리에이터 전환
+        foundUser.changeToCreator();
         createCreator(foundUser);
         return foundUser.getId();
     }
@@ -246,6 +247,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void createCreatorWithOAuthUser(User foundUser) {
+  
         CreatorEntity createdCreator = CreatorEntity.builder().user(foundUser)
             .email(foundUser.getEmail()).build();
         creatorRepository.save(createdCreator);

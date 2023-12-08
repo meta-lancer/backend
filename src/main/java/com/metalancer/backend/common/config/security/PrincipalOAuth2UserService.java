@@ -81,7 +81,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
 //                .marketingAgree(true).statusAgree(
 //                    true).build();
 //            userAgreementRepository.save(savedUserAgreementEntity);
-
+            user.changeToCreator();
             user = userRepository.save(user);
             userRepository.findById(user.getId()).orElseThrow(
                 () -> new BaseException(ErrorCode.SIGNUP_FAILED)

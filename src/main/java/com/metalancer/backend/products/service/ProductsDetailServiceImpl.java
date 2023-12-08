@@ -162,7 +162,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl("");
+      
         return assetFile;
     }
 
@@ -184,7 +184,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
+
         return assetFile;
     }
 

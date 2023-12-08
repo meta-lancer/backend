@@ -93,7 +93,7 @@ public class AdminProductsServiceImpl implements AdminProductsService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
+//        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
         return assetFile;
     }
 

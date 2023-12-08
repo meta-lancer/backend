@@ -9,7 +9,6 @@ public class AssetFile {
 
     private List<String> thumbnailUrlList;
     private List<String> viewUrlList;
-    private String zipFileUrl;
     private String productionProgram;
     private String compatibleProgram;
     private double fileSize;
@@ -49,7 +48,4 @@ public class AssetFile {
         this.viewUrlList = viewUrlList;
     }
 
-    public void setZipFileUrl(String zipFileUrl) {
-        this.zipFileUrl = zipFileUrl;
-    }
 }

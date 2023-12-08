@@ -113,7 +113,7 @@ public class CreatorServiceImpl implements CreatorService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
+
         return assetFile;
     }
 

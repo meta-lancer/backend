@@ -8,6 +8,7 @@ import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
@@ -76,6 +77,14 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     }
 
     public void update(AssetUpdate dto) {
+        this.title = dto.getTitle();
+        this.price = dto.getPrice();
+        this.assetDetail = dto.getAssetDetail();
+        this.assetNotice = dto.getAssetNotice();
+        this.assetCopyRight = dto.getCopyRight();
+    }
+
+    public void update(AssetUpdateWithOutThumbnail dto) {
         this.title = dto.getTitle();
         this.price = dto.getPrice();
         this.assetDetail = dto.getAssetDetail();

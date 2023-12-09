@@ -5,6 +5,7 @@ import com.metalancer.backend.common.BaseTimeEntity;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.products.domain.AssetFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -90,6 +91,19 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
     }
 
     public void update(ProductsEntity productsEntity, AssetUpdate dto) {
+        this.productsEntity = productsEntity;
+        this.productionProgram = String.join(", ", dto.getProductionProgram());
+        this.compatibleProgram = String.join(", ", dto.getCompatibleProgram());
+        this.fileSize = dto.getFileSize();
+        this.animation = dto.getAnimation();
+        this.rigging = dto.getRigging();
+        this.extList = String.join(", ", dto.getExtList());
+        this.support = dto.getSupport();
+        this.copyRight = dto.getCopyRight();
+        this.recentVersion = dto.getRecentVersion();
+    }
+
+    public void update(ProductsEntity productsEntity, AssetUpdateWithOutThumbnail dto) {
         this.productsEntity = productsEntity;
         this.productionProgram = String.join(", ", dto.getProductionProgram());
         this.compatibleProgram = String.join(", ", dto.getCompatibleProgram());

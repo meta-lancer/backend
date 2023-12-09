@@ -3,6 +3,7 @@ package com.metalancer.backend.creators.service;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
@@ -35,4 +36,7 @@ public interface CreatorService {
     AssetUpdatedResponse updateAsset(Long productsId, User user, AssetUpdate dto);
 
     String getThumbnailPreSignedUrl(Long productsId, String extension);
+
+    AssetUpdatedResponse updateAssetWithFile(MultipartFile[] thumbnails, Long productsId, User user,
+        AssetUpdateWithOutThumbnail dto);
 }

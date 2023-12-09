@@ -9,6 +9,7 @@ import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.service.CreatorReadService;
@@ -65,7 +66,7 @@ public class MyCreatorsController {
             creatorService.createAsset(user.getUser(), thumbnails, views, dto));
     }
 
-    @Operation(summary = "에셋 수정", description = "썸네일 업로드 다 하고나서 순서대로 url만 보내주시면 됩니다. 만약, 보낸 이미지들이 없으면 업데이트 하지 않습니다(수정된 썸네일이 없으면 보낼지 안 보낼지는 편하게 알아서 해주시면 됩니다.)")
+    @Operation(summary = "에셋 수정(url버전)", description = "썸네일 업로드 다 하고나서 순서대로 url만 보내주시면 됩니다. 만약, 보낸 이미지들이 없으면 업데이트 하지 않습니다(수정된 썸네일이 없으면 보낼지 안 보낼지는 편하게 알아서 해주시면 됩니다.)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetUpdatedResponse.class))),
         @ApiResponse(responseCode = "422 - E004", description = "등록자만 접근 가능", content = @Content(schema = @Schema(implementation = BaseResponse.class)))})
@@ -74,8 +75,24 @@ public class MyCreatorsController {
         @PathVariable Long productsId,
         @RequestBody(required = true) CreatorRequestDTO.AssetUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("에셋 수정(url) DTO - {}", dto);
         return new BaseResponse<AssetUpdatedResponse>(
             creatorService.updateAsset(productsId, user.getUser(), dto));
+    }
+
+    @Operation(summary = "에셋 수정(file버전)", description = "만약, 보낸 이미지들이 없으면 업데이트 하지 않습니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetUpdatedResponse.class))),
+        @ApiResponse(responseCode = "422 - E004", description = "등록자만 접근 가능", content = @Content(schema = @Schema(implementation = BaseResponse.class)))})
+    @PatchMapping("/{productsId}/file")
+    public BaseResponse<AssetUpdatedResponse> updateAssetWithFile(
+        @PathVariable Long productsId,
+        @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
+        @RequestPart(required = true) AssetUpdateWithOutThumbnail dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("에셋 수정(file) DTO - {}", dto);
+        return new BaseResponse<AssetUpdatedResponse>(
+            creatorService.updateAssetWithFile(thumbnails, productsId, user.getUser(), dto));
     }
 
     @Operation(summary = "에셋 파일 presignedUrl 획득", description = "유효시간 5분")

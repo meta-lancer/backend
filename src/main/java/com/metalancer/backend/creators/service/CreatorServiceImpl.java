@@ -8,6 +8,7 @@ import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
@@ -244,7 +245,7 @@ public class CreatorServiceImpl implements CreatorService {
         List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
             productsEntity);
         productsTagRepository.deleteAll(productsTagEntities);
-        updateTagList(dto, productsEntity);
+        updateTagList(dto.getTagList(), productsEntity);
 
         // 작업 수, 에셋 평점
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
@@ -264,6 +265,85 @@ public class CreatorServiceImpl implements CreatorService {
         ProductsEntity productsEntity = productsRepository.findProductById(productsId);
         String randomFileName = uploadService.getRandomStringForImageName(8);
         return uploadService.getThumbnailPresignedUrl(productsId, randomFileName, extension);
+    }
+
+    @Override
+    public AssetUpdatedResponse updateAssetWithFile(MultipartFile[] thumbnails, Long productsId,
+        User user, AssetUpdateWithOutThumbnail dto) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        // 본인만 접근 가능
+        CreatorEntity creatorEntity = productsEntity.getCreatorEntity();
+        if (!creatorEntity.getUser().getId().equals(user.getId())) {
+            throw new BaseException(ErrorCode.IS_NOT_WRITER);
+        }
+
+        productsEntity.update(dto);
+        productsEntity = productsRepository.findProductById(productsId);
+        // 혹시 몰라서 save까지
+        productsRepository.save(productsEntity);
+        productsEntity = productsRepository.findProductById(productsId);
+        // 에셋 파일 조회
+        ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            productsEntity);
+        // 에셋 파일 업데이트
+        foundProductsAssetFileEntity.update(productsEntity, dto);
+        productsAssetFileRepository.save(foundProductsAssetFileEntity);
+
+        // 썸네일 수정. 만약 보낸다면 기존에 갖고있던 거 싹 다 없애버리고..!
+        // multipartFile은 빈값으로 보내도 무조건인듯?
+        if (thumbnails != null && thumbnails.length > 0) {
+            int index = 1;
+            // 전부 삭제
+            for (MultipartFile file : thumbnails) {
+                // Check if the file is not null and the size is greater than 0
+                if (file != null && file.getSize() > 0) {
+                    try {
+                        if (index == 1) {
+                            productsThumbnailRepository.deleteAllUrlByProduct(productsEntity);
+                        }
+                        List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
+                        for (MultipartFile thumbnail : thumbnails) {
+                            String randomFileName = uploadService.getRandomStringForImageName(8);
+                            // 업로드한 url
+                            String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(
+                                AssetType.THUMBNAIL,
+                                productsEntity.getId(), thumbnail, randomFileName);
+                            if (index == 1) {
+                                productsEntity.setThumbnail(uploadedThumbnailUrl);
+                            }
+                            ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
+                                .productsEntity(productsEntity).thumbnailOrd(index++)
+                                .thumbnailUrl(uploadedThumbnailUrl)
+                                .build();
+                            productsThumbnailEntities.add(createdProductsThumbnailEntity);
+                        }
+                        productsThumbnailRepository.saveAll(productsThumbnailEntities);
+                    } catch (Exception e) {
+                        log.error(e.getLocalizedMessage() + ": ", e);
+                        throw new BaseException(ErrorCode.THUMBNAILS_UPLOAD_FAILED);
+                    }
+                }
+            }
+
+        }
+
+        // 태그 수정
+        List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
+            productsEntity);
+        productsTagRepository.deleteAll(productsTagEntities);
+        updateTagList(dto.getTagList(), productsEntity);
+
+        // 작업 수, 에셋 평점
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail productsDetail = productsEntity.toProductsDetail(taskCnt, satisficationRate);
+        // tag 목록
+        getProductsDetailTagList(productsEntity, productsDetail);
+        // 에셋 파일
+        AssetFile assetFile = getProductsDetailAssetFile(productsEntity,
+            productsDetail);
+        productsDetail.setAssetFile(assetFile);
+        return AssetUpdatedResponse.builder().productsDetail(productsDetail).build();
     }
 
     private void setUpdatedThumbnailList(List<String> thumbnailList,
@@ -294,9 +374,9 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
 
-    private void updateTagList(AssetUpdate dto, ProductsEntity productsEntity) {
+    private void updateTagList(List<String> tagList, ProductsEntity productsEntity) {
         List<ProductsTagEntity> tagEntities = new ArrayList<>();
-        for (String tag : dto.getTagList()) {
+        for (String tag : tagList) {
             ProductsTagEntity createdProductsTagEntity = ProductsTagEntity.builder()
                 .productsEntity(productsEntity).name(tag).build();
             tagEntities.add(createdProductsTagEntity);

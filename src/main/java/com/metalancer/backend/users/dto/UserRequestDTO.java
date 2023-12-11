@@ -101,4 +101,13 @@ public class UserRequestDTO {
         private boolean marketingAgree;
         private boolean statusAgree;
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class CreateInquiryRequest {
+
+        private String title;
+        private String content;
+        private Long orderProductId;
+    }
 }

@@ -209,4 +209,16 @@ public class UserController {
         return new BaseResponse<Boolean>(
             userService.applyCreator(files, dto, user));
     }
+
+    @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping("/inquiry")
+    public BaseResponse<Boolean> createInquiry(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.CreateInquiryRequest dto) {
+        return new BaseResponse<Boolean>(
+            userService.createInquiry(user, dto));
+    }
 }

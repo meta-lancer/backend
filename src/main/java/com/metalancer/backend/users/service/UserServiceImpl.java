@@ -17,6 +17,7 @@ import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
+import com.metalancer.backend.users.dto.UserRequestDTO.CreateInquiryRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateBasicInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerIntroRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.UpdateCareerRequest;
@@ -25,12 +26,14 @@ import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.CareerEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import com.metalancer.backend.users.entity.InquiryEntity;
 import com.metalancer.backend.users.entity.PortfolioEntity;
 import com.metalancer.backend.users.entity.PortfolioReferenceEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.CareerRepository;
+import com.metalancer.backend.users.repository.InquiryRepository;
 import com.metalancer.backend.users.repository.PayedAssetsRepository;
 import com.metalancer.backend.users.repository.PortfolioReferenceRepository;
 import com.metalancer.backend.users.repository.PortfolioRepository;
@@ -66,6 +69,7 @@ public class UserServiceImpl implements UserService {
     private final PortfolioRepository portfolioRepository;
     private final S3Service uploadService;
     private final PortfolioReferenceRepository portfolioReferenceRepository;
+    private final InquiryRepository inquiryRepository;
 
     @Override
     public boolean updateToCreator(PrincipalDetails user) {
@@ -235,6 +239,19 @@ public class UserServiceImpl implements UserService {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        InquiryEntity inquiryEntity = InquiryEntity.builder().build();
+        inquiryRepository.save(inquiryEntity);
+        Optional<InquiryEntity> foundInquiryEntity = inquiryRepository.findById(
+            inquiryEntity.getId());
+        return foundInquiryEntity.isPresent();
     }
 
     private static LocalDateTime convertDateToLocalDateTime(String dateString) {

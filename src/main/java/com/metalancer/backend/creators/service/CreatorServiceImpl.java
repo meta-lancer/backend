@@ -293,38 +293,38 @@ public class CreatorServiceImpl implements CreatorService {
         // multipartFile은 빈값으로 보내도 무조건인듯?
         if (thumbnails != null && thumbnails.length > 0) {
             int index = 1;
+            List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
             // 전부 삭제
-            for (MultipartFile file : thumbnails) {
+            for (MultipartFile thumbnail : thumbnails) {
                 // Check if the file is not null and the size is greater than 0
-                if (file != null && file.getSize() > 0) {
+                if (thumbnail != null && thumbnail.getSize() > 0) {
                     try {
+                        // 처음일 때만 지워준다.
                         if (index == 1) {
                             productsThumbnailRepository.deleteAllUrlByProduct(productsEntity);
                         }
-                        List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
-                        for (MultipartFile thumbnail : thumbnails) {
-                            String randomFileName = uploadService.getRandomStringForImageName(8);
-                            // 업로드한 url
-                            String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(
-                                AssetType.THUMBNAIL,
-                                productsEntity.getId(), thumbnail, randomFileName);
-                            if (index == 1) {
-                                productsEntity.setThumbnail(uploadedThumbnailUrl);
-                            }
-                            ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
-                                .productsEntity(productsEntity).thumbnailOrd(index++)
-                                .thumbnailUrl(uploadedThumbnailUrl)
-                                .build();
-                            productsThumbnailEntities.add(createdProductsThumbnailEntity);
+                        String randomFileName = uploadService.getRandomStringForImageName(8);
+                        // 업로드한 url
+                        String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(
+                            AssetType.THUMBNAIL,
+                            productsEntity.getId(), thumbnail, randomFileName);
+                        if (index == 1) {
+                            productsEntity.setThumbnail(uploadedThumbnailUrl);
                         }
-                        productsThumbnailRepository.saveAll(productsThumbnailEntities);
+                        ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
+                            .productsEntity(productsEntity).thumbnailOrd(index++)
+                            .thumbnailUrl(uploadedThumbnailUrl)
+                            .build();
+                        productsThumbnailEntities.add(createdProductsThumbnailEntity);
                     } catch (Exception e) {
                         log.error(e.getLocalizedMessage() + ": ", e);
                         throw new BaseException(ErrorCode.THUMBNAILS_UPLOAD_FAILED);
                     }
                 }
             }
-
+            if (productsThumbnailEntities.size() > 0) {
+                productsThumbnailRepository.saveAll(productsThumbnailEntities);
+            }
         }
 
         // 태그 수정

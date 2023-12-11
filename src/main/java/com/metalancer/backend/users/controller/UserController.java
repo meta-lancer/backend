@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
@@ -34,7 +35,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "유저", description = "")
 @RestController
@@ -192,5 +195,18 @@ public class UserController {
         if (user == null) {
             throw new BaseException(ErrorCode.LOGIN_REQUIRED);
         }
+    }
+
+    @Operation(summary = "마이페이지 - 크리에이터 전환 신청", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping("/portfolio")
+    public BaseResponse<Boolean> applyCreator(
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.ApplyCreator dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<Boolean>(
+            userService.applyCreator(files, dto, user));
     }
 }

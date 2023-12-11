@@ -6,11 +6,11 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.ApplyCreator;
 import com.metalancer.backend.creators.repository.CreatorRepository;
+import com.metalancer.backend.external.aws.s3.S3Service;
 import com.metalancer.backend.interests.domain.Interests;
 import com.metalancer.backend.orders.repository.OrderPaymentRepository;
-import com.metalancer.backend.orders.repository.OrderProductsRepository;
-import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.users.domain.Career;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
@@ -25,11 +25,15 @@ import com.metalancer.backend.users.dto.UserResponseDTO.IntroAndCareer;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.CareerEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import com.metalancer.backend.users.entity.PortfolioEntity;
+import com.metalancer.backend.users.entity.PortfolioReferenceEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.CareerRepository;
 import com.metalancer.backend.users.repository.PayedAssetsRepository;
+import com.metalancer.backend.users.repository.PortfolioReferenceRepository;
+import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import java.time.LocalDate;
@@ -44,6 +48,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -56,10 +61,11 @@ public class UserServiceImpl implements UserService {
     private final PayedAssetsRepository payedAssetsRepository;
     private final CareerRepository careerRepository;
     private final CreatorRepository creatorRepository;
-    private final OrdersRepository ordersRepository;
-    private final OrderProductsRepository orderProductsRepository;
     private final OrderPaymentRepository orderPaymentRepository;
     private final ApproveLinkRepository approveLinkRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final S3Service uploadService;
+    private final PortfolioReferenceRepository portfolioReferenceRepository;
 
     @Override
     public boolean updateToCreator(PrincipalDetails user) {
@@ -176,6 +182,59 @@ public class UserServiceImpl implements UserService {
             DataStatus.ACTIVE);
         creator.ifPresent(creatorEntity -> response.setCreatorId(creatorEntity.getId()));
         return response;
+    }
+
+    @Override
+    public boolean applyCreator(MultipartFile[] files, ApplyCreator dto, PrincipalDetails user) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        // 크리에이터 생성 + 승인대기
+        CreatorEntity createdCreatorEntity = CreatorEntity.builder().user(foundUser)
+            .email(foundUser.getEmail()).build();
+        createdCreatorEntity.setPending();
+        creatorRepository.save(createdCreatorEntity);
+
+        // 포트폴리오 생성
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.PENDING);
+        PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
+            .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
+            .workerCnt(dto.getWorkerCnt()).tool(dto.getTool())
+            .build();
+        portfolioRepository.save(portfolioEntity);
+
+        // 포트폴리오와 관련하여 파일 등록
+        if (files != null && files.length > 0) {
+            int index = 1;
+            List<PortfolioReferenceEntity> portfolioReferenceEntities = new ArrayList<>();
+            // 전부 삭제
+            for (MultipartFile file : files) {
+                // Check if the file is not null and the size is greater than 0
+                if (file != null && file.getSize() > 0) {
+                    try {
+                        String randomFileName = uploadService.getRandomStringForImageName(8);
+                        // 업로드한 url
+                        String uploadedUrl = uploadService.uploadToPortfolioReference(
+                            createdCreatorEntity.getId(), portfolioEntity.getId(), file,
+                            randomFileName);
+                        PortfolioReferenceEntity createdPortfolioReferenceEntity = PortfolioReferenceEntity.builder()
+                            .portfolioEntity(portfolioEntity).url(uploadedUrl).ord(index++)
+                            .build();
+                        portfolioReferenceEntities.add(createdPortfolioReferenceEntity);
+                    } catch (Exception e) {
+                        log.error(e.getLocalizedMessage() + ": ", e);
+                        throw new BaseException(ErrorCode.REFERENCE_UPLOAD_FAILED);
+                    }
+                }
+            }
+            if (portfolioReferenceEntities.size() > 0) {
+                portfolioReferenceRepository.saveAll(portfolioReferenceEntities);
+            }
+        }
+
+        return true;
     }
 
     private static LocalDateTime convertDateToLocalDateTime(String dateString) {

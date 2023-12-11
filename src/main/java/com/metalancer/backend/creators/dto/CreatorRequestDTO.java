@@ -162,4 +162,20 @@ public class CreatorRequestDTO {
         private String referenceFile;
     }
 
+    @Data
+    public static class ApplyCreator {
+
+        @Schema(description = "제목")
+        private String title;
+        @Schema(description = "시작기간")
+        private LocalDateTime beginAt;
+        @Schema(description = "마감날(진행중이면 null로)")
+        private LocalDateTime endAt;
+        @Schema(description = "작업 인원수")
+        private int workerCnt;
+        @Schema(description = "작업툴")
+        private String tool;
+        
+    }
+
 }

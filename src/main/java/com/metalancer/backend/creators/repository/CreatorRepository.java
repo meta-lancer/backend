@@ -12,6 +12,9 @@ public interface CreatorRepository {
 
     Optional<CreatorEntity> findOptionalByUserAndStatus(User user, DataStatus dataStatus);
 
+    Optional<CreatorEntity> findOptionalByUser(User user);
+
+
     CreatorEntity findByCreatorId(Long creatorId);
 
     List<CreatorEntity> findAll();

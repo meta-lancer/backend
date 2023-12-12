@@ -5,6 +5,7 @@ import com.metalancer.backend.creators.dto.CreatorRequestDTO.ApplyCreator;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
+import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.dto.AuthResponseDTO.userInfo;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateInquiryRequest;
@@ -52,4 +53,6 @@ public interface UserService {
     boolean applyCreator(MultipartFile[] files, ApplyCreator dto, PrincipalDetails user);
 
     boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto);
+
+    List<Portfolio> getMyPortfolio(PrincipalDetails user);
 }

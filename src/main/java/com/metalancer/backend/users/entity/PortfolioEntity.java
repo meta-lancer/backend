@@ -43,10 +43,11 @@ public class PortfolioEntity extends BaseTimeEntity implements Serializable {
     private int workerCnt;
     private String tool;
     private String referenceFile;
+    private int seq;
 
     @Builder
     public PortfolioEntity(CreatorEntity creatorEntity, String title, LocalDateTime beginAt,
-        LocalDateTime endAt, int workerCnt, String tool, String referenceFile) {
+        LocalDateTime endAt, int workerCnt, String tool, String referenceFile, int seq) {
         this.creatorEntity = creatorEntity;
         this.title = title;
         this.beginAt = beginAt;
@@ -54,12 +55,13 @@ public class PortfolioEntity extends BaseTimeEntity implements Serializable {
         this.workerCnt = workerCnt;
         this.tool = tool;
         this.referenceFile = referenceFile;
+        this.seq = seq;
     }
 
     public Portfolio toDomain() {
         return Portfolio.builder().portfolioId(id).title(title)
             .beginAt(beginAt).endAt(endAt).workerCnt(workerCnt).tool(tool)
-            .referenceFile(referenceFile).build();
+            .build();
     }
 
     public void update(String title, LocalDateTime beginAt,

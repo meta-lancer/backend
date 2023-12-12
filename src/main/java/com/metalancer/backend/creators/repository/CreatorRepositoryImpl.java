@@ -29,6 +29,11 @@ public class CreatorRepositoryImpl implements CreatorRepository {
     }
 
     @Override
+    public Optional<CreatorEntity> findOptionalByUser(User user) {
+        return creatorJpaRepository.findByUser(user);
+    }
+
+    @Override
     public CreatorEntity findByCreatorId(Long creatorId) {
         return creatorJpaRepository.findById(creatorId).orElseThrow(
             () -> new BaseException(ErrorCode.NOT_FOUND)

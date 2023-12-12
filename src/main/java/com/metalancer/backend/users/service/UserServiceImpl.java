@@ -17,6 +17,7 @@ import com.metalancer.backend.users.domain.Career;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
+import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCareerRequest;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateInquiryRequest;
@@ -37,7 +38,7 @@ import com.metalancer.backend.users.repository.ApproveLinkRepository;
 import com.metalancer.backend.users.repository.CareerRepository;
 import com.metalancer.backend.users.repository.InquiryRepository;
 import com.metalancer.backend.users.repository.PayedAssetsRepository;
-import com.metalancer.backend.users.repository.PortfolioReferenceRepository;
+import com.metalancer.backend.users.repository.PortfolioImagesRepository;
 import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService {
     private final ApproveLinkRepository approveLinkRepository;
     private final PortfolioRepository portfolioRepository;
     private final S3Service uploadService;
-    private final PortfolioReferenceRepository portfolioReferenceRepository;
+    private final PortfolioImagesRepository portfolioImagesRepository;
     private final InquiryRepository inquiryRepository;
 
     @Override
@@ -214,6 +215,7 @@ public class UserServiceImpl implements UserService {
         PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
             .title(dto.getTitle()).beginAt(beginAt).endAt(endAt)
             .workerCnt(dto.getWorkerCnt()).tool(dto.getTool())
+            .seq(1)
             .build();
         portfolioRepository.save(portfolioEntity);
 
@@ -242,7 +244,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
             if (portfolioReferenceEntities.size() > 0) {
-                portfolioReferenceRepository.saveAll(portfolioReferenceEntities);
+                portfolioImagesRepository.saveAll(portfolioReferenceEntities);
             }
         }
 
@@ -260,6 +262,14 @@ public class UserServiceImpl implements UserService {
         Optional<InquiryEntity> foundInquiryEntity = inquiryRepository.findById(
             inquiryEntity.getId());
         return foundInquiryEntity.isPresent();
+    }
+
+    @Override
+    public List<Portfolio> getMyPortfolio(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        Optional<CreatorEntity> creatorEntity = creatorRepository.findOptionalByUser(
+            foundUser);
+        return creatorEntity.map(portfolioRepository::findAllByCreator).orElse(null);
     }
 
     private static LocalDateTime convertDateToLocalDateTime(String dateString) {

@@ -9,12 +9,12 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class PortfolioReferenceRepositoryImpl implements PortfolioReferenceRepository {
+public class PortfolioImagesRepositoryImpl implements PortfolioImagesRepository {
 
-    private final PortfolioReferenceJpaRepository portfolioReferenceJpaRepository;
+    private final PortfolioImagesJpaRepository portfolioImagesJpaRepository;
 
     @Override
     public void saveAll(List<PortfolioImagesEntity> portfolioReferenceEntities) {
-        portfolioReferenceJpaRepository.saveAll(portfolioReferenceEntities);
+        portfolioImagesJpaRepository.saveAll(portfolioReferenceEntities);
     }
 }

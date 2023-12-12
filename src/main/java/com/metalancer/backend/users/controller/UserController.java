@@ -10,6 +10,7 @@ import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
+import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserResponseDTO;
@@ -206,18 +207,31 @@ public class UserController {
         @RequestPart(value = "files", required = false) MultipartFile[] files,
         @RequestPart CreatorRequestDTO.ApplyCreator dto,
         @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("로그인되어있는 유저: {}", user);
+        log.info("크리에이터 전환 신청 dto: {}", dto);
         return new BaseResponse<Boolean>(
             userService.applyCreator(files, dto, user));
     }
 
-    @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
+    @Operation(summary = "마이페이지 - 내 포트폴리오 조회(크리에이터 신청확인용)", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @GetMapping("/portfolio")
+    public BaseResponse<List<Portfolio>> getMyPortfolio(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<List<Portfolio>>(userService.getMyPortfolio(user));
+    }
+
+    @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
     })
     @PostMapping("/inquiry")
     public BaseResponse<Boolean> createInquiry(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.CreateInquiryRequest dto) {
+        log.info("구매 관리 문의 등록 dto: {}", dto);
         return new BaseResponse<Boolean>(
             userService.createInquiry(user, dto));
     }

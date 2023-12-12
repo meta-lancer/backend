@@ -4,7 +4,9 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.InvalidRoleException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.ApplyCreator;
 import com.metalancer.backend.creators.repository.CreatorRepository;
@@ -28,7 +30,7 @@ import com.metalancer.backend.users.entity.CareerEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.InquiryEntity;
 import com.metalancer.backend.users.entity.PortfolioEntity;
-import com.metalancer.backend.users.entity.PortfolioReferenceEntity;
+import com.metalancer.backend.users.entity.PortfolioImagesEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
@@ -194,6 +196,12 @@ public class UserServiceImpl implements UserService {
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
+        Optional<CreatorEntity> foundCreatorEntity = creatorRepository.findOptionalByUserAndStatus(
+            foundUser, DataStatus.ACTIVE);
+        if (!foundUser.getRole().equals(Role.ROLE_USER) || foundCreatorEntity.isPresent()) {
+            throw new InvalidRoleException(ErrorCode.INVALID_ROLE_ACCESS);
+        }
+
         // 크리에이터 생성 + 승인대기
         CreatorEntity createdCreatorEntity = CreatorEntity.builder().user(foundUser)
             .email(foundUser.getEmail()).build();
@@ -212,7 +220,7 @@ public class UserServiceImpl implements UserService {
         // 포트폴리오와 관련하여 파일 등록
         if (files != null && files.length > 0) {
             int index = 1;
-            List<PortfolioReferenceEntity> portfolioReferenceEntities = new ArrayList<>();
+            List<PortfolioImagesEntity> portfolioReferenceEntities = new ArrayList<>();
             // 전부 삭제
             for (MultipartFile file : files) {
                 // Check if the file is not null and the size is greater than 0
@@ -223,8 +231,8 @@ public class UserServiceImpl implements UserService {
                         String uploadedUrl = uploadService.uploadToPortfolioReference(
                             createdCreatorEntity.getId(), portfolioEntity.getId(), file,
                             randomFileName);
-                        PortfolioReferenceEntity createdPortfolioReferenceEntity = PortfolioReferenceEntity.builder()
-                            .portfolioEntity(portfolioEntity).url(uploadedUrl).ord(index++)
+                        PortfolioImagesEntity createdPortfolioReferenceEntity = PortfolioImagesEntity.builder()
+                            .portfolioEntity(portfolioEntity).imagePath(uploadedUrl).seq(index++)
                             .build();
                         portfolioReferenceEntities.add(createdPortfolioReferenceEntity);
                     } catch (Exception e) {

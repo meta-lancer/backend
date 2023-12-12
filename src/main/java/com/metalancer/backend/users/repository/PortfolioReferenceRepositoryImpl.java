@@ -1,6 +1,6 @@
 package com.metalancer.backend.users.repository;
 
-import com.metalancer.backend.users.entity.PortfolioReferenceEntity;
+import com.metalancer.backend.users.entity.PortfolioImagesEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ public class PortfolioReferenceRepositoryImpl implements PortfolioReferenceRepos
     private final PortfolioReferenceJpaRepository portfolioReferenceJpaRepository;
 
     @Override
-    public void saveAll(List<PortfolioReferenceEntity> portfolioReferenceEntities) {
+    public void saveAll(List<PortfolioImagesEntity> portfolioReferenceEntities) {
         portfolioReferenceJpaRepository.saveAll(portfolioReferenceEntities);
     }
 }

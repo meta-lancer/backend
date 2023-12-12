@@ -20,34 +20,34 @@ import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "portfolio_reference")
+@Entity(name = "portfolio_images")
 @ToString
-public class PortfolioReferenceEntity extends BaseTimeEntity implements Serializable {
+public class PortfolioImagesEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 748415572434233156L;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "portfolio_reference_id", nullable = false)
+    @Column(name = "portfolio_image_id", nullable = false)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "portfolio_id", nullable = false)
     private PortfolioEntity portfolioEntity;
 
-    private String url;
-    private int ord;
+    private String imagePath;
+    private int seq;
 
     @Builder
-    public PortfolioReferenceEntity(PortfolioEntity portfolioEntity, String url, int ord) {
+    public PortfolioImagesEntity(PortfolioEntity portfolioEntity, String imagePath, int seq) {
         this.portfolioEntity = portfolioEntity;
-        this.url = url;
-        this.ord = ord;
+        this.imagePath = imagePath;
+        this.seq = seq;
     }
 
     public PortfolioReference toDomain() {
-        return PortfolioReference.builder().url(url).ord(ord).build();
+        return PortfolioReference.builder().url(imagePath).ord(seq).build();
     }
 
 }

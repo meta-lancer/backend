@@ -108,6 +108,6 @@ public class UserRequestDTO {
 
         private String title;
         private String content;
-        private Long orderProductId;
+//        private Long orderProductId;
     }
 }

@@ -269,7 +269,7 @@ public class User extends BaseEntity implements Serializable {
         delete();
     }
 
-    public void setFirstNickName(String randowNickName) {
-        this.nickname = randowNickName;
+    public void setFirstNickName(String randomNickName) {
+        this.nickname = randomNickName;
     }
 }

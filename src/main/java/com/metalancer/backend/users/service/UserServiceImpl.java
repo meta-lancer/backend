@@ -257,7 +257,8 @@ public class UserServiceImpl implements UserService {
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
-        InquiryEntity inquiryEntity = InquiryEntity.builder().build();
+        InquiryEntity inquiryEntity = InquiryEntity.builder().user(foundUser).title(dto.getTitle())
+            .content(dto.getContent()).build();
         inquiryRepository.save(inquiryEntity);
         Optional<InquiryEntity> foundInquiryEntity = inquiryRepository.findById(
             inquiryEntity.getId());
@@ -267,6 +268,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Portfolio> getMyPortfolio(PrincipalDetails user) {
         User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         Optional<CreatorEntity> creatorEntity = creatorRepository.findOptionalByUser(
             foundUser);
         return creatorEntity.map(portfolioRepository::findAllByCreator).orElse(null);

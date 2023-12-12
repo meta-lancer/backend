@@ -31,6 +31,7 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
             List<String> portfolioImages = portfolioImagesJpaRepository.findAllByPortfolioEntityOrderBySeq(
                 portfolioEntity).stream().map(PortfolioImagesEntity::getImagePath).toList();
             portfolio.setReferenceFileList(portfolioImages);
+            response.add(portfolio);
         }
         return response;
     }

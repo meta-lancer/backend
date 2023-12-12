@@ -1,7 +1,6 @@
 package com.metalancer.backend.creators.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -134,9 +133,9 @@ public class CreatorRequestDTO {
         @Schema(description = "제목")
         private String title;
         @Schema(description = "시작날")
-        private LocalDateTime beginAt;
+        private String beginAt;
         @Schema(description = "마감날(진행중이면 null로)")
-        private LocalDateTime endAt;
+        private String endAt;
         @Schema(description = "작업 인원수")
         private int workerCnt;
         @Schema(description = "작업툴")
@@ -151,9 +150,9 @@ public class CreatorRequestDTO {
         @Schema(description = "제목")
         private String title;
         @Schema(description = "시작날")
-        private LocalDateTime beginAt;
+        private String beginAt;
         @Schema(description = "마감날(진행중이면 null로)")
-        private LocalDateTime endAt;
+        private String endAt;
         @Schema(description = "작업 인원수")
         private int workerCnt;
         @Schema(description = "작업툴")
@@ -168,14 +167,14 @@ public class CreatorRequestDTO {
         @Schema(description = "제목")
         private String title;
         @Schema(description = "시작기간")
-        private LocalDateTime beginAt;
+        private String beginAt;
         @Schema(description = "마감날(진행중이면 null로)")
-        private LocalDateTime endAt;
+        private String endAt;
         @Schema(description = "작업 인원수")
         private int workerCnt;
         @Schema(description = "작업툴")
         private String tool;
-        
+
     }
 
 }

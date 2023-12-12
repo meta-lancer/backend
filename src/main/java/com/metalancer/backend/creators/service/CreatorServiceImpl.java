@@ -36,6 +36,9 @@ import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -478,8 +481,10 @@ public class CreatorServiceImpl implements CreatorService {
         );
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.ACTIVE);
+        LocalDateTime beginAt = convertDateToLocalDateTime(dto.getBeginAt());
+        LocalDateTime endAt = convertDateToLocalDateTime(dto.getEndAt());
         PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
-            .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
+            .title(dto.getTitle()).beginAt(beginAt).endAt(endAt)
             .workerCnt(dto.getWorkerCnt()).tool(dto.getTool()).referenceFile(dto.getReferenceFile())
             .build();
         portfolioRepository.save(portfolioEntity);
@@ -497,10 +502,18 @@ public class CreatorServiceImpl implements CreatorService {
             DataStatus.ACTIVE);
         PortfolioEntity portfolioEntity = portfolioRepository.findEntityByIdAndCreator(portfolioId,
             creatorEntity);
-        portfolioEntity.update(dto.getTitle(), dto.getBeginAt(), dto.getEndAt(), dto.getWorkerCnt(),
+        LocalDateTime beginAt = convertDateToLocalDateTime(dto.getBeginAt());
+        LocalDateTime endAt = convertDateToLocalDateTime(dto.getEndAt());
+        portfolioEntity.update(dto.getTitle(), beginAt, endAt, dto.getWorkerCnt(),
             dto.getTool(), dto.getReferenceFile());
         portfolioRepository.save(portfolioEntity);
         return portfolioRepository.findAllByCreator(creatorEntity);
+    }
+
+    private static LocalDateTime convertDateToLocalDateTime(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        return date.atStartOfDay();
     }
 
 

@@ -201,18 +201,18 @@ public class UserServiceImpl implements UserService {
         if (!foundUser.getRole().equals(Role.ROLE_USER) || foundCreatorEntity.isPresent()) {
             throw new InvalidRoleException(ErrorCode.INVALID_ROLE_ACCESS);
         }
-
         // 크리에이터 생성 + 승인대기
         CreatorEntity createdCreatorEntity = CreatorEntity.builder().user(foundUser)
             .email(foundUser.getEmail()).build();
         createdCreatorEntity.setPending();
         creatorRepository.save(createdCreatorEntity);
-
         // 포트폴리오 생성
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.PENDING);
+        LocalDateTime beginAt = convertDateToLocalDateTime(dto.getBeginAt());
+        LocalDateTime endAt = convertDateToLocalDateTime(dto.getEndAt());
         PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
-            .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
+            .title(dto.getTitle()).beginAt(beginAt).endAt(endAt)
             .workerCnt(dto.getWorkerCnt()).tool(dto.getTool())
             .build();
         portfolioRepository.save(portfolioEntity);

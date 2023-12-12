@@ -61,7 +61,7 @@ public class CreatorEntity extends BaseEntity implements Serializable {
     }
 
     private void checkIfUserHasSellerAuthority(User user) {
-        if (!(user.getRole().equals(Role.ROLE_SELLER) || user.getRole().equals(Role.ROLE_ADMIN))) {
+        if (!user.getRole().equals(Role.ROLE_USER)) {
             throw new InvalidRoleException(ErrorCode.INVALID_ROLE_ACCESS);
         }
     }

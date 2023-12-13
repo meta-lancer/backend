@@ -29,9 +29,11 @@ public interface CreatorService {
 
     List<Portfolio> deleteMyPortfolio(Long portfolioId, PrincipalDetails user);
 
-    List<Portfolio> createMyPortfolio(PortfolioCreate dto, PrincipalDetails user);
+    List<Portfolio> createMyPortfolio(MultipartFile[] files, PortfolioCreate dto,
+        PrincipalDetails user);
 
-    List<Portfolio> updateMyPortfolio(Long portfolioId, PortfolioUpdate dto, PrincipalDetails user);
+    List<Portfolio> updateMyPortfolio(MultipartFile[] files, Long portfolioId, PortfolioUpdate dto,
+        PrincipalDetails user);
 
     AssetUpdatedResponse updateAsset(Long productsId, User user, AssetUpdate dto);
 

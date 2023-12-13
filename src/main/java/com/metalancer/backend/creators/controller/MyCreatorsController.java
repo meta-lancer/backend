@@ -178,10 +178,11 @@ public class MyCreatorsController {
     })
     @PostMapping("/portfolio")
     public BaseResponse<List<Portfolio>> createMyPortfolio(
-        @RequestBody CreatorRequestDTO.PortfolioCreate dto,
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.PortfolioCreate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
         return new BaseResponse<List<Portfolio>>(
-            creatorService.createMyPortfolio(dto, user));
+            creatorService.createMyPortfolio(files, dto, user));
     }
 
     @Operation(summary = "내 포트폴리오 수정", description = "")
@@ -191,11 +192,11 @@ public class MyCreatorsController {
     @PatchMapping("/portfolio/{portfolioId}")
     public BaseResponse<List<Portfolio>> updateMyPortfolio(
         @PathVariable Long portfolioId,
-        @RequestBody CreatorRequestDTO.PortfolioUpdate dto,
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.PortfolioUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
-
         return new BaseResponse<List<Portfolio>>(
-            creatorService.updateMyPortfolio(portfolioId, dto, user));
+            creatorService.updateMyPortfolio(files, portfolioId, dto, user));
     }
 
 

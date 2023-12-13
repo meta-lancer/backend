@@ -31,14 +31,13 @@ import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.PortfolioEntity;
+import com.metalancer.backend.users.entity.PortfolioImagesEntity;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.PortfolioImagesRepository;
 import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +65,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final ProductsAssetFileRepository productsAssetFileRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final PortfolioImagesRepository portfolioImagesRepository;
 
     @Override
     public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
@@ -474,25 +474,60 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
-    public List<Portfolio> createMyPortfolio(PortfolioCreate dto, PrincipalDetails user) {
+    public List<Portfolio> createMyPortfolio(MultipartFile[] files, PortfolioCreate dto,
+        PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.ACTIVE);
-        LocalDateTime beginAt = convertDateToLocalDateTime(dto.getBeginAt());
-        LocalDateTime endAt = convertDateToLocalDateTime(dto.getEndAt());
         PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
-            .title(dto.getTitle()).beginAt(beginAt).endAt(endAt)
-            .workerCnt(dto.getWorkerCnt()).tool(dto.getTool()).referenceFile(dto.getReferenceFile())
+            .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
+            .workerCnt(dto.getWorkerCnt()).tool(dto.getTool())
+            .seq(1)
             .build();
         portfolioRepository.save(portfolioEntity);
+        // 포트폴리오와 관련하여 파일 등록
+        if (files != null && files.length > 0) {
+            savePortfolioImageList(files, creatorEntity, portfolioEntity);
+        }
+
         return portfolioRepository.findAllByCreator(creatorEntity);
     }
 
+    private void savePortfolioImageList(MultipartFile[] files, CreatorEntity creatorEntity,
+        PortfolioEntity portfolioEntity) {
+        int index = 1;
+        List<PortfolioImagesEntity> portfolioReferenceEntities = new ArrayList<>();
+        // 전부 삭제
+        for (MultipartFile file : files) {
+            // Check if the file is not null and the size is greater than 0
+            if (file != null && file.getSize() > 0) {
+                try {
+                    String randomFileName = uploadService.getRandomStringForImageName(8);
+                    // 업로드한 url
+                    String uploadedUrl = uploadService.uploadToPortfolioReference(
+                        creatorEntity.getId(), portfolioEntity.getId(), file,
+                        randomFileName);
+                    PortfolioImagesEntity createdPortfolioReferenceEntity = PortfolioImagesEntity.builder()
+                        .portfolioEntity(portfolioEntity).imagePath(uploadedUrl).seq(index++)
+                        .build();
+                    portfolioReferenceEntities.add(createdPortfolioReferenceEntity);
+                } catch (Exception e) {
+                    log.error(e.getLocalizedMessage() + ": ", e);
+                    throw new BaseException(ErrorCode.REFERENCE_UPLOAD_FAILED);
+                }
+            }
+        }
+        if (portfolioReferenceEntities.size() > 0) {
+            portfolioImagesRepository.saveAll(portfolioReferenceEntities);
+        }
+    }
+
     @Override
-    public List<Portfolio> updateMyPortfolio(Long portfolioId, PortfolioUpdate dto,
+    public List<Portfolio> updateMyPortfolio(MultipartFile[] files, Long portfolioId,
+        PortfolioUpdate dto,
         PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
@@ -502,18 +537,16 @@ public class CreatorServiceImpl implements CreatorService {
             DataStatus.ACTIVE);
         PortfolioEntity portfolioEntity = portfolioRepository.findEntityByIdAndCreator(portfolioId,
             creatorEntity);
-        LocalDateTime beginAt = convertDateToLocalDateTime(dto.getBeginAt());
-        LocalDateTime endAt = convertDateToLocalDateTime(dto.getEndAt());
-        portfolioEntity.update(dto.getTitle(), beginAt, endAt, dto.getWorkerCnt(),
-            dto.getTool(), dto.getReferenceFile());
+        portfolioEntity.update(dto.getTitle(), dto.getBeginAt(), dto.getEndAt(), dto.getWorkerCnt(),
+            dto.getTool());
         portfolioRepository.save(portfolioEntity);
-        return portfolioRepository.findAllByCreator(creatorEntity);
-    }
+        portfolioImagesRepository.deleteAllByPortfolioEntity(portfolioEntity);
+        
+        if (files != null && files.length > 0) {
+            savePortfolioImageList(files, creatorEntity, portfolioEntity);
+        }
 
-    private static LocalDateTime convertDateToLocalDateTime(String dateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date = LocalDate.parse(dateString, formatter);
-        return date.atStartOfDay();
+        return portfolioRepository.findAllByCreator(creatorEntity);
     }
 
 

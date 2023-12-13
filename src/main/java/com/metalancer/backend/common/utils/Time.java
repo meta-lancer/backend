@@ -1,6 +1,7 @@
 package com.metalancer.backend.common.utils;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -123,5 +124,11 @@ public class Time {
     public static String convertDateToFullString(LocalDateTime dateTime) {
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return dateTime != null ? dateTime.format(outputFormat) : "-";
+    }
+
+    public static LocalDateTime convertDateToLocalDateTime(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        return date.atStartOfDay();
     }
 }

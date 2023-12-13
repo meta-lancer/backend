@@ -1,5 +1,6 @@
 package com.metalancer.backend.users.repository;
 
+import com.metalancer.backend.users.entity.PortfolioEntity;
 import com.metalancer.backend.users.entity.PortfolioImagesEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,12 @@ public class PortfolioImagesRepositoryImpl implements PortfolioImagesRepository 
     @Override
     public void saveAll(List<PortfolioImagesEntity> portfolioReferenceEntities) {
         portfolioImagesJpaRepository.saveAll(portfolioReferenceEntities);
+    }
+
+    @Override
+    public void deleteAllByPortfolioEntity(PortfolioEntity portfolioEntity) {
+        List<PortfolioImagesEntity> portfolioImagesEntityList = portfolioImagesJpaRepository.findAllByPortfolioEntityOrderBySeq(
+            portfolioEntity);
+        portfolioImagesJpaRepository.deleteAll(portfolioImagesEntityList);
     }
 }

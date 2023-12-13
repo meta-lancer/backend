@@ -210,10 +210,8 @@ public class UserServiceImpl implements UserService {
         // 포트폴리오 생성
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.PENDING);
-        LocalDateTime beginAt = convertDateToLocalDateTime(dto.getBeginAt());
-        LocalDateTime endAt = convertDateToLocalDateTime(dto.getEndAt());
         PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
-            .title(dto.getTitle()).beginAt(beginAt).endAt(endAt)
+            .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
             .workerCnt(dto.getWorkerCnt()).tool(dto.getTool())
             .seq(1)
             .build();

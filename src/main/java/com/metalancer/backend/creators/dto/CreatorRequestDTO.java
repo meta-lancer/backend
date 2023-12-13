@@ -140,8 +140,6 @@ public class CreatorRequestDTO {
         private int workerCnt;
         @Schema(description = "작업툴")
         private String tool;
-        @Schema(description = "첨부 파일")
-        private String referenceFile;
     }
 
     @Data
@@ -157,8 +155,6 @@ public class CreatorRequestDTO {
         private int workerCnt;
         @Schema(description = "작업툴")
         private String tool;
-        @Schema(description = "첨부 파일")
-        private String referenceFile;
     }
 
     @Data

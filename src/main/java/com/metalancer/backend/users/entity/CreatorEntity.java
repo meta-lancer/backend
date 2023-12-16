@@ -83,7 +83,7 @@ public class CreatorEntity extends BaseEntity implements Serializable {
         String userType = user.getRole().getGrantedAuthority().equals("ROLE_SELLER") ? "크리에이터" :
             user.getRole().getGrantedAuthority().equals("ROLE_ADMIN") ? "관리자" :
                 user.getRole().getGrantedAuthority().equals("ROLE_USER") ? "일반회원" : null;
-        return Creator.builder().creatorId(id).nickName(user.getName())
+        return Creator.builder().creatorId(id).nickName(user.getNickname())
             .profileImg(user.getProfileImg()).email(email)
             .introduction(introduction).introductionShort(introductionShort)
             .userType(userType).build();

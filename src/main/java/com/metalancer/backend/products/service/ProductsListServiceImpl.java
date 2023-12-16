@@ -120,8 +120,15 @@ public class ProductsListServiceImpl implements ProductsListService {
         } else {
             GenreGalaxyTypeEntity genreGalaxyTypeEntity = genreGalaxyTypeRepository.findByName(
                 type);
+            // 혹시 모르니 대문자로 했을떄도!
+            if (genreGalaxyTypeEntity == null) {
+                type = type.toUpperCase();
+                genreGalaxyTypeEntity = genreGalaxyTypeRepository.findByName(
+                    type);
+            }
             tagList = tagsRepository.findAllByGenreGalaxy(genreGalaxyTypeEntity);
         }
+
         Page<ProductsEntity> productsEntities = productsRepository.findAllDistinctByTagListAndStatus(
             tagList, DataStatus.ACTIVE, pageable);
         Page<GenreGalaxy> genreGalaxies = productsEntities.map(ProductsEntity::toGenreGalaxy);

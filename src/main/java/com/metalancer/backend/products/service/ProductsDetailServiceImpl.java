@@ -109,7 +109,6 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         AssetFile assetFile = getProductsDetailAssetFileAfterUploaded(foundProductsEntity,
             response);
         response.setAssetFile(assetFile);
-        response.setAssetFile(assetFile);
         return response;
     }
 
@@ -162,7 +161,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-      
+
         return assetFile;
     }
 

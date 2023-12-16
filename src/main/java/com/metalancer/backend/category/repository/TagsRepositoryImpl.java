@@ -39,6 +39,7 @@ public class TagsRepositoryImpl implements TagsRepository {
         );
         List<TagsEntity> tagsEntityList = tagsJpaRepository.findAllByParentId(
             tagsEntity.getId());
+        tagsEntityList.add(0, tagsEntity);
         return tagsEntityList.stream().map(TagsEntity::getTagName).toList();
     }
 

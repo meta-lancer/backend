@@ -1,6 +1,7 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.category.entity.GenreGalaxyTypeEntity;
+import com.metalancer.backend.category.entity.TagsEntity;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,7 @@ public interface GenreGalaxyTypeJpaRepository extends JpaRepository<GenreGalaxyT
     Optional<GenreGalaxyTypeEntity> findByName(@Param("name") String name);
 
     List<GenreGalaxyTypeEntity> findAllByTagsEntityIsNotNull();
+
+    @Query("select ggt.tagsEntity from genre_galaxy_type ggt where ggt.tagsEntity is not null")
+    List<TagsEntity> findAllGenreGalaxyTagList();
 }

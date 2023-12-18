@@ -293,15 +293,17 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     private void setWhereClauseWithTagList(List<String> tagList, BooleanBuilder whereClause) {
+        BooleanBuilder whereTagListClause = new BooleanBuilder();
         for (String tag : tagList) {
             // tag마다 ProductsTag에서 해당되는 고유한 ProductsEntity만 선별
             List<ProductsEntity> productsEntities = getProductsForTag(tag);
             if (productsEntities.size() > 0) {
-                whereClause.or(
+                whereTagListClause.or(
                     QProductsEntity.productsEntity.in(
                         productsEntities));
             }
         }
+        whereClause.and(whereTagListClause);
     }
 
     private void setWhereClauseWithAssetUploadedSuccess(

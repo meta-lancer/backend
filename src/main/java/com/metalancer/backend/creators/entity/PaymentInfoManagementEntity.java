@@ -1,6 +1,6 @@
 package com.metalancer.backend.creators.entity;
 
-import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.common.BaseTimeEntity;
 import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
@@ -23,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "payment_info_management")
 @ToString
-public class PaymentInfoManagementEntity extends BaseEntity implements Serializable {
+public class PaymentInfoManagementEntity extends BaseTimeEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 756241188241993156L;

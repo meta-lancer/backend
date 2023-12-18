@@ -41,4 +41,6 @@ public interface CreatorService {
 
     AssetUpdatedResponse updateAssetWithFile(MultipartFile[] thumbnails, Long productsId, User user,
         AssetUpdateWithOutThumbnail dto);
+
+    boolean deleteMyPaymentInfoManagement(PrincipalDetails user);
 }

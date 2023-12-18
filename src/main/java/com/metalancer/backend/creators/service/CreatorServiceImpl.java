@@ -13,7 +13,9 @@ import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
+import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
 import com.metalancer.backend.creators.repository.CreatorRepository;
+import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
 import com.metalancer.backend.external.aws.s3.S3Service;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
@@ -66,6 +68,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final PortfolioImagesRepository portfolioImagesRepository;
+    private final PaymentInfoManagementRepository paymentInfoManagementRepository;
 
     @Override
     public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
@@ -349,6 +352,21 @@ public class CreatorServiceImpl implements CreatorService {
         return AssetUpdatedResponse.builder().productsDetail(productsDetail).build();
     }
 
+    @Override
+    public boolean deleteMyPaymentInfoManagement(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        optionalPaymentInfoManagement.ifPresent(paymentInfoManagementRepository::delete);
+        return paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity).isEmpty();
+    }
+
     private void setUpdatedThumbnailList(List<String> thumbnailList,
         ProductsEntity productsEntity) {
         int index = 1;
@@ -541,7 +559,7 @@ public class CreatorServiceImpl implements CreatorService {
             dto.getTool());
         portfolioRepository.save(portfolioEntity);
         portfolioImagesRepository.deleteAllByPortfolioEntity(portfolioEntity);
-        
+
         if (files != null && files.length > 0) {
             savePortfolioImageList(files, creatorEntity, portfolioEntity);
         }

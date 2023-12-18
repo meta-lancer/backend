@@ -8,6 +8,7 @@ import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO;
@@ -229,5 +230,52 @@ public class MyCreatorsController {
         String[] imageTypeArr = {"jpg", "png", "jpeg", "JPG", "PNG", "JPEG"};
         List<String> strList = new ArrayList<>(Arrays.asList(imageTypeArr));
         return strList.contains(fileType);
+    }
+
+    @Operation(summary = "결제정보 관리 조회", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = ManageAsset.class)))
+    })
+    @GetMapping("/payment-info/management")
+    public BaseResponse<PaymentInfoManagement> getMyPaymentInfoManagement(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<PaymentInfoManagement>(
+            creatorReadService.getMyPaymentInfoManagement(user));
+    }
+
+    @Operation(summary = "결제정보 관리 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @PostMapping("/payment-info/management")
+    public BaseResponse<Boolean> createMyPaymentInfoManagement(
+        @RequestPart CreatorRequestDTO.PortfolioCreate dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<Boolean>(
+            creatorService.createMyPaymentInfoManagement(files, dto, user));
+    }
+
+    @Operation(summary = "결제정보 관리 수정", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @PatchMapping("/payment-info/management")
+    public BaseResponse<Boolean> updateMyPaymentInfoManagement(
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.PortfolioUpdate dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<Boolean>(
+            creatorService.updateMyPaymentInfoManagement(dto, user));
+    }
+
+    @Operation(summary = "결제정보 관리 삭제", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @DeleteMapping("/payment-info/management")
+    public BaseResponse<Boolean> deleteMyPaymentInfoManagement(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<Boolean>(
+            creatorService.deleteMyPaymentInfoManagement(user));
     }
 }

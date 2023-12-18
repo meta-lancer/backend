@@ -15,7 +15,13 @@ public class PaymentInfoManagementRepositoryImpl implements PaymentInfoManagemen
     private final PaymentInfoManagementJpaRepository paymentInfoManagementJpaRepository;
 
     @Override
-    public Optional<PaymentInfoManagementEntity> findByCreatorEntity(CreatorEntity creatorEntity) {
+    public Optional<PaymentInfoManagementEntity> findByCreatorEntity(
+        CreatorEntity creatorEntity) {
         return paymentInfoManagementJpaRepository.findByCreatorEntity(creatorEntity);
+    }
+
+    @Override
+    public void delete(PaymentInfoManagementEntity paymentInfoManagementEntity) {
+        paymentInfoManagementJpaRepository.delete(paymentInfoManagementEntity);
     }
 }

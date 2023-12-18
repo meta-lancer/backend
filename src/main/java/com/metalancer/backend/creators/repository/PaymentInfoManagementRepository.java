@@ -9,4 +9,6 @@ public interface PaymentInfoManagementRepository {
     Optional<PaymentInfoManagementEntity> findByCreatorEntity(CreatorEntity creatorEntity);
 
     void delete(PaymentInfoManagementEntity paymentInfoManagementEntity);
+
+    void save(PaymentInfoManagementEntity createdPaymentInfoManagementEntity);
 }

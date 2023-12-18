@@ -157,6 +157,24 @@ public class S3Service {
         return url.toString();
     }
 
+    public String uploadToPaymentInfoManagement(Long creatorId,
+        MultipartFile file,
+        String randomString)
+        throws IOException {
+        String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName = randomString + "." + ext;
+        String bucketName =
+            assetBucket + "/creator/" + creatorId + "/paymentInfo-management";
+        String readBucketName =
+            readBucket + "/creator/" + creatorId + "/paymentInfo-management";
+
+        s3Client.putObject(
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        return readBucketName + "/" + fileName;
+    }
+
     public String extractBaseUrl(String signedUrl) {
         try {
             URL url = new URL(signedUrl);

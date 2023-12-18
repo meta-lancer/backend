@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -249,10 +250,13 @@ public class MyCreatorsController {
     })
     @PostMapping("/payment-info/management")
     public BaseResponse<Boolean> createMyPaymentInfoManagement(
-        @RequestPart CreatorRequestDTO.PortfolioCreate dto,
-        @AuthenticationPrincipal PrincipalDetails user) {
+        @RequestPart(value = "idCardCopyFile", required = true) MultipartFile idCardCopyFile,
+        @RequestPart(value = "accountCopyFile", required = true) MultipartFile accountCopyFile,
+        @RequestPart CreatorRequestDTO.MyPaymentInfoManagementCreate dto,
+        @AuthenticationPrincipal PrincipalDetails user) throws IOException {
         return new BaseResponse<Boolean>(
-            creatorService.createMyPaymentInfoManagement(files, dto, user));
+            creatorService.createMyPaymentInfoManagement(idCardCopyFile, accountCopyFile, dto,
+                user));
     }
 
     @Operation(summary = "결제정보 관리 수정", description = "")
@@ -261,11 +265,13 @@ public class MyCreatorsController {
     })
     @PatchMapping("/payment-info/management")
     public BaseResponse<Boolean> updateMyPaymentInfoManagement(
-        @RequestPart(value = "files", required = false) MultipartFile[] files,
-        @RequestPart CreatorRequestDTO.PortfolioUpdate dto,
-        @AuthenticationPrincipal PrincipalDetails user) {
+        @RequestPart(value = "idCardCopyFile", required = false) MultipartFile idCardCopyFile,
+        @RequestPart(value = "accountCopyFile", required = false) MultipartFile accountCopyFile,
+        @RequestPart CreatorRequestDTO.MyPaymentInfoManagementUpdate dto,
+        @AuthenticationPrincipal PrincipalDetails user) throws IOException {
         return new BaseResponse<Boolean>(
-            creatorService.updateMyPaymentInfoManagement(dto, user));
+            creatorService.updateMyPaymentInfoManagement(idCardCopyFile, accountCopyFile, dto,
+                user));
     }
 
     @Operation(summary = "결제정보 관리 삭제", description = "")

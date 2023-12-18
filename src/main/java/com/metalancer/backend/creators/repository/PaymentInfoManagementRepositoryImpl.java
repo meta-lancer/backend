@@ -24,4 +24,9 @@ public class PaymentInfoManagementRepositoryImpl implements PaymentInfoManagemen
     public void delete(PaymentInfoManagementEntity paymentInfoManagementEntity) {
         paymentInfoManagementJpaRepository.delete(paymentInfoManagementEntity);
     }
+
+    @Override
+    public void save(PaymentInfoManagementEntity createdPaymentInfoManagementEntity) {
+        paymentInfoManagementJpaRepository.save(createdPaymentInfoManagementEntity);
+    }
 }

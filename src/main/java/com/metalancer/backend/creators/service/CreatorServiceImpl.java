@@ -5,10 +5,13 @@ import com.metalancer.backend.common.constants.AssetType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.DuplicatedException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManagementCreate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManagementUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
@@ -353,6 +356,75 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
+    public boolean createMyPaymentInfoManagement(MultipartFile idCardCopyFile,
+        MultipartFile accountCopyFile,
+        MyPaymentInfoManagementCreate dto, PrincipalDetails user) throws IOException {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        if (optionalPaymentInfoManagement.isPresent()) {
+            throw new DuplicatedException("결제정보 관리", ErrorCode.DUPLICATED);
+        }
+        String randomString1 = uploadService.getRandomStringForImageName(8);
+        String randomString2 = uploadService.getRandomStringForImageName(8);
+        String idCardCopyUrl = uploadService.uploadToPaymentInfoManagement(creatorEntity.getId(),
+            idCardCopyFile, randomString1);
+        String accountCopyUrl = uploadService.uploadToPaymentInfoManagement(creatorEntity.getId(),
+            accountCopyFile, randomString2);
+
+        PaymentInfoManagementEntity createdPaymentInfoManagementEntity = PaymentInfoManagementEntity.builder()
+            .creatorEntity(creatorEntity).registerNo(dto.getRegisterNo()).idCardCopy(idCardCopyUrl)
+            .bank(dto.getBank()).accountCopy(accountCopyUrl)
+            .incomeAgree(dto.isIncomeAgree())
+            .build();
+        paymentInfoManagementRepository.save(createdPaymentInfoManagementEntity);
+        return paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity).isPresent();
+    }
+
+    @Override
+    public boolean updateMyPaymentInfoManagement(MultipartFile idCardCopyFile,
+        MultipartFile accountCopyFile,
+        MyPaymentInfoManagementUpdate dto, PrincipalDetails user) throws IOException {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        if (optionalPaymentInfoManagement.isEmpty()) {
+            throw new NotFoundException("결제정보 관리", ErrorCode.NOT_FOUND);
+        }
+        PaymentInfoManagementEntity paymentInfoManagementEntity = optionalPaymentInfoManagement.get();
+        paymentInfoManagementEntity.update(dto.getRegisterNo(), dto.getBank());
+
+        if (idCardCopyFile != null && !idCardCopyFile.isEmpty()) {
+            String randomString1 = uploadService.getRandomStringForImageName(8);
+            String idCardCopyUrl = uploadService.uploadToPaymentInfoManagement(
+                creatorEntity.getId(),
+                idCardCopyFile, randomString1);
+            paymentInfoManagementEntity.setIdCardCopy(idCardCopyUrl);
+        }
+
+        if (accountCopyFile != null && !accountCopyFile.isEmpty()) {
+            String randomString2 = uploadService.getRandomStringForImageName(8);
+            String accountCopyUrl = uploadService.uploadToPaymentInfoManagement(
+                creatorEntity.getId(),
+                accountCopyFile, randomString2);
+            paymentInfoManagementEntity.setAccountCopy(accountCopyUrl);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean deleteMyPaymentInfoManagement(PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
@@ -366,6 +438,7 @@ public class CreatorServiceImpl implements CreatorService {
         return paymentInfoManagementRepository.findByCreatorEntity(
             creatorEntity).isEmpty();
     }
+
 
     private void setUpdatedThumbnailList(List<String> thumbnailList,
         ProductsEntity productsEntity) {

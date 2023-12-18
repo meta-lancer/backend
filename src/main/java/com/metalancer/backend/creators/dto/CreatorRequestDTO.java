@@ -173,4 +173,25 @@ public class CreatorRequestDTO {
 
     }
 
+    @Data
+    public static class MyPaymentInfoManagementCreate {
+
+        @Schema(description = "주민등록번호")
+        private String registerNo;
+        @Schema(description = "은행")
+        private String bank;
+        @Schema(description = "소득 지급 관련 정보 동의")
+        private boolean incomeAgree;
+
+    }
+
+    @Data
+    public static class MyPaymentInfoManagementUpdate {
+
+        @Schema(description = "주민등록번호")
+        private String registerNo;
+        @Schema(description = "은행")
+        private String bank;
+    }
+
 }

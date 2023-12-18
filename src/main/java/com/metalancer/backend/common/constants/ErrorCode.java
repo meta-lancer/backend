@@ -44,7 +44,6 @@ public enum ErrorCode {
     USER_UPDATE_OK(SUCCESS, "D001", "회원정보 수정 성공"),
     USER_UPDATE_INVALID(NOT_FOUND_VALUE, "D002", "회원정보 수정 실패"),
     USER_KAKAO_INVALID(NOT_FOUND_VALUE, "D003", "KAKAO 회원정보 조회 실패"),
-
     /**
      * 권한여부
      */
@@ -100,6 +99,7 @@ public enum ErrorCode {
     STATUS_PENDING(INVALID_VALUE, "Z102", "승인대기 상태입니다."),
     STATUS_BANNED(INVALID_VALUE, "Z103", "정지된 상태입니다."),
     ROLE_INVALID(INVALID_VALUE, "Z104", "올바르지않은 권한입니다."),
+    DUPLICATED(DUPLICATED_VALUE, "Z105", "이미 존재합니다."),
     /**
      * 잘못된 ExceptionCode
      */

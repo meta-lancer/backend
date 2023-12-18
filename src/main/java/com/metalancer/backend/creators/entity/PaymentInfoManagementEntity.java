@@ -63,4 +63,17 @@ public class PaymentInfoManagementEntity extends BaseTimeEntity implements Seria
             .idCardCopy(idCardCopy)
             .bank(bank).accountCopy(accountCopy).build();
     }
+
+    public void update(String registerNo, String bank) {
+        this.registerNo = registerNo;
+        this.bank = bank;
+    }
+
+    public void setIdCardCopy(String idCardCopy) {
+        this.idCardCopy = idCardCopy;
+    }
+
+    public void setAccountCopy(String accountCopy) {
+        this.accountCopy = accountCopy;
+    }
 }

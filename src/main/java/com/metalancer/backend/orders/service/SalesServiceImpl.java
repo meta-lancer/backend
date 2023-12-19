@@ -46,20 +46,25 @@ public class SalesServiceImpl implements SalesService {
         LocalDateTime beginAt = getBeginAtBasedOnPeriodType(periodType, endAt);
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<DaySalesReport> response = new ArrayList<>();
-
         for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {
-            String formattedDate = date.format(dateFormatter);
-            LocalDateTime startOfNextDay = date.plusDays(1);
-            Integer totalPrice = productsSalesRepository.getTotalPriceByCreatorAndDate(
-                creatorEntity, date, startOfNextDay);
-            int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
-                creatorEntity, date, startOfNextDay);
-            DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-                .totalPrice(totalPrice).salesCnt(salesCnt).build();
-            response.add(daySalesReport);
+            setTotalPriceAndSalesCntBasedOnDate(creatorEntity, dateFormatter, response, date);
         }
         Collections.reverse(response);
         return response;
+    }
+
+    private void setTotalPriceAndSalesCntBasedOnDate(CreatorEntity creatorEntity,
+        DateTimeFormatter dateFormatter,
+        List<DaySalesReport> response, LocalDateTime date) {
+        String formattedDate = date.format(dateFormatter);
+        LocalDateTime startOfNextDay = date.plusDays(1);
+        Integer totalPrice = productsSalesRepository.getTotalPriceByCreatorAndDate(
+            creatorEntity, date, startOfNextDay);
+        int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
+            creatorEntity, date, startOfNextDay);
+        DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
+            .totalPrice(totalPrice).salesCnt(salesCnt).build();
+        response.add(daySalesReport);
     }
 
     @NotNull
@@ -75,7 +80,7 @@ public class SalesServiceImpl implements SalesService {
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
-        return beginAt;
+        return beginAt.plusDays(1);
     }
 
     @Override
@@ -89,6 +94,12 @@ public class SalesServiceImpl implements SalesService {
             DataStatus.ACTIVE);
         LocalDateTime beginAt = Time.convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = Time.convertDateToLocalDateTime(endDate);
-        return null;
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<DaySalesReport> response = new ArrayList<>();
+        for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {
+            setTotalPriceAndSalesCntBasedOnDate(creatorEntity, dateFormatter, response, date);
+        }
+        Collections.reverse(response);
+        return response;
     }
 }

@@ -9,6 +9,7 @@ import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
+import com.metalancer.backend.orders.domain.SettlementReportList;
 import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
@@ -231,5 +232,11 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         return ProductsList.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
             .dataStatus(getStatus()).createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
             .build();
+    }
+
+    public SettlementReportList toSettlementReportList(boolean hasSettled) {
+        return SettlementReportList.builder().assetsId(id).assetTitle(title)
+            .assetExtension(productsAssetFileEntity.getExtList())
+            .assetsFileSize(productsAssetFileEntity.getFileSize()).hasSettled(hasSettled).build();
     }
 }

@@ -94,8 +94,7 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     public Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable) {
-        return productsJpaRepository.findAllByCreatorEntityAndStatus(creatorEntity, pageable,
-            DataStatus.ACTIVE);
+        return productsJpaRepository.findAllByCreatorEntity(creatorEntity, pageable);
     }
 
     @Override

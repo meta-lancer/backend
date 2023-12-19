@@ -77,4 +77,6 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
 
     Page<ProductsEntity> findAllByStatusAndProductsAssetFileEntitySuccessAndTitleContainsOrderByCreatedAtDesc(
         DataStatus status, Boolean success, String keyword, Pageable pageable);
+
+    Page<ProductsEntity> findAllByCreatorEntity(CreatorEntity creatorEntity, Pageable pageable);
 }

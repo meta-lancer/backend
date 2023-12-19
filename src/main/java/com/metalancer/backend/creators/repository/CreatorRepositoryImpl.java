@@ -19,7 +19,7 @@ public class CreatorRepositoryImpl implements CreatorRepository {
     @Override
     public CreatorEntity findByUserAndStatus(User user, DataStatus status) {
         return creatorJpaRepository.findByUserAndStatus(user, status).orElseThrow(
-            () -> new BaseException(ErrorCode.NOT_FOUND)
+            () -> new BaseException("크리에이터", ErrorCode.NOT_FOUND)
         );
     }
 

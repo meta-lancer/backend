@@ -55,12 +55,27 @@ public class SalesServiceImpl implements SalesService {
             DataStatus.ACTIVE);
         LocalDateTime endAt = LocalDateTime.now();
         LocalDateTime beginAt = getBeginAtBasedOnPeriodType(periodType, endAt);
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         List<DaySalesReport> response = new ArrayList<>();
-        for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {
-            setTotalPriceAndSalesCntBasedOnDate(creatorEntity, dateFormatter, response, date);
+        if (!periodType.equals(PeriodType.YEARLY)) {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {
+                setTotalPriceAndSalesCntBasedOnDate(creatorEntity, dateFormatter, response, date);
+            }
+        } else {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM월");
+            for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusMonths(1)) {
+                String formattedDate = date.format(dateFormatter);
+                LocalDateTime startOfNextMonth = date.plusMonths(1);
+                Integer totalPrice = productsSalesRepository.getTotalPriceByCreatorAndDate(
+                    creatorEntity, date, startOfNextMonth);
+                int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
+                    creatorEntity, date, startOfNextMonth);
+                DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
+                    .totalPrice(totalPrice).salesCnt(salesCnt).build();
+                response.add(daySalesReport);
+            }
         }
-        Collections.reverse(response);
         return response;
     }
 
@@ -81,17 +96,26 @@ public class SalesServiceImpl implements SalesService {
     @NotNull
     private static LocalDateTime getBeginAtBasedOnPeriodType(PeriodType periodType,
         LocalDateTime endAt) {
-        LocalDateTime beginAt = periodType.equals(PeriodType.WEEKLY) ? endAt.minusWeeks(1)
+        return periodType.equals(PeriodType.WEEKLY) ? endAt.minusWeeks(1)
             .withHour(0)
             .withMinute(0)
             .withSecond(0)
-            .withNano(0) :
-            endAt.minusMonths(1)
-                .withHour(0)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0);
-        return beginAt.plusDays(1);
+            .withNano(0)
+            .plusDays(1) :
+            periodType.equals(PeriodType.MONTHLY) ?
+                endAt.minusMonths(1)
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0)
+                    .plusDays(1) :
+                endAt.minusYears(1)
+                    .withDayOfMonth(1)
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0)
+                    .plusMonths(1);
     }
 
     @Override

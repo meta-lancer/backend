@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum PeriodType {
 
     WEEKLY("주간"),
-    MONTHLY("월간");
+    MONTHLY("월간"),
+    YEARLY("연간");
 
     private final String korName;
 

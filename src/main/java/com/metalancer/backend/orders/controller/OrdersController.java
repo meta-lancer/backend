@@ -7,7 +7,6 @@ import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.PaymentResponse;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO.CancelAllPayment;
-import com.metalancer.backend.orders.repository.OrdersRepository;
 import com.metalancer.backend.orders.service.OrdersService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -47,7 +46,6 @@ public class OrdersController {
     @Value("${iamport.api.secret}")
     private String apiSecret;
     private final OrdersService ordersService;
-    private final OrdersRepository ordersRepository;
 
     // 토큰 발행
     // 주문서 생성 => 도중에 사전 등록

@@ -75,8 +75,8 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
 
     public void completeOrder() {
         if (this.orderProductStatus.equals(OrderStatus.PAY_ING) || this.orderProductStatus.equals(
-            OrderStatus.PAY_DONE)) {
-            this.orderProductStatus = OrderStatus.PAY_DONE;
+            OrderStatus.PAY_CONFIRM)) {
+            this.orderProductStatus = OrderStatus.PAY_CONFIRM;
         } else {
             throw new OrderStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_ORDER_STATUS);
         }

@@ -98,7 +98,7 @@ public class OrdersEntity extends BaseEntity implements Serializable {
         // PAY_CONFIRM은 웹훅과 동시에 진행하기 때문에 허용
         if (this.orderStatus.equals(OrderStatus.PAY_ING) || this.orderStatus.equals(
             OrderStatus.PAY_DONE)) {
-            this.orderStatus = OrderStatus.PAY_DONE;
+            this.orderStatus = OrderStatus.PAY_CONFIRM;
         } else {
             throw new DataStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_DATA_STATUS);
         }

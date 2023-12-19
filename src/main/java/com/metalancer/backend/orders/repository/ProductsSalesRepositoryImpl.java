@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.repository;
 
+import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,10 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
         LocalDateTime startOfNextDay) {
         return productsSalesJpaRepository.getSalesCntByCreatorAndDate(creatorEntity, date,
             startOfNextDay);
+    }
+
+    @Override
+    public void save(ProductsSalesEntity createdProductsSalesEntity) {
+        productsSalesJpaRepository.save(createdProductsSalesEntity);
     }
 }

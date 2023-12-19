@@ -95,4 +95,11 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
             .orderProductNo(orderProductNo).orderProductStatus(orderProductStatus).price(price)
             .claimType(claimType).claimStatus(claimStatus).build();
     }
+
+    public ProductsSalesEntity toProductsSalesEntity() {
+        return ProductsSalesEntity.builder().creatorEntity(productsEntity.getCreatorEntity())
+            .ordersEntity(ordersEntity).ordererId(orderer.getId())
+            .productsEntity(productsEntity).orderProductNo(orderProductNo).orderNo(orderNo)
+            .price(price).build();
+    }
 }

@@ -18,9 +18,11 @@ import com.metalancer.backend.orders.dto.OrdersRequestDTO.CreateOrder;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
 import com.metalancer.backend.orders.entity.OrdersEntity;
+import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
+import com.metalancer.backend.orders.repository.ProductsSalesRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
@@ -65,6 +67,7 @@ public class OrdersServiceImpl implements OrdersService {
     private final OrderPaymentRepository orderPaymentRepository;
     private final PayedAssetsRepository payedAssetsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
+    private final ProductsSalesRepository productsSalesRepository;
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
@@ -200,6 +203,10 @@ public class OrdersServiceImpl implements OrdersService {
                 .orderPaymentEntity(savedOrderPaymentEntity)
                 .downloadLink(assetUrl).build();
             payedAssetsRepository.save(createdPayedAssetsEntity);
+
+            // 판매자 판매내역
+            ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity();
+            productsSalesRepository.save(createdProductsSalesEntity);
         }
 
         PaymentResponse response = getPaymentResponse(user,

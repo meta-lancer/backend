@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.repository;
 
+import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.time.LocalDateTime;
 
@@ -10,4 +11,6 @@ public interface ProductsSalesRepository {
 
     int getSalesCntByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
         LocalDateTime startOfNextDay);
+
+    void save(ProductsSalesEntity createdProductsSalesEntity);
 }

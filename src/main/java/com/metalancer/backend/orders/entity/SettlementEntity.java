@@ -2,6 +2,8 @@ package com.metalancer.backend.orders.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.SettlementStatus;
+import com.metalancer.backend.common.utils.Time;
+import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -67,4 +69,10 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     @Schema(name = "첨부파일")
     private String referenceFile;
 
+    public SettlementRecordList toSettlementRecordList() {
+        return SettlementRecordList.builder().settlementId(id)
+            .requestDay(Time.convertDateToString(requestDay))
+            .currentSituation(currentSituation)
+            .manager(manager).settlementStatus(settlementStatus).build();
+    }
 }

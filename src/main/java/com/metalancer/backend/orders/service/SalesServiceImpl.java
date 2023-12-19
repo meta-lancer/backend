@@ -9,8 +9,11 @@ import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.orders.domain.DaySalesReport;
+import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
+import com.metalancer.backend.orders.entity.SettlementEntity;
 import com.metalancer.backend.orders.repository.ProductsSalesRepository;
+import com.metalancer.backend.orders.repository.SettlementRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.users.entity.CreatorEntity;
@@ -40,6 +43,7 @@ public class SalesServiceImpl implements SalesService {
     private final UserRepository userRepository;
     private final CreatorRepository creatorRepository;
     private final ProductsRepository productsRepository;
+    private final SettlementRepository settlementRepository;
 
     @Override
     public List<DaySalesReport> getDaySalesReport(PrincipalDetails user, PeriodType periodType) {
@@ -133,5 +137,19 @@ public class SalesServiceImpl implements SalesService {
             reportLists.add(settlementReport);
         }
         return new PageImpl<>(reportLists, pageable, totalCnt);
+    }
+
+    @Override
+    public Page<SettlementRecordList> getSettlementRecordList(PrincipalDetails user,
+        Pageable pageable) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Page<SettlementEntity> settlementEntityList = settlementRepository.findAllByCreator(
+            creatorEntity, pageable);
+        return settlementEntityList.map(SettlementEntity::toSettlementRecordList);
     }
 }

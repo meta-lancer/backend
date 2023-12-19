@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.orders.domain.DaySalesReport;
+import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
 import com.metalancer.backend.orders.service.SalesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,5 +61,15 @@ public class SettlementController {
         Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(salesService.getSettlementReportList(user, pageable));
+    }
+
+    @Operation(summary = "정산관리-정산 기록", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementReportList.class)))
+    @GetMapping("/record")
+    public BaseResponse<Page<SettlementRecordList>> getSettlementRecordList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        Pageable pageable) {
+        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        return new BaseResponse<>(salesService.getSettlementRecordList(user, pageable));
     }
 }

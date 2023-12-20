@@ -116,6 +116,11 @@ public class Time {
         return dateTime != null ? dateTime.format(outputFormat) : "-";
     }
 
+    public static String convertDateToStringWithAttached(LocalDateTime dateTime) {
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
+        return dateTime != null ? dateTime.format(outputFormat) : "-";
+    }
+
     public static String convertDateToStringSlash(LocalDateTime dateTime) {
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         return dateTime != null ? dateTime.format(outputFormat) : "-";

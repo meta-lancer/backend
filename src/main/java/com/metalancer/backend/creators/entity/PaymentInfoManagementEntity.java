@@ -1,6 +1,8 @@
 package com.metalancer.backend.creators.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.metalancer.backend.common.BaseTimeEntity;
+import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
@@ -12,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +48,10 @@ public class PaymentInfoManagementEntity extends BaseTimeEntity implements Seria
     private String accountCopy;
     @Column(nullable = false)
     private boolean incomeAgree;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime idCardCopyUploadedAt = LocalDateTime.now();
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime accountCopyUploadedAt = LocalDateTime.now();
 
     @Builder
     public PaymentInfoManagementEntity(CreatorEntity creatorEntity, String registerNo,
@@ -56,12 +63,17 @@ public class PaymentInfoManagementEntity extends BaseTimeEntity implements Seria
         this.bank = bank;
         this.accountCopy = accountCopy;
         this.incomeAgree = incomeAgree;
+        this.idCardCopyUploadedAt = LocalDateTime.now();
+        this.accountCopyUploadedAt = LocalDateTime.now();
     }
 
     public PaymentInfoManagement toPaymentInfoManagement() {
         return PaymentInfoManagement.builder().paymentInfoManagementId(id).registerNo(registerNo)
             .idCardCopy(idCardCopy)
-            .bank(bank).accountCopy(accountCopy).build();
+            .bank(bank).accountCopy(accountCopy)
+            .idCardCopyUploadedAt(Time.convertDateToStringWithAttached(idCardCopyUploadedAt))
+            .accountCopyUploadedAt(Time.convertDateToStringWithAttached(accountCopyUploadedAt))
+            .build();
     }
 
     public void update(String registerNo, String bank) {
@@ -71,9 +83,11 @@ public class PaymentInfoManagementEntity extends BaseTimeEntity implements Seria
 
     public void setIdCardCopy(String idCardCopy) {
         this.idCardCopy = idCardCopy;
+        this.idCardCopyUploadedAt = LocalDateTime.now();
     }
 
     public void setAccountCopy(String accountCopy) {
         this.accountCopy = accountCopy;
+        this.accountCopyUploadedAt = LocalDateTime.now();
     }
 }

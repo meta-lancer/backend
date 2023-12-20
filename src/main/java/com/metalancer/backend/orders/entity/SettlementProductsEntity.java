@@ -7,6 +7,8 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -46,6 +48,7 @@ public class SettlementProductsEntity extends BaseEntity implements Serializable
     @Schema(name = "판매 횟수")
     private int salesQuantity;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Schema(name = "정산 상태")
     private SettlementStatus settlementStatus = SettlementStatus.REQUEST;
     @Column(nullable = false)

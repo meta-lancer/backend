@@ -3,6 +3,7 @@ package com.metalancer.backend.common.constants;
 import static com.metalancer.backend.common.constants.HttpStatus.BAD_REQUEST;
 import static com.metalancer.backend.common.constants.HttpStatus.CREATED;
 import static com.metalancer.backend.common.constants.HttpStatus.DUPLICATED_VALUE;
+import static com.metalancer.backend.common.constants.HttpStatus.EXTERNAL_API_CALL_FAILED;
 import static com.metalancer.backend.common.constants.HttpStatus.FORBIDDEN;
 import static com.metalancer.backend.common.constants.HttpStatus.INVALID_ACCESS;
 import static com.metalancer.backend.common.constants.HttpStatus.INVALID_VALUE;
@@ -38,23 +39,23 @@ public enum ErrorCode {
      * 회원정보
      */
     USER_GET_OK(SUCCESS, "C001", "회원정보 있음"),
-    USER_NOT_FOUND(NOT_FOUND_VALUE, "C002", "회원정보 없음"),
+    USER_NOT_FOUND(UNEXPECTED_ERROR, "C002", "회원정보 없음"),
     NICKNAME_UPDATE_COUNT_PROHIBIT(BAD_REQUEST, "C003", "닉네임을 1번 변경한 적이 있습니다."),
 
     USER_UPDATE_OK(SUCCESS, "D001", "회원정보 수정 성공"),
-    USER_UPDATE_INVALID(NOT_FOUND_VALUE, "D002", "회원정보 수정 실패"),
-    USER_KAKAO_INVALID(NOT_FOUND_VALUE, "D003", "KAKAO 회원정보 조회 실패"),
+    USER_UPDATE_INVALID(BAD_REQUEST, "D002", "회원정보 수정 실패"),
+    USER_KAKAO_INVALID(BAD_REQUEST, "D003", "KAKAO 회원정보 조회 실패"),
     /**
      * 권한여부
      */
     AUTHORITY_HAVE(SUCCESS, "E001", "수정/삭제 권한이 있습니다"),
-    AUTHORITY_NOT_HAVE(NOT_FOUND_VALUE, "E002", "수정/삭제 권한이 없습니다."),
+    AUTHORITY_NOT_HAVE(FORBIDDEN, "E002", "수정/삭제 권한이 없습니다."),
     INVALID_ROLE_ACCESS(FORBIDDEN, "E003", "올바르지 않은 권한 접근입니다."),
     IS_NOT_WRITER(INVALID_ACCESS, "E004", "본인만 접근 가능합니다."),
     /**
      * 포트원 결제
      */
-    PORTONE_ERROR(NOT_FOUND_VALUE, "F002", "포트원 api 호출에 실패했습니다."),
+    PORTONE_ERROR(EXTERNAL_API_CALL_FAILED, "F002", "포트원 api 호출에 실패했습니다."),
     ILLEGAL_ORDER_STATUS(INVALID_VALUE, "F003", "잘못된 주문 상태 입니다."),
     FAIL_TO_ORDER(INVALID_VALUE, "F004", "주문에 실패했습니다."),
 
@@ -85,7 +86,7 @@ public enum ErrorCode {
 
     PRODUCTS_STATUS_ERROR(INVALID_VALUE, "H001", "상품이 삭제되었거나 제한되었습니다."),
 
-    TYPE_NOT_FOUND(NOT_FOUND_VALUE, "Z002", "해당 type이 존재하지 않습니다."),
+    TYPE_NOT_FOUND(BAD_REQUEST, "Z002", "해당 type이 존재하지 않습니다."),
 
     INVALID_PARAMETER(BAD_REQUEST, "Z001", "요청값이 올바르지 않습니다."),
     NOT_FOUND(NOT_FOUND_VALUE, "Z002", "존재하지 않습니다."),

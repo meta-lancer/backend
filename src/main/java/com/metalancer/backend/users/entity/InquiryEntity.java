@@ -1,6 +1,8 @@
 package com.metalancer.backend.users.entity;
 
+import com.metalancer.backend.admin.domain.InquiryList;
 import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.common.utils.Time;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -50,5 +52,14 @@ public class InquiryEntity extends BaseEntity implements Serializable {
         this.title = title;
         this.content = content;
         this.orderProductId = orderProductId;
+    }
+
+    public InquiryList toInquiryList() {
+        return InquiryList.builder().inquiryId(id).memberId(user.getId())
+            .profileImg(user.getProfileImg())
+            .nickname(user.getNickname()).title(title)
+            .content(content).createdDate(Time.convertDateToStringWithDot(getCreatedAt()))
+            .createdAt(Time.convertDateToKor(getCreatedAt()))
+            .updatedAt(Time.convertDateToKor(getUpdatedAt())).build();
     }
 }

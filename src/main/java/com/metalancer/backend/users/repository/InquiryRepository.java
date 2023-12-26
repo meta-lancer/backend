@@ -13,4 +13,6 @@ public interface InquiryRepository {
     Optional<InquiryEntity> findById(Long id);
 
     Page<InquiryList> findAdminAll(Pageable pageable);
+
+    Integer countNewCnt();
 }

@@ -31,4 +31,9 @@ public class InquiryRepositoryImpl implements InquiryRepository {
     public Page<InquiryList> findAdminAll(Pageable pageable) {
         return inquiryJpaRepository.findAllBy(pageable).map(InquiryEntity::toInquiryList);
     }
+
+    @Override
+    public Integer countNewCnt() {
+        return inquiryJpaRepository.countAllByReplyIsFalse();
+    }
 }

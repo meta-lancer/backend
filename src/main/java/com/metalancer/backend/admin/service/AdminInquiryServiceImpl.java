@@ -22,4 +22,9 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
     public Page<InquiryList> getAdminInquiryList(Pageable pageable) {
         return inquiryRepository.findAdminAll(pageable);
     }
+
+    @Override
+    public Integer getAdminInquiryNewCount() {
+        return inquiryRepository.countNewCnt();
+    }
 }

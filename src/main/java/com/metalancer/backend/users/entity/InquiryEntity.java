@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +47,18 @@ public class InquiryEntity extends BaseEntity implements Serializable {
     @Column
     private Long orderProductId;
 
+    private Long adminId;
+
+    private String adminName;
+
+    private boolean reply = false;
+
+    private String replyContent;
+
+    private LocalDateTime replyAt;
+
+    private LocalDateTime replyUpdatedAt;
+
     @Builder
     public InquiryEntity(User user, String title, String content, Long orderProductId) {
         this.user = user;
@@ -54,12 +67,28 @@ public class InquiryEntity extends BaseEntity implements Serializable {
         this.orderProductId = orderProductId;
     }
 
+    public void reply(Long adminId, String adminName, String replyContent) {
+        this.adminId = adminId;
+        this.adminName = adminName;
+        this.replyContent = replyContent;
+        this.reply = true;
+        if (replyAt == null) {
+            this.replyAt = LocalDateTime.now();
+        } else {
+            this.replyUpdatedAt = LocalDateTime.now();
+        }
+
+    }
+
     public InquiryList toInquiryList() {
         return InquiryList.builder().inquiryId(id).memberId(user.getId())
             .profileImg(user.getProfileImg())
             .nickname(user.getNickname()).title(title)
             .content(content).createdDate(Time.convertDateToStringWithDot(getCreatedAt()))
             .createdAt(Time.convertDateToKor(getCreatedAt()))
-            .updatedAt(Time.convertDateToKor(getUpdatedAt())).build();
+            .updatedAt(Time.convertDateToKor(getUpdatedAt()))
+            .adminId(adminId).adminName(adminName).reply(reply).replyContent(replyContent)
+            .replyAt(replyAt).replyUpdatedAt(replyUpdatedAt)
+            .build();
     }
 }

@@ -24,10 +24,16 @@ public class AdminInquiryController {
 
     @GetMapping("/list")
     public BaseResponse<Page<InquiryList>> getAdminInquiryList(
-        @Parameter(description = "페이징") Pageable pageable) throws Exception {
+        @Parameter(description = "페이징") Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<InquiryList>>(
             adminInquiryService.getAdminInquiryList(pageable));
+    }
+
+    @GetMapping("/new/count")
+    public BaseResponse<Integer> getAdminInquiryNewCount() {
+        return new BaseResponse<Integer>(
+            adminInquiryService.getAdminInquiryNewCount());
     }
 
 }

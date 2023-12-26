@@ -9,4 +9,6 @@ public interface InquiryJpaRepository extends
     JpaRepository<InquiryEntity, Long> {
 
     Page<InquiryEntity> findAllBy(Pageable pageable);
+
+    int countAllByReplyIsFalse();
 }

@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable;
 public interface AdminInquiryService {
 
     Page<InquiryList> getAdminInquiryList(Pageable pageable);
+
+    Integer getAdminInquiryNewCount();
 }

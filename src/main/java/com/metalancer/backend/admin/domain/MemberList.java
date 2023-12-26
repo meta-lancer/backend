@@ -13,7 +13,7 @@ public class MemberList {
     private Long memberId;
     private String email;
     private String name;
-    private String username;
+    private String nickname;
     private String mobile;
     private String job;
     private Role role;
@@ -23,14 +23,14 @@ public class MemberList {
     private DataStatus status;
 
     @Builder
-    public MemberList(Long memberId, String email, String name, String username, String mobile,
+    public MemberList(Long memberId, String email, String name, String nickname, String mobile,
         String job, Role role, LoginType loginType, LocalDateTime createdAt,
         LocalDateTime updatedAt,
         DataStatus status) {
         this.memberId = memberId;
         this.email = email;
         this.name = name;
-        this.username = username;
+        this.nickname = nickname;
         this.mobile = mobile;
         this.job = job;
         this.role = role;

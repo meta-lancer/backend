@@ -110,9 +110,9 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         User user = userRepository.findById(memberId).orElseThrow(
             () -> new NotFoundException(ErrorCode.NOT_FOUND)
         );
-        user.changeToCreator();
         CreatorEntity createdCreator = CreatorEntity.builder().user(user)
             .email(user.getEmail()).build();
+        user.changeToCreator();
         creatorRepository.save(createdCreator);
         return "판매자 전환했습니다.";
     }

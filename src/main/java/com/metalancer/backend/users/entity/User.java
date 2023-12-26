@@ -204,7 +204,7 @@ public class User extends BaseEntity implements Serializable {
             .email(email)
             .mobile(mobile)
             .name(name)
-            .username(username)
+            .nickname(nickname)
             .job(job)
             .loginType(loginType)
             .role(role)

@@ -48,8 +48,10 @@ public class PaymentInfoManagementEntity extends BaseTimeEntity implements Seria
     private String accountCopy;
     @Column(nullable = false)
     private boolean incomeAgree;
+    @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime idCardCopyUploadedAt = LocalDateTime.now();
+    @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime accountCopyUploadedAt = LocalDateTime.now();
 

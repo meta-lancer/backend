@@ -1,6 +1,8 @@
 package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.admin.domain.InquiryList;
+import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.users.entity.InquiryEntity;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +37,12 @@ public class InquiryRepositoryImpl implements InquiryRepository {
     @Override
     public Integer countNewCnt() {
         return inquiryJpaRepository.countAllByReplyIsFalse();
+    }
+
+    @Override
+    public InquiryEntity findEntityById(Long inquiryId) {
+        return inquiryJpaRepository.findById(inquiryId).orElseThrow(
+            () -> new NotFoundException("inquiry", ErrorCode.NOT_FOUND)
+        );
     }
 }

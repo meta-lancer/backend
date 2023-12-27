@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,10 @@ public class CreatorRepositoryImpl implements CreatorRepository {
     @Override
     public void save(CreatorEntity createdCreator) {
         creatorJpaRepository.save(createdCreator);
+    }
+
+    @Override
+    public Integer getRegisterCntByDate(LocalDateTime date, LocalDateTime startOfNextDay) {
+        return creatorJpaRepository.getRegisterCntByDate(date, startOfNextDay);
     }
 }

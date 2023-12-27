@@ -3,8 +3,11 @@ package com.metalancer.backend.users.repository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.users.entity.User;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -16,4 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     int countUsersByNickname(String nickname);
+
+    @Query("select count(u) from users u where u.createdAt between :startDate and :startOfNextDay")
+    Integer getRegisterCntByDate(@Param("startDate") LocalDateTime startDate,
+        @Param("startOfNextDay") LocalDateTime startOfNextDay);
 }

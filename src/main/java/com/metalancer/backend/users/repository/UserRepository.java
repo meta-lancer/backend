@@ -23,4 +23,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select count(u) from users u where u.createdAt between :startDate and :startOfNextDay")
     Integer getRegisterCntByDate(@Param("startDate") LocalDateTime startDate,
         @Param("startOfNextDay") LocalDateTime startOfNextDay);
+
+
+    Integer countUserBy();
+
+    Integer countAllByStatus(DataStatus status);
+
+    Integer countAllByLoginType(LoginType loginType);
+
+    @Query("select count(u) from users u left join creators c on u = c.user where c.id is null")
+    Integer getNormalUserCnt();
+
+    @Query("select count(u) from users u left join creators c on u = c.user where c.id is not null")
+    Integer getCreatorUserCnt();
+
 }

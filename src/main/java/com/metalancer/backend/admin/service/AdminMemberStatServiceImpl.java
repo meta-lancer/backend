@@ -2,6 +2,8 @@ package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.MemberRegisterDailyStat;
 import com.metalancer.backend.admin.domain.MemberRegisterStat;
+import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.creators.repository.CreatorRepository;
@@ -29,15 +31,19 @@ public class AdminMemberStatServiceImpl implements AdminMemberStatService {
 
     @Override
     public MemberRegisterStat getAdminMemberStat() {
-        Integer totalUserCnt;
-        Integer normalUserCnt;
-        Integer creatorUserCnt;
-        Integer withdrewCnt;
-        Integer emailRegisterCnt;
-        Integer googleRegisterCnt;
-        Integer naverRegisterCnt;
-        Integer kakaoRegisterCnt;
-        return null;
+        Integer totalUserCnt = userRepository.countUserBy();
+        Integer normalUserCnt = userRepository.getNormalUserCnt();
+        Integer creatorUserCnt = userRepository.getCreatorUserCnt();
+        Integer withdrewCnt = userRepository.countAllByStatus(DataStatus.DELETED);
+        Integer emailRegisterCnt = userRepository.countAllByLoginType(LoginType.NORMAL);
+        Integer googleRegisterCnt = userRepository.countAllByLoginType(LoginType.GOOGLE);
+        Integer naverRegisterCnt = userRepository.countAllByLoginType(LoginType.NAVER);
+        Integer kakaoRegisterCnt = userRepository.countAllByLoginType(LoginType.KAKAO);
+        return MemberRegisterStat.builder().totalUserCnt(totalUserCnt).normalUserCnt(normalUserCnt)
+            .creatorUserCnt(creatorUserCnt)
+            .withdrewCnt(withdrewCnt).emailRegisterCnt(emailRegisterCnt)
+            .googleRegisterCnt(googleRegisterCnt).naverRegisterCnt(naverRegisterCnt)
+            .kakaoRegisterCnt(kakaoRegisterCnt).build();
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.metalancer.backend.common.constants.LoginType;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.creators.repository.CreatorRepository;
-import com.metalancer.backend.users.repository.ApproveLinkRepository;
+import com.metalancer.backend.users.repository.LoginLogsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminMemberStatServiceImpl implements AdminMemberStatService {
 
     private final UserRepository userRepository;
-    private final ApproveLinkRepository approveLinkRepository;
     private final CreatorRepository creatorRepository;
+    private final LoginLogsRepository loginLogsRepository;
 
     @Override
     public MemberRegisterStat getAdminMemberStat() {
@@ -66,7 +66,8 @@ public class AdminMemberStatServiceImpl implements AdminMemberStatService {
                 Integer registerCnt = userRepository.getRegisterCntByDate(date, startOfNextMonth);
                 Integer creatorRegisterCnt = creatorRepository.getRegisterCntByDate(date,
                     startOfNextMonth);
-                Integer loginCnt = 0;
+                Integer loginCnt = loginLogsRepository.getLoginCntYearly(date,
+                    startOfNextMonth);
                 MemberRegisterDailyStat dailyStat = MemberRegisterDailyStat.builder()
                     .date(formattedDate)
                     .registerCnt(registerCnt)
@@ -83,7 +84,8 @@ public class AdminMemberStatServiceImpl implements AdminMemberStatService {
         LocalDateTime startOfNextDay = date.plusDays(1);
         Integer registerCnt = userRepository.getRegisterCntByDate(date, startOfNextDay);
         Integer creatorRegisterCnt = creatorRepository.getRegisterCntByDate(date, startOfNextDay);
-        Integer loginCnt = 0;
+        Integer loginCnt = loginLogsRepository.getLoginCntDaily(date,
+            startOfNextDay);
         MemberRegisterDailyStat dailyStat = MemberRegisterDailyStat.builder()
             .date(formattedDate)
             .registerCnt(registerCnt)

@@ -52,13 +52,16 @@ public class OrderPaymentEntity extends BaseEntity {
 
     @Column(nullable = false)
     private LocalDateTime purchasedAt;
-    @Column(nullable = false)
+    //    @Column(nullable = false)
     private String receiptUrl;
+    private String paidStatus;
+    private String pgTid;
 
     @Builder
     public OrderPaymentEntity(OrdersEntity ordersEntity, String impUid, String orderNo,
         String type, String title,
-        String method, int paymentPrice, String currency, Date purchasedAt, String receiptUrl) {
+        String method, int paymentPrice, String currency, Date purchasedAt, String receiptUrl,
+        String paidStatus, String pgTid) {
         this.ordersEntity = ordersEntity;
         this.impUid = impUid;
         this.orderNo = orderNo;
@@ -72,5 +75,7 @@ public class OrderPaymentEntity extends BaseEntity {
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime();
         ;
+        this.paidStatus = paidStatus;
+        this.pgTid = pgTid;
     }
 }

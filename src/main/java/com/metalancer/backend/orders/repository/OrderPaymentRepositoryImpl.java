@@ -37,8 +37,9 @@ public class OrderPaymentRepositoryImpl implements OrderPaymentRepository {
     @Override
     public Page<PayedOrder> findAllByUserWithDateOption(User foundUser, Pageable pageable,
         LocalDateTime beginAt, LocalDateTime endAt) {
+        LocalDateTime adjustedEndAt = endAt.plusDays(1);
         Page<OrderPaymentEntity> orderPaymentEntities = orderPaymentJpaRepository.findAllByPurchasedAtBetweenAndOrderer(
-            beginAt, endAt, foundUser, pageable);
+            beginAt, adjustedEndAt, foundUser, pageable);
         List<PayedOrder> payedOrderList = new ArrayList<>();
         for (OrderPaymentEntity orderPaymentEntity : orderPaymentEntities) {
             LocalDateTime purchasedAt = orderPaymentEntity.getPurchasedAt();
@@ -57,8 +58,9 @@ public class OrderPaymentRepositoryImpl implements OrderPaymentRepository {
     @Override
     public Page<PayedOrder> findAllByUserWithOrderStatusAndDateOption(User foundUser,
         Pageable pageable, LocalDateTime beginAt, LocalDateTime endAt, OrderStatus orderStatus) {
+        LocalDateTime adjustedEndAt = endAt.plusDays(1);
         Page<OrderPaymentEntity> orderPaymentEntities = orderPaymentJpaRepository.findAllByPurchasedAtBetweenAndOrdererAndOrderStatus(
-            beginAt, endAt, foundUser, orderStatus, pageable);
+            beginAt, adjustedEndAt, foundUser, orderStatus, pageable);
         List<PayedOrder> payedOrderList = new ArrayList<>();
         for (OrderPaymentEntity orderPaymentEntity : orderPaymentEntities) {
             LocalDateTime purchasedAt = orderPaymentEntity.getPurchasedAt();

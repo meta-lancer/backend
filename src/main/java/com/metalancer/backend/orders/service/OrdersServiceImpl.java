@@ -181,6 +181,17 @@ public class OrdersServiceImpl implements OrdersService {
         Payment paymentResponse = payment_response.getResponse();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
             foundOrdersEntity);
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getCurrency());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getAmount());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getName());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getPayMethod());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getReceiptUrl());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getCardNumber());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getPaidAt());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getBuyerEmail());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getStatus());
+        log.info("아임포트 paymentResponse: {}", paymentResponse.getPgTid());
+
         if (orderStatus.equals(OrderStatus.PAY_DONE)) {
             PaymentResponse response = getPaymentResponse(user,
                 foundOrdersEntity, orderStatus, paymentResponse);
@@ -225,7 +236,11 @@ public class OrdersServiceImpl implements OrdersService {
             .receiptUrl(paymentResponse.getReceiptUrl())
             .type(paymentResponse.getPgProvider())
             .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
-            .purchasedAt(paymentResponse.getPaidAt()).build();
+            .purchasedAt(paymentResponse.getPaidAt())
+            .paidStatus(paymentResponse.getStatus())
+            .pgTid(paymentResponse.getPgTid())
+            .impUid(paymentResponse.getImpUid())
+            .build();
         orderPaymentRepository.save(createdOrderPaymentEntity);
         return orderPaymentRepository.findByOrderNo(orderNo);
     }

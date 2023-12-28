@@ -129,6 +129,7 @@ public class SalesServiceImpl implements SalesService {
             DataStatus.ACTIVE);
         LocalDateTime beginAt = Time.convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = Time.convertDateToLocalDateTime(endDate);
+        endAt = endAt.plusDays(1);
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<DaySalesReport> response = new ArrayList<>();
         for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {

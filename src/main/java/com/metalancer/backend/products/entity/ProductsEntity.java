@@ -4,6 +4,7 @@ import com.metalancer.backend.admin.domain.ProductsList;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
@@ -20,6 +21,8 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -68,6 +71,9 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private String assetCopyRight;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productsEntity")
     private ProductsAssetFileEntity productsAssetFileEntity;
+    @Enumerated(EnumType.STRING)
+    private ProductsType productsType = ProductsType.NORMAL;
+    
 
     public void setActive() {
         active();
@@ -97,6 +103,10 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         String baseLink = "https://www.metaovis.com/details?share_id=";
         int length = 10;
         this.sharedLink = baseLink + RandomStringUtils.randomAlphanumeric(length);
+    }
+
+    public void setProductsTypeRequest() {
+        this.productsType = ProductsType.REQUEST;
     }
 
     public void setDiscount(double discount) {

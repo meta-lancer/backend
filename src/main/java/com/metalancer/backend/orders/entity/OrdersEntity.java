@@ -48,15 +48,15 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Integer totalPoint = 0;
     @Column(nullable = false)
-    private Integer totalPrice;
+    private Double totalPrice;
     @Column(nullable = false)
-    private Integer totalPaymentPrice;
+    private Double totalPaymentPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PAY_ING;
 
     @Builder
-    public OrdersEntity(User orderer, String orderNo, Integer totalPrice,
-        Integer totalPaymentPrice) {
+    public OrdersEntity(User orderer, String orderNo, Double totalPrice,
+        Double totalPaymentPrice) {
         this.orderer = orderer;
         this.orderNo = orderNo;
         this.totalPoint = 0;

@@ -16,9 +16,9 @@ public class OrdersRequestDTO {
     public static class CreateOrder {
 
         @Schema(description = "총 금액", example = "5000")
-        private int totalPrice;
+        private double totalPrice;
         @Schema(description = "총 결제금액", example = "5000")
-        private int totalPaymentPrice;
+        private double totalPaymentPrice;
         //        @Schema(description = "총 포인트", example = "0")
 //        private Integer totalPoint;
         @Schema(description = "결제할 에셋 고유번호 목록", example = "[1, 3, 4]")

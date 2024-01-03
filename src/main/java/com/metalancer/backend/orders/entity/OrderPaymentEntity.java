@@ -48,7 +48,7 @@ public class OrderPaymentEntity extends BaseEntity {
     private String currency;
 
     @Column(nullable = false)
-    private int paymentPrice;
+    private Double paymentPrice;
 
     @Column(nullable = false)
     private LocalDateTime purchasedAt;
@@ -60,7 +60,7 @@ public class OrderPaymentEntity extends BaseEntity {
     @Builder
     public OrderPaymentEntity(OrdersEntity ordersEntity, String impUid, String orderNo,
         String type, String title,
-        String method, int paymentPrice, String currency, Date purchasedAt, String receiptUrl,
+        String method, Double paymentPrice, String currency, Date purchasedAt, String receiptUrl,
         String paidStatus, String pgTid) {
         this.ordersEntity = ordersEntity;
         this.impUid = impUid;

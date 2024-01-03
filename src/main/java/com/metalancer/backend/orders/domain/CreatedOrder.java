@@ -10,7 +10,7 @@ public class CreatedOrder {
 
     private final Long ordererId;
     private final String orderNo;
-    private final Integer totalPrice;
+    private final Double totalPrice;
     private final String orderStatus;
     private String orderProductList;
     private final String buyerNm;
@@ -18,7 +18,7 @@ public class CreatedOrder {
     private final String buyerEmail;
 
     @Builder
-    public CreatedOrder(Long ordererId, String orderNo, Integer totalPrice,
+    public CreatedOrder(Long ordererId, String orderNo, Double totalPrice,
         String orderStatus, String buyerNm, String buyerPhone, String buyerEmail) {
         this.ordererId = ordererId;
         this.orderNo = orderNo;

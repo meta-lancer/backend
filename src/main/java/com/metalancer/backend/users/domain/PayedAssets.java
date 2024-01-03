@@ -16,7 +16,7 @@ public class PayedAssets {
     private String orderProductNo;
     private Long productsId;
     private String title;
-    private int price;
+    private Double price;
     private String sellerNickname;
     private String sellerName;
     private String sellerPhone;
@@ -29,7 +29,7 @@ public class PayedAssets {
     @Builder
     public PayedAssets(Long payedAssetsId, String orderNo, String orderProductNo, Long productsId,
         String title,
-        int price, String sellerNickname, String sellerName, String sellerPhone,
+        Double price, String sellerNickname, String sellerName, String sellerPhone,
         String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink,
         OrderStatus orderStatus) {
         this.payedAssetsId = payedAssetsId;

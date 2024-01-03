@@ -19,7 +19,9 @@ public class Scheduler {
 
     private final ExchangeRatesJpaRepository exchangeRatesJpaRepository;
 
-    @Scheduled(cron = "0 0 0 * * *") //정오
+    // 이용시 유의사항
+    //비영업일의 데이터, 혹은 영업당일 11시 이전에 해당일의 데이터를 요청할 경우 null 값이 반환
+    @Scheduled(cron = "0 0 12 * * *") //자정 => 안 먹힌다.
     public void updateExchangeRate() {
         BigDecimal exchangeRate = exchangeRateUtils.getExchangeRate();
         log.info(exchangeRate.toString());

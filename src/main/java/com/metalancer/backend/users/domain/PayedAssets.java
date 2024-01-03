@@ -2,6 +2,7 @@ package com.metalancer.backend.users.domain;
 
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.utils.Time;
+import com.metalancer.backend.products.domain.RequestOption;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class PayedAssets {
     private Integer downloadedCnt;
     private String downloadLink;
     private OrderStatus orderStatus;
+    private RequestOption requestOption;
 
     @Builder
     public PayedAssets(Long payedAssetsId, String orderNo, String orderProductNo, Long productsId,
@@ -46,5 +48,9 @@ public class PayedAssets {
         this.downloadedCnt = downloadedCnt;
         this.downloadLink = downloadLink;
         this.orderStatus = orderStatus;
+    }
+
+    public void setRequestOption(RequestOption requestOption) {
+        this.requestOption = requestOption;
     }
 }

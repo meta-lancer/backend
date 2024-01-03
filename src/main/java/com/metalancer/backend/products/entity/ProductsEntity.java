@@ -73,7 +73,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private ProductsAssetFileEntity productsAssetFileEntity;
     @Enumerated(EnumType.STRING)
     private ProductsType productsType = ProductsType.NORMAL;
-    
+
 
     public void setActive() {
         active();
@@ -185,6 +185,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt)
             .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .productsType(productsType)
             .build();
     }
 
@@ -195,6 +196,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt)
             .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .productsType(productsType)
             .build();
     }
 

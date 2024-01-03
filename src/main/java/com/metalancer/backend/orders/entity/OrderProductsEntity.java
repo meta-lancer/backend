@@ -8,6 +8,7 @@ import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.OrderStatusException;
 import com.metalancer.backend.orders.domain.OrderProducts;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,6 +50,9 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "products_id", nullable = false)
     private ProductsEntity productsEntity;
+    @ManyToOne
+    @JoinColumn(name = "products_request_option_id")
+    private ProductsRequestOptionEntity productsRequestOptionEntity;
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
@@ -64,13 +68,14 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     public OrderProductsEntity(User orderer, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, String orderNo,
         String orderProductNo,
-        Integer price) {
+        Integer price, ProductsRequestOptionEntity productsRequestOptionEntity) {
         this.orderer = orderer;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.price = price;
+        this.productsRequestOptionEntity = productsRequestOptionEntity;
     }
 
     public void completeOrder() {

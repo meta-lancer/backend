@@ -2,6 +2,7 @@ package com.metalancer.backend.users.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.domain.Cart;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,15 +42,27 @@ public class CartEntity extends BaseEntity implements Serializable {
     @JoinColumn(name = "products_id", nullable = false)
     private ProductsEntity products;
 
+    @ManyToOne
+    @JoinColumn(name = "products_request_option_id")
+    private ProductsRequestOptionEntity productsRequestOptionEntity;
+
     @Builder
     public CartEntity(User user, ProductsEntity products) {
         this.user = user;
         this.products = products;
     }
 
+    public void setProductsRequestOptionEntity(
+        ProductsRequestOptionEntity productsRequestOptionEntity) {
+        this.productsRequestOptionEntity = productsRequestOptionEntity;
+    }
+
     public Cart toDomain() {
         return Cart.builder().cartId(id).assetId(products.getId()).title(products.getTitle())
-            .price(products.getPrice()).build();
+            .price(products.getPrice()).requestOption(
+                productsRequestOptionEntity != null ? productsRequestOptionEntity.toRequestOption()
+                    : null)
+            .build();
     }
 
     public void restoreCart() {

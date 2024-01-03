@@ -3,16 +3,19 @@ package com.metalancer.backend.products.service;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
+import com.metalancer.backend.products.domain.RequestOption;
 import com.metalancer.backend.products.entity.ProductsAssetFileEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsWishEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsRequestOptionRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
@@ -44,6 +47,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     private final ProductsViewsRepository productsViewsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
     private final UserRepository userRepository;
+    private final ProductsRequestOptionRepository productsRequestOptionRepository;
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
@@ -109,8 +113,14 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
-
         getProductsDetailTagList(foundProductsEntity, response);
+
+        // request 인 경우
+        if (foundProductsEntity.getProductsType().equals(ProductsType.REQUEST)) {
+            List<RequestOption> productsRequestOptionEntityList = productsRequestOptionRepository.findAllByProducts(
+                foundProductsEntity);
+            response.setRequestOptionList(productsRequestOptionEntityList);
+        }
         AssetFile assetFile = getProductsDetailAssetFileAfterUploaded(foundProductsEntity,
             response);
         response.setAssetFile(assetFile);
@@ -148,11 +158,17 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
-
         getProductsDetailTagList(foundProductsEntity, response);
+
+        // request 인 경우
+        if (foundProductsEntity.getProductsType().equals(ProductsType.REQUEST)) {
+            List<RequestOption> productsRequestOptionEntityList = productsRequestOptionRepository.findAllByProducts(
+                foundProductsEntity);
+            response.setRequestOptionList(productsRequestOptionEntityList);
+        }
+
         AssetFile assetFile = getProductsDetailAssetFile(foundProductsEntity,
             response);
-        response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
     }

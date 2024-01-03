@@ -47,13 +47,10 @@ public class CartEntity extends BaseEntity implements Serializable {
     private ProductsRequestOptionEntity productsRequestOptionEntity;
 
     @Builder
-    public CartEntity(User user, ProductsEntity products) {
+    public CartEntity(User user, ProductsEntity products,
+        ProductsRequestOptionEntity productsRequestOptionEntity) {
         this.user = user;
         this.products = products;
-    }
-
-    public void setProductsRequestOptionEntity(
-        ProductsRequestOptionEntity productsRequestOptionEntity) {
         this.productsRequestOptionEntity = productsRequestOptionEntity;
     }
 
@@ -62,6 +59,7 @@ public class CartEntity extends BaseEntity implements Serializable {
             .price(products.getPrice()).requestOption(
                 productsRequestOptionEntity != null ? productsRequestOptionEntity.toRequestOption()
                     : null)
+            .thumbnail(products.getThumbnail())
             .build();
     }
 

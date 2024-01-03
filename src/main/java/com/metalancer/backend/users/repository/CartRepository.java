@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
@@ -14,7 +15,7 @@ public interface CartRepository {
 
     int countAllByUser(User user);
 
-    boolean createCart(User user, ProductsEntity foundProductsEntity);
+    void createCart(User user, ProductsEntity foundProductsEntity);
 
     void deleteAllCart(User user);
 
@@ -25,4 +26,11 @@ public interface CartRepository {
     int countCartCnt(User user);
 
     void deleteCart(User user, ProductsEntity productsEntity);
+
+    Optional<CartEntity> findCartByUserAndAssetAndOption(User user,
+        ProductsEntity foundProductsEntity,
+        ProductsRequestOptionEntity productsRequestOptionEntity);
+
+    void createCartWithOption(User user, ProductsEntity foundProductsEntity,
+        ProductsRequestOptionEntity productsRequestOptionEntity);
 }

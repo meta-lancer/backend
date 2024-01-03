@@ -4,6 +4,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
@@ -32,11 +33,11 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
-    public boolean createCart(User user, ProductsEntity foundProductsEntity) {
+    public void createCart(User user, ProductsEntity foundProductsEntity) {
         CartEntity savedCartEntity = CartEntity.builder().user(user).products(foundProductsEntity)
             .build();
         cartJpaRepository.save(savedCartEntity);
-        return cartJpaRepository.findById(savedCartEntity.getId()).isPresent();
+        cartJpaRepository.findById(savedCartEntity.getId());
     }
 
     @Override
@@ -67,4 +68,22 @@ public class CartRepositoryImpl implements CartRepository {
             user, productsEntity, DataStatus.ACTIVE);
         foundCartEntity.ifPresent(CartEntity::deleteCart);
     }
+
+    @Override
+    public Optional<CartEntity> findCartByUserAndAssetAndOption(User user,
+        ProductsEntity foundProductsEntity,
+        ProductsRequestOptionEntity productsRequestOptionEntity) {
+        return cartJpaRepository.findByUserAndProductsAndProductsRequestOptionEntity(user,
+            foundProductsEntity, productsRequestOptionEntity);
+    }
+
+    @Override
+    public void createCartWithOption(User user, ProductsEntity foundProductsEntity,
+        ProductsRequestOptionEntity productsRequestOptionEntity) {
+        CartEntity savedCartEntity = CartEntity.builder().user(user).products(foundProductsEntity)
+            .build();
+        cartJpaRepository.save(savedCartEntity);
+    }
+
+
 }

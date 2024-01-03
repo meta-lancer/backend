@@ -110,4 +110,13 @@ public class UserRequestDTO {
         private String content;
 //        private Long orderProductId;
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class CreateCartRequest {
+
+        private Long assetId;
+        private Long requestOptionId;
+
+    }
 }

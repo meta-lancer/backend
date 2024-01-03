@@ -16,11 +16,13 @@ public class Cart {
     private RequestOption requestOption;
 
     @Builder
-    public Cart(Long cartId, Long assetId, String title, int price, RequestOption requestOption) {
+    public Cart(Long cartId, Long assetId, String title, int price, String thumbnail,
+        RequestOption requestOption) {
         this.cartId = cartId;
         this.assetId = assetId;
         this.title = title;
         this.price = price;
+        this.thumbnail = thumbnail;
         this.requestOption = requestOption;
     }
 

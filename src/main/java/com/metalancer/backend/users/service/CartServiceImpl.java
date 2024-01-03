@@ -3,8 +3,11 @@ package com.metalancer.backend.users.service;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsRequestOptionRepository;
 import com.metalancer.backend.users.domain.Cart;
+import com.metalancer.backend.users.dto.UserRequestDTO.CreateCartRequest;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
@@ -26,6 +29,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductsRepository productsRepository;
     private final UserRepository userRepository;
+    private final ProductsRequestOptionRepository productsRequestOptionRepository;
 
     @Override
     public Page<Cart> getAllCart(User user, Pageable pageable) {
@@ -39,12 +43,24 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public boolean createCart(User user, Long assetId) {
-        ProductsEntity foundProductsEntity = productsRepository.findProductById(assetId);
-        Optional<CartEntity> cartEntity = cartRepository.findCartByUserAndAsset(user,
-            foundProductsEntity);
+    public boolean createCart(User user, CreateCartRequest dto) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductById(dto.getAssetId());
+        Optional<ProductsRequestOptionEntity> productsRequestOptionEntity = productsRequestOptionRepository.findOptionById(
+            dto.getRequestOptionId());
+        // 옵션에 따라
+        Optional<CartEntity> cartEntity =
+            productsRequestOptionEntity.isEmpty() ? cartRepository.findCartByUserAndAsset(user,
+                foundProductsEntity)
+                : cartRepository.findCartByUserAndAssetAndOption(user, foundProductsEntity,
+                    productsRequestOptionEntity.get());
         if (cartEntity.isEmpty()) {
-            cartRepository.createCart(user, foundProductsEntity);
+            if (productsRequestOptionEntity.isEmpty()) {
+                cartRepository.createCart(user, foundProductsEntity);
+            } else {
+                cartRepository.createCartWithOption(user, foundProductsEntity,
+                    productsRequestOptionEntity.get());
+            }
+
             return true;
         }
         if (cartEntity.get().getStatus().equals(DataStatus.DELETED)) {

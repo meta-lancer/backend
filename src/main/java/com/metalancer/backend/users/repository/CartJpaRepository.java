@@ -2,6 +2,7 @@ package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
 import java.util.Optional;
@@ -18,6 +19,9 @@ public interface CartJpaRepository extends JpaRepository<CartEntity, Long> {
     void deleteAllByUser(User user);
 
     Optional<CartEntity> findByUserAndProducts(User user, ProductsEntity products);
+
+    Optional<CartEntity> findByUserAndProductsAndProductsRequestOptionEntity(User user,
+        ProductsEntity products, ProductsRequestOptionEntity productsRequestOptionEntity);
 
     Optional<CartEntity> findByUserAndProductsAndStatus(User user, ProductsEntity products,
         DataStatus status);

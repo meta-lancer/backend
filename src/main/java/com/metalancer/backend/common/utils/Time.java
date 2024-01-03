@@ -53,6 +53,8 @@ public class Time {
             time = (diffTime) + "시간 전";
         } else if ((diffTime /= TIME_MAX.HOUR) < TIME_MAX.DAY) {
             time = dateTime.format(formatter);
+        } else if ((diffTime /= TIME_MAX.DAY) < TIME_MAX.MONTH) {
+            time = dateTime.format(formatter);
         } else {
             time = (diffTime / TIME_MAX.MONTH) + "년 전";
         }
@@ -73,6 +75,8 @@ public class Time {
         } else if ((diffTime /= TIME_MAX.MIN) < TIME_MAX.HOUR) {
             time = (diffTime) + "hrs ago";
         } else if ((diffTime /= TIME_MAX.HOUR) < TIME_MAX.DAY) {
+            time = dateTime.format(formatter);
+        } else if ((diffTime /= TIME_MAX.DAY) < TIME_MAX.MONTH) {
             time = dateTime.format(formatter);
         } else {
             time = (diffTime / TIME_MAX.MONTH) + "years ago";

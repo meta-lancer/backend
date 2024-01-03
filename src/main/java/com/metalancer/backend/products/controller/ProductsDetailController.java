@@ -3,6 +3,7 @@ package com.metalancer.backend.products.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.service.ProductsDetailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +56,7 @@ public class ProductsDetailController {
     public BaseResponse<Boolean> toggleProductWish(@AuthenticationPrincipal
     PrincipalDetails user, @PathVariable("productId") Long productId) {
         log.info("찜하기 상품고유번호: {}", productId);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(productsDetailService.toggleProductWish(user, productId));
     }
 

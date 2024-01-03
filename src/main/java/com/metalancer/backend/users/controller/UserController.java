@@ -2,9 +2,8 @@ package com.metalancer.backend.users.controller;
 
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
-import com.metalancer.backend.common.constants.ErrorCode;
-import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.users.domain.OrderStatusList;
@@ -55,7 +54,7 @@ public class UserController {
     public BaseResponse<AuthResponseDTO.userInfo> getUserInfo(
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("로그인되어있는 유저: {}", user);
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<AuthResponseDTO.userInfo>(userService.getUserInfo(user));
     }
 
@@ -65,7 +64,7 @@ public class UserController {
 //    public BaseResponse<Boolean> updateToCreator(
 //            @AuthenticationPrincipal PrincipalDetails user) {
 //        log.info("로그인되어있는 유저: {}", user);
-//        validateUserAuthentication(user);
+//        AuthUtils.validateUserAuthentication(user);
 //        return new BaseResponse<>(userService.updateToCreator(user));
 //    }
 
@@ -74,7 +73,7 @@ public class UserController {
     @GetMapping("/basic")
     public BaseResponse<UserResponseDTO.BasicInfo> getBasicInfo(
         @AuthenticationPrincipal PrincipalDetails user) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<UserResponseDTO.BasicInfo>(userService.getBasicInfo(user));
     }
 
@@ -85,7 +84,7 @@ public class UserController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateBasicInfo dto
     ) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<UserResponseDTO.BasicInfo>(
             userService.updateBasicInfo(user, dto));
     }
@@ -96,7 +95,7 @@ public class UserController {
     @GetMapping("/career")
     public BaseResponse<IntroAndCareer> getIntroAndCareer(
         @AuthenticationPrincipal PrincipalDetails user) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.getIntroAndCareer(user));
     }
@@ -108,7 +107,7 @@ public class UserController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateCareerIntroRequest dto
     ) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.updateCareerIntro(user, dto));
     }
@@ -119,7 +118,7 @@ public class UserController {
     public BaseResponse<IntroAndCareer> createCareer(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.CreateCareerRequest dto) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.createCareer(user, dto));
     }
@@ -131,7 +130,7 @@ public class UserController {
         @PathVariable Long careerId,
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateCareerRequest dto) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.updateCareer(careerId, user, dto));
     }
@@ -142,7 +141,7 @@ public class UserController {
     public BaseResponse<IntroAndCareer> deleteCareer(
         @PathVariable Long careerId,
         @AuthenticationPrincipal PrincipalDetails user) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.deleteCareer(careerId, user));
     }
@@ -160,7 +159,7 @@ public class UserController {
         Pageable pageable) {
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         log.info("로그인되어있는 유저: {}", user);
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<PayedOrder>>(
             userService.getPaymentList(user, status, beginDate, endDate, adjustedPageable));
     }
@@ -177,7 +176,7 @@ public class UserController {
         @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         log.info("로그인되어있는 유저: {}", user);
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<PayedAssets>>(
             userService.getPayedAssetList(status, beginDate, endDate, user, pageable));
     }
@@ -192,11 +191,6 @@ public class UserController {
             userService.getOrderStatusList());
     }
 
-    public void validateUserAuthentication(PrincipalDetails user) {
-        if (user == null) {
-            throw new BaseException(ErrorCode.LOGIN_REQUIRED);
-        }
-    }
 
     @Operation(summary = "마이페이지 - 크리에이터 전환 신청", description = "")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = {

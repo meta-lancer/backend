@@ -3,6 +3,7 @@ package com.metalancer.backend.users.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCartRequest;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,12 +43,10 @@ public class CartController {
     })
     @GetMapping
     public BaseResponse<Page<Cart>> getAllCart(
-        HttpSession session,
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter(description = "페이징") Pageable pageable) {
         log.info("로그인되어있는 유저: {}", user);
-        log.info("세션: {}", session);
-        log.info("세션 LOGIN_USER: {}", session.getAttribute("LOGIN_USER"));
+        AuthUtils.validateUserAuthentication(user);
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(cartService.getAllCart(user.getUser(), adjustedPageable));
     }
@@ -60,6 +58,7 @@ public class CartController {
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter @RequestBody CreateCartRequest dto) {
         log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(
             cartService.createCart(user.getUser(), dto));
     }
@@ -71,6 +70,7 @@ public class CartController {
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter @PathVariable Long assetId) {
         log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(
             cartService.deleteCart(user.getUser(), assetId));
     }
@@ -81,6 +81,7 @@ public class CartController {
     public BaseResponse<Boolean> deleteAllCart(
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(cartService.deleteAllCart(user.getUser()));
     }
 

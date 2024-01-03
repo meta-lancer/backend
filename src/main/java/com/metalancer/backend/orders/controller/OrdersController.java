@@ -3,6 +3,7 @@ package com.metalancer.backend.orders.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.PaymentResponse;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO;
@@ -69,6 +70,7 @@ public class OrdersController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody OrdersRequestDTO.CreateOrder dto) {
         log.info("주문서 만들기: {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(
             ordersService.createOrder(user.getUser(), dto));
     }
@@ -138,6 +140,7 @@ public class OrdersController {
         @RequestBody CancelAllPayment dto
     ) throws Exception {
         log.info("결제 전체 취소 요청 객체: {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<PaymentResponse>(
             ordersService.cancelAllPayment(user.getUser(), dto));
     }

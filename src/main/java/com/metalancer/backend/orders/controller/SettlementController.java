@@ -4,6 +4,7 @@ package com.metalancer.backend.orders.controller;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.orders.domain.DaySalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
@@ -40,6 +41,7 @@ public class SettlementController {
     public BaseResponse<List<DaySalesReport>> getDaySalesReport(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestParam("periodType") PeriodType periodType) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(salesService.getDaySalesReport(user, periodType));
     }
 
@@ -50,6 +52,7 @@ public class SettlementController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestParam("beginDate") String beginDate,
         @RequestParam("endDate") String endDate) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(salesService.getDaySalesReportByExcel(user, beginDate, endDate));
     }
 
@@ -59,6 +62,7 @@ public class SettlementController {
     public BaseResponse<Page<SettlementReportList>> getSettlementReportList(
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
+        AuthUtils.validateUserAuthentication(user);
         pageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(salesService.getSettlementReportList(user, pageable));
     }
@@ -69,6 +73,7 @@ public class SettlementController {
     public BaseResponse<Page<SettlementRecordList>> getSettlementRecordList(
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
+        AuthUtils.validateUserAuthentication(user);
         pageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(salesService.getSettlementRecordList(user, pageable));
     }

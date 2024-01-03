@@ -5,6 +5,7 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
@@ -64,6 +65,7 @@ public class MyCreatorsController {
         @RequestPart(required = true) CreatorRequestDTO.AssetRequest dto,
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("에셋 등록 DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<CreatorResponseDTO.AssetCreatedResponse>(
             creatorService.createAsset(user.getUser(), thumbnails, views, dto));
     }
@@ -78,6 +80,7 @@ public class MyCreatorsController {
         @RequestBody(required = true) CreatorRequestDTO.AssetUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("에셋 수정(url) DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<AssetUpdatedResponse>(
             creatorService.updateAsset(productsId, user.getUser(), dto));
     }
@@ -93,6 +96,7 @@ public class MyCreatorsController {
         @RequestPart(required = true) AssetUpdateWithOutThumbnail dto,
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("에셋 수정(file) DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<AssetUpdatedResponse>(
             creatorService.updateAssetWithFile(thumbnails, productsId, user.getUser(), dto));
     }
@@ -125,7 +129,7 @@ public class MyCreatorsController {
     public BaseResponse<Boolean> successAsset(
         @PathVariable Long productsId,
         @AuthenticationPrincipal PrincipalDetails user) {
-
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.successAsset(productsId, user));
     }
@@ -136,7 +140,7 @@ public class MyCreatorsController {
     public BaseResponse<Boolean> failAsset(
         @PathVariable Long productsId,
         @AuthenticationPrincipal PrincipalDetails user) {
-
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.failAsset(productsId, user));
     }
@@ -147,6 +151,7 @@ public class MyCreatorsController {
     public BaseResponse<Boolean> deleteAsset(
         @PathVariable Long productsId,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.deleteAsset(productsId, user));
     }
@@ -160,6 +165,7 @@ public class MyCreatorsController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageable(pageable);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<CreatorAssetList>>(
             creatorReadService.getMyRegisteredAssets(user, pageable));
     }
@@ -171,6 +177,7 @@ public class MyCreatorsController {
     @GetMapping("/portfolio")
     public BaseResponse<List<Portfolio>> getMyPortfolio(
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(creatorReadService.getMyPortfolio(user));
     }
 
@@ -183,6 +190,7 @@ public class MyCreatorsController {
         @RequestPart(value = "files", required = false) MultipartFile[] files,
         @RequestPart CreatorRequestDTO.PortfolioCreate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(
             creatorService.createMyPortfolio(files, dto, user));
     }
@@ -197,6 +205,7 @@ public class MyCreatorsController {
         @RequestPart(value = "files", required = false) MultipartFile[] files,
         @RequestPart CreatorRequestDTO.PortfolioUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(
             creatorService.updateMyPortfolio(files, portfolioId, dto, user));
     }
@@ -210,6 +219,7 @@ public class MyCreatorsController {
     public BaseResponse<List<Portfolio>> deleteMyPortfolio(
         @PathVariable Long portfolioId,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(
             creatorService.deleteMyPortfolio(portfolioId, user));
     }
@@ -223,6 +233,7 @@ public class MyCreatorsController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageable(pageable);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<ManageAsset>>(
             creatorReadService.getMyManageAssetList(user, pageable));
     }
@@ -240,6 +251,7 @@ public class MyCreatorsController {
     @GetMapping("/payment-info/management")
     public BaseResponse<PaymentInfoManagement> getMyPaymentInfoManagement(
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<PaymentInfoManagement>(
             creatorReadService.getMyPaymentInfoManagement(user));
     }
@@ -254,6 +266,7 @@ public class MyCreatorsController {
         @RequestPart(value = "accountCopyFile", required = true) MultipartFile accountCopyFile,
         @RequestPart CreatorRequestDTO.MyPaymentInfoManagementCreate dto,
         @AuthenticationPrincipal PrincipalDetails user) throws IOException {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.createMyPaymentInfoManagement(idCardCopyFile, accountCopyFile, dto,
                 user));
@@ -269,6 +282,7 @@ public class MyCreatorsController {
         @RequestPart(value = "accountCopyFile", required = false) MultipartFile accountCopyFile,
         @RequestPart CreatorRequestDTO.MyPaymentInfoManagementUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) throws IOException {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.updateMyPaymentInfoManagement(idCardCopyFile, accountCopyFile, dto,
                 user));
@@ -281,6 +295,7 @@ public class MyCreatorsController {
     @DeleteMapping("/payment-info/management")
     public BaseResponse<Boolean> deleteMyPaymentInfoManagement(
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.deleteMyPaymentInfoManagement(user));
     }

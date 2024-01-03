@@ -83,7 +83,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     public ProductsDetail getProductDetail(PrincipalDetails user, Long productId) {
         ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
             DataStatus.ACTIVE);
-        foundProductsEntity.addViewCnt();
+
         CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
         double satisficationRate = 0.0;
@@ -93,6 +93,11 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
                 () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
             );
+            // 로그인 유저의 조회수만..! 본인인 경우 조회수 증가 x
+            if (!foundProductsEntity.getCreatorEntity().getUser().getId()
+                .equals(foundUser.getId())) {
+                foundProductsEntity.addViewCnt();
+            }
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
@@ -117,7 +122,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         ProductsEntity foundProductsEntity = productsRepository.findProductBySharedLinkAndStatus(
             link,
             DataStatus.ACTIVE);
-        foundProductsEntity.addViewCnt();
+
         CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
         double satisficationRate = 0.0;
@@ -127,6 +132,11 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
                 () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
             );
+            // 로그인 유저의 조회수만..! 본인인 경우 조회수 증가 x
+            if (!foundProductsEntity.getCreatorEntity().getUser().getId()
+                .equals(foundUser.getId())) {
+                foundProductsEntity.addViewCnt();
+            }
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());

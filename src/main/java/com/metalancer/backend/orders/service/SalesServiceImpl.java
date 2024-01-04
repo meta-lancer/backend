@@ -1,6 +1,7 @@
 package com.metalancer.backend.orders.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
+import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
@@ -67,12 +68,15 @@ public class SalesServiceImpl implements SalesService {
             for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusMonths(1)) {
                 String formattedDate = date.format(dateFormatter);
                 LocalDateTime startOfNextMonth = date.plusMonths(1);
-                Integer totalPrice = productsSalesRepository.getTotalPriceByCreatorAndDate(
-                    creatorEntity, date, startOfNextMonth);
+                Integer totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
+                    creatorEntity, date, startOfNextMonth, CurrencyType.KRW);
+                Integer totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
+                    creatorEntity, date, startOfNextMonth, CurrencyType.USD);
                 int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth);
                 DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-                    .totalPrice(totalPrice).salesCnt(salesCnt).build();
+                    .totalPrice(totalPriceKRW).totalPriceUSD(totalPriceUSD).salesCnt(salesCnt)
+                    .build();
                 response.add(daySalesReport);
             }
         }
@@ -84,12 +88,14 @@ public class SalesServiceImpl implements SalesService {
         List<DaySalesReport> response, LocalDateTime date) {
         String formattedDate = date.format(dateFormatter);
         LocalDateTime startOfNextDay = date.plusDays(1);
-        Integer totalPrice = productsSalesRepository.getTotalPriceByCreatorAndDate(
-            creatorEntity, date, startOfNextDay);
+        Integer totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
+            creatorEntity, date, startOfNextDay, CurrencyType.KRW);
+        Integer totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
+            creatorEntity, date, startOfNextDay, CurrencyType.USD);
         int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
             creatorEntity, date, startOfNextDay);
         DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-            .totalPrice(totalPrice).salesCnt(salesCnt).build();
+            .totalPrice(totalPriceKRW).totalPriceUSD(totalPriceUSD).salesCnt(salesCnt).build();
         response.add(daySalesReport);
     }
 

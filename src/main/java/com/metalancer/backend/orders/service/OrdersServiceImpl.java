@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.service;
 
+import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
@@ -181,16 +182,6 @@ public class OrdersServiceImpl implements OrdersService {
         Payment paymentResponse = payment_response.getResponse();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
             foundOrdersEntity);
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getCurrency());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getAmount());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getName());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getPayMethod());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getReceiptUrl());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getCardNumber());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getPaidAt());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getBuyerEmail());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getStatus());
-        log.info("아임포트 paymentResponse: {}", paymentResponse.getPgTid());
 
         if (orderStatus.equals(OrderStatus.PAY_DONE)) {
             PaymentResponse response = getPaymentResponse(user,
@@ -216,7 +207,9 @@ public class OrdersServiceImpl implements OrdersService {
             payedAssetsRepository.save(createdPayedAssetsEntity);
 
             // 판매자 판매내역
-            ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity();
+            CurrencyType currencyType = CurrencyType.valueOf(savedOrderPaymentEntity.getCurrency());
+            ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity(
+                currencyType);
             productsSalesRepository.save(createdProductsSalesEntity);
         }
 

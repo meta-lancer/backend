@@ -3,6 +3,7 @@ package com.metalancer.backend.orders.entity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ClaimStatus;
 import com.metalancer.backend.common.constants.ClaimType;
+import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.OrderStatusException;
@@ -101,10 +102,10 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
             .claimType(claimType).claimStatus(claimStatus).build();
     }
 
-    public ProductsSalesEntity toProductsSalesEntity() {
+    public ProductsSalesEntity toProductsSalesEntity(CurrencyType currencyType) {
         return ProductsSalesEntity.builder().creatorEntity(productsEntity.getCreatorEntity())
             .ordersEntity(ordersEntity).ordererId(orderer.getId())
             .productsEntity(productsEntity).orderProductNo(orderProductNo).orderNo(orderNo)
-            .price(price).build();
+            .price(price).currency(currencyType).build();
     }
 }

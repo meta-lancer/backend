@@ -18,6 +18,7 @@ public class PayedAssets {
     private Long productsId;
     private String title;
     private Double price;
+    private String priceUnit;
     private String sellerNickname;
     private String sellerName;
     private String sellerPhone;
@@ -33,13 +34,14 @@ public class PayedAssets {
         String title,
         Double price, String sellerNickname, String sellerName, String sellerPhone,
         String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink,
-        OrderStatus orderStatus) {
+        OrderStatus orderStatus, String priceUnit) {
         this.payedAssetsId = payedAssetsId;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.productsId = productsId;
         this.title = title;
         this.price = price;
+        this.priceUnit = priceUnit;
         this.sellerNickname = sellerNickname;
         this.sellerName = sellerName;
         this.sellerPhone = sellerPhone;

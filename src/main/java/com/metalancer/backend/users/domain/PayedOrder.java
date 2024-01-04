@@ -17,6 +17,7 @@ public class PayedOrder {
     private OrderStatus orderStatus;
     private String payMethod;
     private Double price;
+    private String priceUnit;
     private String purchasedAt;
     private String receiptUrl;
     private RequestOption requestOption;
@@ -37,5 +38,9 @@ public class PayedOrder {
 
     public void setRequestOption(RequestOption requestOption) {
         this.requestOption = requestOption;
+    }
+
+    public void setPriceUnit(String priceUnit) {
+        this.priceUnit = priceUnit;
     }
 }

@@ -49,6 +49,7 @@ public class OrderPaymentRepositoryImpl implements OrderPaymentRepository {
             OrdersEntity ordersEntity = orderPaymentEntity.getOrdersEntity();
             PayedOrder payedOrder = ordersEntity.toPayedOrderDomain(payMethod, purchasedAt, title,
                 receiptUrl);
+            payedOrder.setPriceUnit(orderPaymentEntity.getCurrency());
             payedOrderList.add(payedOrder);
         }
         long count = orderPaymentJpaRepository.countAllByUser(foundUser);
@@ -70,6 +71,7 @@ public class OrderPaymentRepositoryImpl implements OrderPaymentRepository {
             OrdersEntity ordersEntity = orderPaymentEntity.getOrdersEntity();
             PayedOrder payedOrder = ordersEntity.toPayedOrderDomain(payMethod, purchasedAt, title,
                 receiptUrl);
+            payedOrder.setPriceUnit(orderPaymentEntity.getCurrency());
             payedOrderList.add(payedOrder);
         }
         long count = orderPaymentJpaRepository.countAllByUser(foundUser);

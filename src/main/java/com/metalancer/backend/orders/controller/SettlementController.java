@@ -7,6 +7,7 @@ import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.orders.domain.DaySalesReport;
+import com.metalancer.backend.orders.domain.EachSalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
 import com.metalancer.backend.orders.service.SalesService;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,5 +78,30 @@ public class SettlementController {
         AuthUtils.validateUserAuthentication(user);
         pageable = PageFunction.convertToOneBasedPageable(pageable);
         return new BaseResponse<>(salesService.getSettlementRecordList(user, pageable));
+    }
+
+    @Operation(summary = "정산관리-정산리포트 상품별", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = DaySalesReport.class)))
+    @GetMapping("/products/{productsId}")
+    public BaseResponse<EachSalesReport> getSettlementProductsReport(
+        @PathVariable("productsId") Long productsId,
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestParam("periodType") PeriodType periodType) {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<EachSalesReport>(
+            salesService.getSettlementProductsReport(productsId, user, periodType));
+    }
+
+    @Operation(summary = "정산관리-정산리포트 상품별 엑셀출력", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = DaySalesReport.class)))
+    @GetMapping("/products/{productsId}/excel")
+    public BaseResponse<List<DaySalesReport>> getSettlementProductsReportByExcel(
+        @PathVariable("productsId") Long productsId,
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestParam("beginDate") String beginDate,
+        @RequestParam("endDate") String endDate) {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<>(
+            salesService.getProductsDaySalesReportByExcel(productsId, user, beginDate, endDate));
     }
 }

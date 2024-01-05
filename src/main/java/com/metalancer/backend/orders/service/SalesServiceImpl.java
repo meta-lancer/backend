@@ -6,10 +6,10 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.exception.BaseException;
-import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.orders.domain.DaySalesReport;
+import com.metalancer.backend.orders.domain.EachSalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
 import com.metalancer.backend.orders.entity.SettlementEntity;
@@ -19,6 +19,7 @@ import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.CartRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,15 +47,11 @@ public class SalesServiceImpl implements SalesService {
     private final CreatorRepository creatorRepository;
     private final ProductsRepository productsRepository;
     private final SettlementRepository settlementRepository;
+    private final CartRepository cartRepository;
 
     @Override
     public List<DaySalesReport> getDaySalesReport(PrincipalDetails user, PeriodType periodType) {
-        User foundUser = user.getUser();
-        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
-        );
-        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
-            DataStatus.ACTIVE);
+        CreatorEntity creatorEntity = getCreatorEntity(user);
         LocalDateTime endAt = LocalDateTime.now();
         LocalDateTime beginAt = getBeginAtBasedOnPeriodType(periodType, endAt);
 
@@ -76,7 +73,8 @@ public class SalesServiceImpl implements SalesService {
                 int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth);
                 DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-                    .totalPrice(convertDoubleToInteger(totalPriceKRW)).totalPriceUSD(totalPriceUSD)
+                    .totalPrice(convertBigDecimalToInteger(totalPriceKRW))
+                    .totalPriceUSD(totalPriceUSD)
                     .salesCnt(salesCnt)
                     .build();
                 response.add(daySalesReport);
@@ -85,7 +83,7 @@ public class SalesServiceImpl implements SalesService {
         return response;
     }
 
-    public Integer convertDoubleToInteger(BigDecimal doubleValue) {
+    public Integer convertBigDecimalToInteger(BigDecimal doubleValue) {
         if (doubleValue == null) {
             return null;
         }
@@ -104,7 +102,25 @@ public class SalesServiceImpl implements SalesService {
         int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
             creatorEntity, date, startOfNextDay);
         DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-            .totalPrice(convertDoubleToInteger(totalPriceKRW)).totalPriceUSD(totalPriceUSD)
+            .totalPrice(convertBigDecimalToInteger(totalPriceKRW)).totalPriceUSD(totalPriceUSD)
+            .salesCnt(salesCnt).build();
+        response.add(daySalesReport);
+    }
+
+    private void setProductsTotalPriceAndSalesCntBasedOnDate(CreatorEntity creatorEntity,
+        ProductsEntity productsEntity,
+        DateTimeFormatter dateFormatter,
+        List<DaySalesReport> response, LocalDateTime date) {
+        String formattedDate = date.format(dateFormatter);
+        LocalDateTime startOfNextDay = date.plusDays(1);
+        BigDecimal totalPriceKRW = (productsSalesRepository.getProductsTotalPriceByCreatorAndDate(
+            creatorEntity, productsEntity, date, startOfNextDay, CurrencyType.KRW));
+        BigDecimal totalPriceUSD = productsSalesRepository.getProductsTotalPriceByCreatorAndDate(
+            creatorEntity, productsEntity, date, startOfNextDay, CurrencyType.USD);
+        int salesCnt = productsSalesRepository.getProductsSalesCntByCreatorAndDate(
+            creatorEntity, productsEntity, date, startOfNextDay);
+        DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
+            .totalPrice(convertBigDecimalToInteger(totalPriceKRW)).totalPriceUSD(totalPriceUSD)
             .salesCnt(salesCnt).build();
         response.add(daySalesReport);
     }
@@ -137,12 +153,7 @@ public class SalesServiceImpl implements SalesService {
     @Override
     public List<DaySalesReport> getDaySalesReportByExcel(PrincipalDetails user, String beginDate,
         String endDate) {
-        User foundUser = user.getUser();
-        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
-        );
-        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
-            DataStatus.ACTIVE);
+        CreatorEntity creatorEntity = getCreatorEntity(user);
         LocalDateTime beginAt = Time.convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = Time.convertDateToLocalDateTime(endDate);
         endAt = endAt.plusDays(1);
@@ -158,12 +169,7 @@ public class SalesServiceImpl implements SalesService {
     @Override
     public Page<SettlementReportList> getSettlementReportList(PrincipalDetails user,
         Pageable pageable) {
-        User foundUser = user.getUser();
-        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
-        );
-        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
-            DataStatus.ACTIVE);
+        CreatorEntity creatorEntity = getCreatorEntity(user);
         Page<ProductsEntity> productsEntityList = productsRepository.findAllByCreator(creatorEntity,
             pageable);
         long totalCnt = productsEntityList.getTotalElements();
@@ -183,14 +189,82 @@ public class SalesServiceImpl implements SalesService {
     @Override
     public Page<SettlementRecordList> getSettlementRecordList(PrincipalDetails user,
         Pageable pageable) {
-        User foundUser = user.getUser();
-        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
-            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
-        );
-        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
-            DataStatus.ACTIVE);
+        CreatorEntity creatorEntity = getCreatorEntity(user);
         Page<SettlementEntity> settlementEntityList = settlementRepository.findAllByCreator(
             creatorEntity, pageable);
         return settlementEntityList.map(SettlementEntity::toSettlementRecordList);
+    }
+
+    @Override
+    public EachSalesReport getSettlementProductsReport(Long productsId, PrincipalDetails user,
+        PeriodType periodType) {
+        List<DaySalesReport> daySalesReports = new ArrayList<>();
+        CreatorEntity creatorEntity = getCreatorEntity(user);
+
+        LocalDateTime endAt = LocalDateTime.now();
+        LocalDateTime beginAt = getBeginAtBasedOnPeriodType(periodType, endAt);
+
+        ProductsEntity productsEntity = productsRepository.findProductByIdWithoutStatus(productsId);
+
+        if (!productsEntity.getCreatorEntity().equals(creatorEntity)) {
+            throw new BaseException(ErrorCode.IS_NOT_WRITER);
+        }
+
+        if (!periodType.equals(PeriodType.YEARLY)) {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {
+                setProductsTotalPriceAndSalesCntBasedOnDate(creatorEntity, productsEntity,
+                    dateFormatter, daySalesReports, date);
+            }
+        } else {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM월");
+            for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusMonths(1)) {
+                String formattedDate = date.format(dateFormatter);
+                LocalDateTime startOfNextMonth = date.plusMonths(1);
+                BigDecimal totalPriceKRW = (productsSalesRepository.getProductsTotalPriceByCreatorAndDate(
+                    creatorEntity, productsEntity, date, startOfNextMonth, CurrencyType.KRW));
+                BigDecimal totalPriceUSD = productsSalesRepository.getProductsTotalPriceByCreatorAndDate(
+                    creatorEntity, productsEntity, date, startOfNextMonth, CurrencyType.USD);
+                int salesCnt = productsSalesRepository.getProductsSalesCntByCreatorAndDate(
+                    creatorEntity, productsEntity, date, startOfNextMonth);
+                DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
+                    .totalPrice(convertBigDecimalToInteger(totalPriceKRW))
+                    .totalPriceUSD(totalPriceUSD)
+                    .salesCnt(salesCnt)
+                    .build();
+                daySalesReports.add(daySalesReport);
+            }
+        }
+
+        int viewCnt = productsEntity.getViewCnt();
+        int cartCnt = cartRepository.countAllByProducts(productsEntity);
+        return EachSalesReport.builder().daySalesReports(daySalesReports).viewCnt(viewCnt)
+            .cartCnt(cartCnt).build();
+    }
+
+    private CreatorEntity getCreatorEntity(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        return creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+    }
+
+    @Override
+    public List<DaySalesReport> getProductsDaySalesReportByExcel(Long productsId,
+        PrincipalDetails user, String beginDate,
+        String endDate) {
+        CreatorEntity creatorEntity = getCreatorEntity(user);
+        ProductsEntity productsEntity = productsRepository.findProductByIdWithoutStatus(productsId);
+
+        LocalDateTime beginAt = Time.convertDateToLocalDateTime(beginDate);
+        LocalDateTime endAt = Time.convertDateToLocalDateTime(endDate);
+        endAt = endAt.plusDays(1);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<DaySalesReport> response = new ArrayList<>();
+        for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusDays(1)) {
+            setProductsTotalPriceAndSalesCntBasedOnDate(creatorEntity, productsEntity,
+                dateFormatter, response, date);
+        }
+        Collections.reverse(response);
+        return response;
     }
 }

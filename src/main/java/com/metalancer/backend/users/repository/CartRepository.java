@@ -15,6 +15,8 @@ public interface CartRepository {
 
     int countAllByUser(User user);
 
+    int countAllByProducts(ProductsEntity productsEntity);
+
     void createCart(User user, ProductsEntity foundProductsEntity);
 
     void deleteAllCart(User user);

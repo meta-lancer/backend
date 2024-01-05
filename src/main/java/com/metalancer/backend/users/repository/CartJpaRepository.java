@@ -16,6 +16,8 @@ public interface CartJpaRepository extends JpaRepository<CartEntity, Long> {
 
     int countAllByUser(User user);
 
+    int countAllByProducts(ProductsEntity products);
+
     void deleteAllByUser(User user);
 
     Optional<CartEntity> findByUserAndProducts(User user, ProductsEntity products);

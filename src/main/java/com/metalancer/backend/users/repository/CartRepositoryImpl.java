@@ -33,6 +33,11 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
+    public int countAllByProducts(ProductsEntity productsEntity) {
+        return cartJpaRepository.countAllByProducts(productsEntity);
+    }
+
+    @Override
     public void createCart(User user, ProductsEntity foundProductsEntity) {
         CartEntity savedCartEntity = CartEntity.builder().user(user).products(foundProductsEntity)
             .build();

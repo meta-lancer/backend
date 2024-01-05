@@ -44,6 +44,15 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
+    public ProductsEntity findProductByIdWithoutStatus(Long productsId) {
+        Optional<ProductsEntity> productsEntity = productsJpaRepository.findById(productsId);
+        if (productsEntity.isEmpty()) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND);
+        }
+        return productsEntity.get();
+    }
+
+    @Override
     public ProductsEntity findProductBySharedLinkAndStatus(String sharedLink, DataStatus status) {
         Optional<ProductsEntity> productsEntity = productsJpaRepository.findBySharedLinkContains(
             sharedLink);

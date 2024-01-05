@@ -38,4 +38,10 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
         @Param("products") ProductsEntity products,
         @Param("startDate") LocalDateTime startDate,
         @Param("startOfNextDay") LocalDateTime startOfNextDay);
+
+    int countAllByProductsEntity(ProductsEntity products);
+
+    @Query("select SUM(pse.price) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity = :products and pse.currency = :currency")
+    BigDecimal getProductsTotalPriceByCreator(CreatorEntity creatorEntity,
+        ProductsEntity productsEntity, CurrencyType currency);
 }

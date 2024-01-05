@@ -50,4 +50,17 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
     public void save(ProductsSalesEntity createdProductsSalesEntity) {
         productsSalesJpaRepository.save(createdProductsSalesEntity);
     }
+
+    @Override
+    public int countAllByProducts(ProductsEntity productsEntity) {
+        return productsSalesJpaRepository.countAllByProductsEntity(productsEntity);
+    }
+
+    @Override
+    public BigDecimal getProductsTotalPriceByCreator(CreatorEntity creatorEntity,
+        ProductsEntity productsEntity,
+        CurrencyType currency) {
+        return productsSalesJpaRepository.getProductsTotalPriceByCreator(creatorEntity,
+            productsEntity, currency);
+    }
 }

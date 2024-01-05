@@ -24,4 +24,10 @@ public interface ProductsSalesRepository {
         LocalDateTime startOfNextDay);
 
     void save(ProductsSalesEntity createdProductsSalesEntity);
+
+    int countAllByProducts(ProductsEntity productsEntity);
+
+    BigDecimal getProductsTotalPriceByCreator(CreatorEntity creatorEntity,
+        ProductsEntity productsEntity,
+        CurrencyType currency);
 }

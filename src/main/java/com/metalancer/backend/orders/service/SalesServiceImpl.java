@@ -238,8 +238,15 @@ public class SalesServiceImpl implements SalesService {
 
         int viewCnt = productsEntity.getViewCnt();
         int cartCnt = cartRepository.countAllByProducts(productsEntity);
-        return EachSalesReport.builder().daySalesReports(daySalesReports).viewCnt(viewCnt)
-            .cartCnt(cartCnt).build();
+        int totalSalesCnt = productsSalesRepository.countAllByProducts(productsEntity);
+        BigDecimal totalPriceKRW = productsSalesRepository.getProductsTotalPriceByCreator(
+            creatorEntity, productsEntity, CurrencyType.KRW);
+        BigDecimal totalPriceUSD = productsSalesRepository.getProductsTotalPriceByCreator(
+            creatorEntity, productsEntity, CurrencyType.USD);
+        return EachSalesReport.builder().productsId(productsEntity.getId())
+            .daySalesReports(daySalesReports).viewCnt(viewCnt)
+            .cartCnt(cartCnt).totalSalesCnt(totalSalesCnt).totalPriceKRW(totalPriceKRW.intValue())
+            .totalPriceUSD(totalPriceUSD).build();
     }
 
     private CreatorEntity getCreatorEntity(PrincipalDetails user) {

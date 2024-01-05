@@ -13,6 +13,8 @@ public interface ProductsRepository {
 
     ProductsEntity findProductById(Long productsId);
 
+    ProductsEntity findProductByIdWithoutStatus(Long productsId);
+
     ProductsEntity findProductBySharedLinkAndStatus(String SharedLink, DataStatus status);
 
     ProductsEntity findProductByIdAndStatus(Long productsId, DataStatus status);

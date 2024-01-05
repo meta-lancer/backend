@@ -2,13 +2,14 @@ package com.metalancer.backend.users.controller;
 
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
-import com.metalancer.backend.common.constants.ErrorCode;
-import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
+import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.dto.UserResponseDTO;
@@ -34,7 +35,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "유저", description = "")
 @RestController
@@ -51,7 +54,7 @@ public class UserController {
     public BaseResponse<AuthResponseDTO.userInfo> getUserInfo(
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("로그인되어있는 유저: {}", user);
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<AuthResponseDTO.userInfo>(userService.getUserInfo(user));
     }
 
@@ -61,7 +64,7 @@ public class UserController {
 //    public BaseResponse<Boolean> updateToCreator(
 //            @AuthenticationPrincipal PrincipalDetails user) {
 //        log.info("로그인되어있는 유저: {}", user);
-//        validateUserAuthentication(user);
+//        AuthUtils.validateUserAuthentication(user);
 //        return new BaseResponse<>(userService.updateToCreator(user));
 //    }
 
@@ -70,7 +73,7 @@ public class UserController {
     @GetMapping("/basic")
     public BaseResponse<UserResponseDTO.BasicInfo> getBasicInfo(
         @AuthenticationPrincipal PrincipalDetails user) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<UserResponseDTO.BasicInfo>(userService.getBasicInfo(user));
     }
 
@@ -81,7 +84,7 @@ public class UserController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateBasicInfo dto
     ) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<UserResponseDTO.BasicInfo>(
             userService.updateBasicInfo(user, dto));
     }
@@ -92,7 +95,7 @@ public class UserController {
     @GetMapping("/career")
     public BaseResponse<IntroAndCareer> getIntroAndCareer(
         @AuthenticationPrincipal PrincipalDetails user) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.getIntroAndCareer(user));
     }
@@ -104,7 +107,7 @@ public class UserController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateCareerIntroRequest dto
     ) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.updateCareerIntro(user, dto));
     }
@@ -115,7 +118,7 @@ public class UserController {
     public BaseResponse<IntroAndCareer> createCareer(
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.CreateCareerRequest dto) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.createCareer(user, dto));
     }
@@ -127,7 +130,7 @@ public class UserController {
         @PathVariable Long careerId,
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.UpdateCareerRequest dto) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.updateCareer(careerId, user, dto));
     }
@@ -138,7 +141,7 @@ public class UserController {
     public BaseResponse<IntroAndCareer> deleteCareer(
         @PathVariable Long careerId,
         @AuthenticationPrincipal PrincipalDetails user) {
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<IntroAndCareer>(
             userService.deleteCareer(careerId, user));
     }
@@ -150,15 +153,15 @@ public class UserController {
     @GetMapping("/payment/list")
     public BaseResponse<Page<PayedOrder>> getPaymentList(
         @AuthenticationPrincipal PrincipalDetails user,
-        @RequestParam(value = "type", required = false) String type,
+        @RequestParam(value = "status", required = false) String status,
         @RequestParam("beginDate") String beginDate,
         @RequestParam("endDate") String endDate,
         Pageable pageable) {
         Pageable adjustedPageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         log.info("로그인되어있는 유저: {}", user);
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<PayedOrder>>(
-            userService.getPaymentList(user, type, beginDate, endDate, adjustedPageable));
+            userService.getPaymentList(user, status, beginDate, endDate, adjustedPageable));
     }
 
     @Operation(summary = "마이페이지 - 구매 관리(유저의 구매한 에셋 목록 조회)", description = "구매 상태 api 활용. 전체 상태는 그냥 status=로 보내면 됩니다. 혹은 status=PAY_DONE 처럼")
@@ -173,7 +176,7 @@ public class UserController {
         @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         log.info("로그인되어있는 유저: {}", user);
-        validateUserAuthentication(user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<PayedAssets>>(
             userService.getPayedAssetList(status, beginDate, endDate, user, pageable));
     }
@@ -188,9 +191,42 @@ public class UserController {
             userService.getOrderStatusList());
     }
 
-    public void validateUserAuthentication(PrincipalDetails user) {
-        if (user == null) {
-            throw new BaseException(ErrorCode.LOGIN_REQUIRED);
-        }
+
+    @Operation(summary = "마이페이지 - 크리에이터 전환 신청", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping("/portfolio")
+    public BaseResponse<Boolean> applyCreator(
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.ApplyCreator dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("로그인되어있는 유저: {}", user);
+        log.info("크리에이터 전환 신청 dto: {}", dto);
+        return new BaseResponse<Boolean>(
+            userService.applyCreator(files, dto, user));
+    }
+
+    @Operation(summary = "마이페이지 - 내 포트폴리오 조회(크리에이터 신청확인용)", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @GetMapping("/portfolio")
+    public BaseResponse<List<Portfolio>> getMyPortfolio(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        return new BaseResponse<List<Portfolio>>(userService.getMyPortfolio(user));
+    }
+
+    @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping("/inquiry")
+    public BaseResponse<Boolean> createInquiry(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody UserRequestDTO.CreateInquiryRequest dto) {
+        log.info("구매 관리 문의 등록 dto: {}", dto);
+        return new BaseResponse<Boolean>(
+            userService.createInquiry(user, dto));
     }
 }

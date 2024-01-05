@@ -3,11 +3,13 @@ package com.metalancer.backend.orders.entity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ClaimStatus;
 import com.metalancer.backend.common.constants.ClaimType;
+import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.OrderStatusException;
 import com.metalancer.backend.orders.domain.OrderProducts;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +22,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,10 +52,13 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "products_id", nullable = false)
     private ProductsEntity productsEntity;
+    @ManyToOne
+    @JoinColumn(name = "products_request_option_id")
+    private ProductsRequestOptionEntity productsRequestOptionEntity;
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
-    private Integer price;
+    private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderProductStatus = OrderStatus.PAY_ING;
     @Enumerated(EnumType.STRING)
@@ -64,19 +70,20 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     public OrderProductsEntity(User orderer, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, String orderNo,
         String orderProductNo,
-        Integer price) {
+        BigDecimal price, ProductsRequestOptionEntity productsRequestOptionEntity) {
         this.orderer = orderer;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.price = price;
+        this.productsRequestOptionEntity = productsRequestOptionEntity;
     }
 
     public void completeOrder() {
         if (this.orderProductStatus.equals(OrderStatus.PAY_ING) || this.orderProductStatus.equals(
-            OrderStatus.PAY_DONE)) {
-            this.orderProductStatus = OrderStatus.PAY_DONE;
+            OrderStatus.PAY_CONFIRM)) {
+            this.orderProductStatus = OrderStatus.PAY_CONFIRM;
         } else {
             throw new OrderStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_ORDER_STATUS);
         }
@@ -94,5 +101,12 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
         return OrderProducts.builder().productsDetail(productsEntity.toProductsDetail())
             .orderProductNo(orderProductNo).orderProductStatus(orderProductStatus).price(price)
             .claimType(claimType).claimStatus(claimStatus).build();
+    }
+
+    public ProductsSalesEntity toProductsSalesEntity(CurrencyType currencyType) {
+        return ProductsSalesEntity.builder().creatorEntity(productsEntity.getCreatorEntity())
+            .ordersEntity(ordersEntity).ordererId(orderer.getId())
+            .productsEntity(productsEntity).orderProductNo(orderProductNo).orderNo(orderNo)
+            .price(price).currency(currencyType).build();
     }
 }

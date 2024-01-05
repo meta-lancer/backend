@@ -64,8 +64,19 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
         @Param("tagList") List<String> tagList, @Param("status") DataStatus status,
         Pageable pageable);
 
+    @Query("SELECT DISTINCT pt.productsEntity FROM products_tag pt WHERE pt.name IN :tagList and pt.productsEntity.status = :status and pt.productsEntity.productsAssetFileEntity.success = true and pt.productsEntity.title like concat('%', :keyword,'%') ")
+    Page<ProductsEntity> findDistinctProductsByTagNamesAndStatusAndKeyword(
+        @Param("tagList") List<String> tagList, @Param("status") DataStatus status,
+        @Param("keyword") String keyword,
+        Pageable pageable);
+
     long countAllBy();
 
     Page<ProductsEntity> findAllByStatusAndProductsAssetFileEntitySuccessOrderByCreatedAtDesc(
         DataStatus status, Boolean success, Pageable pageable);
+
+    Page<ProductsEntity> findAllByStatusAndProductsAssetFileEntitySuccessAndTitleContainsOrderByCreatedAtDesc(
+        DataStatus status, Boolean success, String keyword, Pageable pageable);
+
+    Page<ProductsEntity> findAllByCreatorEntity(CreatorEntity creatorEntity, Pageable pageable);
 }

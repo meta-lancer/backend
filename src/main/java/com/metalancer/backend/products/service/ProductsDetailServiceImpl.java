@@ -3,16 +3,19 @@ package com.metalancer.backend.products.service;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
+import com.metalancer.backend.products.domain.RequestOption;
 import com.metalancer.backend.products.entity.ProductsAssetFileEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsWishEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsRequestOptionRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
@@ -44,6 +47,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     private final ProductsViewsRepository productsViewsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
     private final UserRepository userRepository;
+    private final ProductsRequestOptionRepository productsRequestOptionRepository;
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
@@ -83,7 +87,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     public ProductsDetail getProductDetail(PrincipalDetails user, Long productId) {
         ProductsEntity foundProductsEntity = productsRepository.findProductByIdAndStatus(productId,
             DataStatus.ACTIVE);
-        foundProductsEntity.addViewCnt();
+
         CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
         double satisficationRate = 0.0;
@@ -93,6 +97,11 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
                 () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
             );
+            // 로그인 유저의 조회수만..! 본인인 경우 조회수 증가 x
+            if (!foundProductsEntity.getCreatorEntity().getUser().getId()
+                .equals(foundUser.getId())) {
+                foundProductsEntity.addViewCnt();
+            }
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
@@ -104,11 +113,16 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
-
         getProductsDetailTagList(foundProductsEntity, response);
+
+        // request 인 경우
+        if (foundProductsEntity.getProductsType().equals(ProductsType.REQUEST)) {
+            List<RequestOption> productsRequestOptionEntityList = productsRequestOptionRepository.findAllByProducts(
+                foundProductsEntity);
+            response.setRequestOptionList(productsRequestOptionEntityList);
+        }
         AssetFile assetFile = getProductsDetailAssetFileAfterUploaded(foundProductsEntity,
             response);
-        response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
     }
@@ -118,7 +132,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         ProductsEntity foundProductsEntity = productsRepository.findProductBySharedLinkAndStatus(
             link,
             DataStatus.ACTIVE);
-        foundProductsEntity.addViewCnt();
+
         CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
         double satisficationRate = 0.0;
@@ -128,6 +142,11 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
                 () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
             );
+            // 로그인 유저의 조회수만..! 본인인 경우 조회수 증가 x
+            if (!foundProductsEntity.getCreatorEntity().getUser().getId()
+                .equals(foundUser.getId())) {
+                foundProductsEntity.addViewCnt();
+            }
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
@@ -139,11 +158,17 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
-
         getProductsDetailTagList(foundProductsEntity, response);
+
+        // request 인 경우
+        if (foundProductsEntity.getProductsType().equals(ProductsType.REQUEST)) {
+            List<RequestOption> productsRequestOptionEntityList = productsRequestOptionRepository.findAllByProducts(
+                foundProductsEntity);
+            response.setRequestOptionList(productsRequestOptionEntityList);
+        }
+
         AssetFile assetFile = getProductsDetailAssetFile(foundProductsEntity,
             response);
-        response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
     }
@@ -162,7 +187,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl("");
+
         return assetFile;
     }
 
@@ -184,7 +209,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
+
         return assetFile;
     }
 

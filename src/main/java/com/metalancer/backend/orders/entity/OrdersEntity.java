@@ -19,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,22 +47,21 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String orderNo;
     @Column(nullable = false)
-    private Integer totalPoint = 0;
+    private BigDecimal totalPoint = BigDecimal.valueOf(0);
     @Column(nullable = false)
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
     @Column(nullable = false)
-    private Integer totalPaymentPrice;
+    private BigDecimal totalPaymentPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PAY_ING;
 
     @Builder
-    public OrdersEntity(User orderer, String orderNo, Integer totalPrice,
-        Integer totalPaymentPrice) {
+    public OrdersEntity(User orderer, String orderNo, BigDecimal totalPrice,
+        BigDecimal totalPaymentPrice) {
         this.orderer = orderer;
         this.orderNo = orderNo;
-        this.totalPoint = 0;
         this.totalPrice = totalPrice;
-        if (totalPrice - this.totalPoint == totalPaymentPrice) {
+        if (totalPrice.subtract(this.totalPoint).equals(totalPaymentPrice)) {
             this.totalPaymentPrice = totalPaymentPrice;
         } else {
             throw new InvalidParamException("check totalPrice, totalPaymentPrice, totalPoint",
@@ -85,14 +85,26 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     }
 
     public void completeOrder() {
+        // PAY_CONFIRM은 웹훅과 동시에 진행하기 때문에 허용
         if (this.orderStatus.equals(OrderStatus.PAY_ING) || this.orderStatus.equals(
-            OrderStatus.PAY_DONE)) {
-            this.orderStatus = OrderStatus.PAY_DONE;
+            OrderStatus.PAY_CONFIRM)) {
+            this.orderStatus = OrderStatus.PAY_CONFIRM;
         } else {
             throw new DataStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_DATA_STATUS);
         }
     }
 
+    public void completeOrderWithRequest() {
+        // PAY_CONFIRM은 웹훅과 동시에 진행하기 때문에 허용
+        if (this.orderStatus.equals(OrderStatus.PAY_ING) || this.orderStatus.equals(
+            OrderStatus.PAY_DONE)) {
+            this.orderStatus = OrderStatus.PAY_CONFIRM;
+        } else {
+            throw new DataStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_DATA_STATUS);
+        }
+    }
+
+    // 외주제작용
     public void confirmOrder() {
         if (this.orderStatus.equals(OrderStatus.PAY_DONE)) {
             this.orderStatus = OrderStatus.PAY_CONFIRM;

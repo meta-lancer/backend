@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 public class TagsRepositoryImpl implements TagsRepository {
 
     private final TagsJpaRepository tagsJpaRepository;
+    private final GenreGalaxyTypeJpaRepository genreGalaxyTypeJpaRepository;
 
     @Override
     public List<String> findAllByTrendSpotLight(TrendSpotlightTypeEntity trendSpotlightTypeEntity) {
@@ -39,6 +40,7 @@ public class TagsRepositoryImpl implements TagsRepository {
         );
         List<TagsEntity> tagsEntityList = tagsJpaRepository.findAllByParentId(
             tagsEntity.getId());
+        tagsEntityList.add(0, tagsEntity);
         return tagsEntityList.stream().map(TagsEntity::getTagName).toList();
     }
 
@@ -57,12 +59,28 @@ public class TagsRepositoryImpl implements TagsRepository {
 
     @Override
     public List<String> findAllGenreGalaxyTags() {
-        Long genreGalaxyParentId = 4L;
-        List<TagsEntity> parentTagsEntityList = tagsJpaRepository.findAllByParentId(
-            genreGalaxyParentId);
-        List<Long> parentIdList = parentTagsEntityList.stream().map(TagsEntity::getId)
-            .toList();
-        return tagsJpaRepository.findAllByParentIdIsIn(parentIdList)
+        // 모든 genreGalaxy에 해당되는 tag 불러오기
+        List<TagsEntity> genreGalaxyTagList = genreGalaxyTypeJpaRepository.findAllGenreGalaxyTagList();
+
+//        Long genreGalaxyParentId = 4L;
+//        List<TagsEntity> parentTagsEntityList = tagsJpaRepository.findAllByParentId(
+//            genreGalaxyParentId);
+//        List<Long> parentIdList = parentTagsEntityList.stream().map(TagsEntity::getId)
+//            .toList();
+        List<TagsEntity> genreGalaxyTagAndDescentList = new ArrayList<>();
+        // 돌면서
+        for (TagsEntity genreTag : genreGalaxyTagList) {
+            // 자기가 부모인 경우 자식 태그들 싹 다 불러오기
+            List<TagsEntity> tagsEntityList = tagsJpaRepository.findAllByParentId(
+                genreTag.getId());
+            // 자기 자신도 태그에 포함
+            tagsEntityList.add(0, genreTag);
+            genreGalaxyTagAndDescentList.addAll(tagsEntityList);
+        }
+//        return tagsJpaRepository.findAllByParentIdIsIn(parentIdList)
+//            .stream()
+//            .map(TagsEntity::getTagName).toList();
+        return genreGalaxyTagAndDescentList
             .stream()
             .map(TagsEntity::getTagName).toList();
     }

@@ -2,10 +2,15 @@ package com.metalancer.backend.creators.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.domain.PaymentInfoManagement;
+import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
 import com.metalancer.backend.creators.repository.CreatorRepository;
+import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
@@ -21,8 +26,10 @@ import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CareerRepository;
 import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
+import com.metalancer.backend.users.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,12 +51,17 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     private final ProductsTagRepository productsTagRepository;
     private final PortfolioRepository portfolioRepository;
     private final CareerRepository careerRepository;
+    private final UserRepository userRepository;
     private final UserInterestsRepository userInterestsRepository;
+    private final PaymentInfoManagementRepository paymentInfoManagementRepository;
 
     @Override
-    public OtherCreatorBasicInfo getCreatorBasicInfo(PrincipalDetails userPrincipalDetails,
+    public OtherCreatorBasicInfo getCreatorBasicInfo(PrincipalDetails user,
         Long creatorId) {
-        User foundUser = userPrincipalDetails.getUser();
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         CreatorEntity creatorEntity = creatorRepository.findByCreatorId(creatorId);
         User creatorUser = creatorEntity.getUser();
         return creatorUser.toOtherCreatorBasicInfo();
@@ -58,6 +70,9 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     @Override
     public IntroAndCareer getCreatorIntroAndCareer(PrincipalDetails user, Long creatorId) {
         User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         CreatorEntity creatorEntity = creatorRepository.findByCreatorId(creatorId);
         User creatorUser = creatorEntity.getUser();
         return getIntroAndExperience(creatorUser);
@@ -67,6 +82,9 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     public Page<CreatorAssetList> getCreatorAssetList(PrincipalDetails user, Long creatorId,
         Pageable pageable) {
         User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         CreatorEntity creatorEntity = creatorRepository.findByCreatorId(creatorId);
         Page<CreatorAssetList> response = productsAssetFileRepository.findAllMyAssetList(
             creatorEntity, pageable);
@@ -93,6 +111,9 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     @Override
     public Page<CreatorAssetList> getMyRegisteredAssets(PrincipalDetails user, Pageable pageable) {
         User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.ACTIVE);
         return productsAssetFileRepository.findAllMyAssetList(creatorEntity,
@@ -102,6 +123,9 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     @Override
     public Page<ManageAsset> getMyManageAssetList(PrincipalDetails user, Pageable pageable) {
         User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.ACTIVE);
         Page<ProductsEntity> productsEntities = productsRepository.findProductsListByCreator(
@@ -123,6 +147,9 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     @Override
     public List<Portfolio> getMyPortfolio(PrincipalDetails user) {
         User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.ACTIVE);
         return portfolioRepository.findAllByCreator(creatorEntity);
@@ -133,5 +160,19 @@ public class CreatorReadServiceImpl implements CreatorReadService {
         List<Career> careerList = careerEntities.stream().map(CareerEntity::toDomain).toList();
         return IntroAndCareer.builder().introduction(foundUser.getCareerIntroduction())
             .careerList(careerList).build();
+    }
+
+    @Override
+    public PaymentInfoManagement getMyPaymentInfoManagement(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        return optionalPaymentInfoManagement.map(
+            PaymentInfoManagementEntity::toPaymentInfoManagement).orElse(null);
     }
 }

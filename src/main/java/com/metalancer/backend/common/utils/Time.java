@@ -1,6 +1,7 @@
 package com.metalancer.backend.common.utils;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -52,6 +53,8 @@ public class Time {
             time = (diffTime) + "시간 전";
         } else if ((diffTime /= TIME_MAX.HOUR) < TIME_MAX.DAY) {
             time = dateTime.format(formatter);
+        } else if ((diffTime /= TIME_MAX.DAY) < TIME_MAX.MONTH) {
+            time = dateTime.format(formatter);
         } else {
             time = (diffTime / TIME_MAX.MONTH) + "년 전";
         }
@@ -72,6 +75,8 @@ public class Time {
         } else if ((diffTime /= TIME_MAX.MIN) < TIME_MAX.HOUR) {
             time = (diffTime) + "hrs ago";
         } else if ((diffTime /= TIME_MAX.HOUR) < TIME_MAX.DAY) {
+            time = dateTime.format(formatter);
+        } else if ((diffTime /= TIME_MAX.DAY) < TIME_MAX.MONTH) {
             time = dateTime.format(formatter);
         } else {
             time = (diffTime / TIME_MAX.MONTH) + "years ago";
@@ -110,6 +115,16 @@ public class Time {
         return dateTime != null ? dateTime.format(outputFormat) : "-";
     }
 
+    public static String convertDateToStringWithDot(LocalDateTime dateTime) {
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return dateTime != null ? dateTime.format(outputFormat) : "-";
+    }
+
+    public static String convertDateToStringWithAttached(LocalDateTime dateTime) {
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
+        return dateTime != null ? dateTime.format(outputFormat) : "-";
+    }
+
     public static String convertDateToStringSlash(LocalDateTime dateTime) {
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         return dateTime != null ? dateTime.format(outputFormat) : "-";
@@ -118,5 +133,11 @@ public class Time {
     public static String convertDateToFullString(LocalDateTime dateTime) {
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return dateTime != null ? dateTime.format(outputFormat) : "-";
+    }
+
+    public static LocalDateTime convertDateToLocalDateTime(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        return date.atStartOfDay();
     }
 }

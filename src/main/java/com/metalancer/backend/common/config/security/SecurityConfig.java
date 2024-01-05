@@ -3,6 +3,7 @@ package com.metalancer.backend.common.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.metalancer.backend.users.repository.LoginLogsRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final MemberLoginFailService memberLoginFailService;
+    private final LoginLogsRepository loginLogsRepository;
 
     @Value("${spring.security.oauth2.client.targetUrl}")
     private String targetUrl;
@@ -160,8 +162,20 @@ public class SecurityConfig {
             PrincipalDetails defaultUser = (PrincipalDetails) authentication.getPrincipal();
             User foundUser = defaultUser.getUser();
             foundUser.isUserStatusEqualsActive();
+            String ipAddress = getIpAddress(request);
+            loginLogsRepository.saveLog(foundUser, ipAddress);
         });
     }
+
+    private String getIpAddress(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+        log.info("Client IP: " + ipAddress);
+        return ipAddress;
+    }
+
 
     @Bean
     public AuthenticationSuccessHandler oauth2SuccessHandler() {
@@ -171,6 +185,8 @@ public class SecurityConfig {
             User user = oAuth2User.getUser();
             // 이를 통해 리다이렉트하도록 응답 코드 보낸다.
             response.sendRedirect(targetUrl);
+            String ipAddress = getIpAddress(request);
+            loginLogsRepository.saveLog(user, ipAddress);
         });
     }
 

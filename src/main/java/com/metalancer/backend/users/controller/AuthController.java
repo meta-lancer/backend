@@ -3,6 +3,7 @@ package com.metalancer.backend.users.controller;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
@@ -58,6 +59,7 @@ public class AuthController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody UserRequestDTO.CreateOauthRequest dto)
         throws Exception {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Long>(authService.createOauthUser(user, dto));
     }
 
@@ -93,6 +95,7 @@ public class AuthController {
         @AuthenticationPrincipal PrincipalDetails user,
         @RequestBody AuthRequestDTO.PasswordRequest dto
     ) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(authService.resetMyPassword(user, dto));
     }
 

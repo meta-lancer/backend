@@ -111,6 +111,21 @@ public class S3Service {
         return readBucketName + "/" + fileName;
     }
 
+    public String uploadToPortfolioReference(Long creatorId, Long portfolioId, MultipartFile file,
+        String randomString)
+        throws IOException {
+        String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName = randomString + "." + ext;
+        String bucketName = assetBucket + "/creator/" + creatorId + "/portfolio/" + portfolioId;
+        String readBucketName = readBucket + "/creator/" + creatorId + "/portfolio/" + portfolioId;
+
+        s3Client.putObject(
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        return readBucketName + "/" + fileName;
+    }
+
     private String constructBucketName(Long assetId, AssetType assetType) {
         return assetBucket + "/asset/" + assetId + "/" + assetType.getPath();
     }
@@ -140,6 +155,24 @@ public class S3Service {
             newFileName);
         URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
+    }
+
+    public String uploadToPaymentInfoManagement(Long creatorId,
+        MultipartFile file,
+        String randomString)
+        throws IOException {
+        String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName = randomString + "." + ext;
+        String bucketName =
+            assetBucket + "/creator/" + creatorId + "/paymentInfo-management";
+        String readBucketName =
+            readBucket + "/creator/" + creatorId + "/paymentInfo-management";
+
+        s3Client.putObject(
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        return readBucketName + "/" + fileName;
     }
 
     public String extractBaseUrl(String signedUrl) {

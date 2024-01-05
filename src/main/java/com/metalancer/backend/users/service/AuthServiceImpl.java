@@ -24,6 +24,7 @@ import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.entity.UserAgreementEntity;
 import com.metalancer.backend.users.entity.UserInterestsEntity;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
+import com.metalancer.backend.users.repository.NicknameAnimalRepository;
 import com.metalancer.backend.users.repository.UserAgreementRepository;
 import com.metalancer.backend.users.repository.UserInterestsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -57,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserInterestsRepository userInterestsRepository;
     private final UserAgreementRepository userAgreementRepository;
     private final CreatorRepository creatorRepository;
+    private final NicknameAnimalRepository nicknameAnimalRepository;
 
     @Override
     public Long createUser(UserRequestDTO.CreateRequest dto) throws MessagingException {
@@ -68,6 +71,9 @@ public class AuthServiceImpl implements AuthService {
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
         createdApproveLink(foundUser);
+//        // ## 포트원 심사를 위해 크리에이터 전환
+//        foundUser.changeToCreator();
+//        createCreator(foundUser);
         return foundUser.getId();
     }
 
@@ -167,12 +173,26 @@ public class AuthServiceImpl implements AuthService {
         User foundUser = userRepository.findByEmail(foundApproveLink.getEmail())
             .orElseThrow(() -> new BaseException(ErrorCode.LOGIN_DENIED));
         foundUser.setActive();
+        // 랜덤 닉네임 배정
+        setUserRandomNickname(foundUser);
 
         Optional<CreatorEntity> foundCreator = creatorRepository.findOptionalByUserAndStatus(
             foundUser, DataStatus.PENDING);
         foundCreator.ifPresent(CreatorEntity::setActive);
 
         return new AuthResponseDTO.userInfo(foundUser);
+    }
+
+    private void setUserRandomNickname(User foundUser) {
+        Random random = new Random();
+        String randomNickName;
+        int hasDuplicatedNickname;
+        do {
+            int fourDigitNumber = 1000 + random.nextInt(9000); // Generate a random 4-digit number
+            randomNickName = nicknameAnimalRepository.getRandomOne() + fourDigitNumber;
+            hasDuplicatedNickname = userRepository.countUsersByNickname(randomNickName);
+        } while (hasDuplicatedNickname != 0);
+        foundUser.setFirstNickName(randomNickName);
     }
 
     @Override
@@ -222,10 +242,16 @@ public class AuthServiceImpl implements AuthService {
         setUserInterests(foundUser, dto);
         setAgreement(foundUser, dto);
         foundUser.setActive();
+        // 랜덤 닉네임 배정
+        setUserRandomNickname(foundUser);
 //        createdApproveLink(foundUser);
+
+        // # 포트원 심사를 위해 무조건 허용
         if (!dto.isNormalUser()) {
             createCreator(foundUser);
         }
+//        // 심사 필요없음
+//        createCreatorWithOAuthUser(foundUser);
         return foundUser.getId();
     }
 
@@ -234,6 +260,14 @@ public class AuthServiceImpl implements AuthService {
             .email(foundUser.getEmail()).build();
         creatorRepository.save(createdCreator);
         createdCreator.setPending();
+    }
+
+    private void createCreatorWithOAuthUser(User foundUser) {
+
+        CreatorEntity createdCreator = CreatorEntity.builder().user(foundUser)
+            .email(foundUser.getEmail()).build();
+        creatorRepository.save(createdCreator);
+
     }
 
     public void hasPrincipalDetails(PrincipalDetails user) {

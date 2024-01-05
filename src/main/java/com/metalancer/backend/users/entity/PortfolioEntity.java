@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.entity;
 
 import com.metalancer.backend.common.BaseTimeEntity;
+import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.users.domain.Portfolio;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,33 +43,32 @@ public class PortfolioEntity extends BaseTimeEntity implements Serializable {
     private LocalDateTime endAt;
     private int workerCnt;
     private String tool;
-    private String referenceFile;
+    private int seq;
 
     @Builder
-    public PortfolioEntity(CreatorEntity creatorEntity, String title, LocalDateTime beginAt,
-        LocalDateTime endAt, int workerCnt, String tool, String referenceFile) {
+    public PortfolioEntity(CreatorEntity creatorEntity, String title, String beginAt,
+        String endAt, int workerCnt, String tool, int seq) {
         this.creatorEntity = creatorEntity;
         this.title = title;
-        this.beginAt = beginAt;
-        this.endAt = endAt;
+        this.beginAt = Time.convertDateToLocalDateTime(beginAt);
+        this.endAt = Time.convertDateToLocalDateTime(endAt);
         this.workerCnt = workerCnt;
         this.tool = tool;
-        this.referenceFile = referenceFile;
+        this.seq = seq;
     }
 
     public Portfolio toDomain() {
         return Portfolio.builder().portfolioId(id).title(title)
             .beginAt(beginAt).endAt(endAt).workerCnt(workerCnt).tool(tool)
-            .referenceFile(referenceFile).build();
+            .build();
     }
 
-    public void update(String title, LocalDateTime beginAt,
-        LocalDateTime endAt, int workerCnt, String tool, String referenceFile) {
+    public void update(String title, String beginAt,
+        String endAt, int workerCnt, String tool) {
         this.title = title;
-        this.beginAt = beginAt;
-        this.endAt = endAt;
+        this.beginAt = Time.convertDateToLocalDateTime(beginAt);
+        this.endAt = Time.convertDateToLocalDateTime(endAt);
         this.workerCnt = workerCnt;
         this.tool = tool;
-        this.referenceFile = referenceFile;
     }
 }

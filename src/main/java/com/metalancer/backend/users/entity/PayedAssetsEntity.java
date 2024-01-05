@@ -78,6 +78,8 @@ public class PayedAssetsEntity extends BaseEntity implements Serializable {
             .downloadLink(downloadLink).sellerName(seller.getName())
             .sellerNickname(seller.getNickname()).sellerPhone(seller.getMobile())
             .price(orderPaymentEntity.getOrdersEntity().getTotalPrice())
+            .priceUnit(orderPaymentEntity.getCurrency())
+            .orderStatus(orderProductsEntity.getOrderProductStatus())
             .build();
     }
 }

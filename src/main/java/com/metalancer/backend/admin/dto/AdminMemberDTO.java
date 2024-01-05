@@ -29,4 +29,11 @@ public class AdminMemberDTO {
         private DataStatus status;
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class CreateUpdateReply {
+
+        private String replyContent;
+    }
+
 }

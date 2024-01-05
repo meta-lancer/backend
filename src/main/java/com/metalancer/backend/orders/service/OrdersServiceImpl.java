@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.service;
 
+import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
@@ -18,9 +19,11 @@ import com.metalancer.backend.orders.dto.OrdersRequestDTO.CreateOrder;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
 import com.metalancer.backend.orders.entity.OrdersEntity;
+import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
+import com.metalancer.backend.orders.repository.ProductsSalesRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
@@ -65,13 +68,16 @@ public class OrdersServiceImpl implements OrdersService {
     private final OrderPaymentRepository orderPaymentRepository;
     private final PayedAssetsRepository payedAssetsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
+    private final ProductsSalesRepository productsSalesRepository;
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
         user = userRepository.findById(user.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
+        // 포트원용 주문번호 만들기
         String orderNo = createOrderNo();
+        // # 주문서 entity만들기
         OrdersEntity createdOrdersEntity = OrdersEntity.builder().orderer(user)
             .orderNo(orderNo)
             .totalPrice(dto.getTotalPrice())
@@ -79,9 +85,14 @@ public class OrdersServiceImpl implements OrdersService {
 //            .totalPoint(dto.getTotalPoint())
             .build();
         ordersRepository.save(createdOrdersEntity);
+
+        // # 상품 고유번호를 가지고 가격 조회 + 주문상품 생성
+        // 주문상품에 붙일 주문상품번호
         int index = 1;
         for (Long productsId : dto.getProductsIdList()) {
+            // 상품 조회
             ProductsEntity foundProductEntity = productsRepository.findProductById(productsId);
+            // 만약 상품의 할인가가 없다면 원래 금액으로
             Integer price =
                 foundProductEntity.getSalePrice() == null ? foundProductEntity.getPrice()
                     : foundProductEntity.getSalePrice();
@@ -89,10 +100,12 @@ public class OrdersServiceImpl implements OrdersService {
                 .orderer(user)
                 .ordersEntity(createdOrdersEntity).productsEntity(foundProductEntity)
                 .orderNo(orderNo).orderProductNo(orderNo + String.format("%04d", index++))
-                .price(price)
+                .price(BigDecimal.valueOf(price))
                 .build();
             orderProductsRepository.save(createdOrderProductsEntity);
         }
+
+        // response 만들기
         CreatedOrder response = createdOrdersEntity.toCreatedOrderDomain();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
             createdOrdersEntity);
@@ -121,7 +134,7 @@ public class OrdersServiceImpl implements OrdersService {
         OrderStatus orderStatus = foundOrdersEntity.getOrderStatus();
         checkOrderStatusEqualsPAY_ING_OR_PAY_DONE(orderStatus);
         // 금액 비교
-        BigDecimal createdOrderTotalPrice = new BigDecimal(foundOrdersEntity.getTotalPrice());
+        BigDecimal createdOrderTotalPrice = foundOrdersEntity.getTotalPrice();
         BigDecimal paymentResponseTotalPrice = payment_response.getResponse().getAmount();
         return createdOrderTotalPrice.equals(paymentResponseTotalPrice);
     }
@@ -169,6 +182,7 @@ public class OrdersServiceImpl implements OrdersService {
         Payment paymentResponse = payment_response.getResponse();
         List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
             foundOrdersEntity);
+
         if (orderStatus.equals(OrderStatus.PAY_DONE)) {
             PaymentResponse response = getPaymentResponse(user,
                 foundOrdersEntity, orderStatus, paymentResponse);
@@ -191,6 +205,12 @@ public class OrdersServiceImpl implements OrdersService {
                 .orderPaymentEntity(savedOrderPaymentEntity)
                 .downloadLink(assetUrl).build();
             payedAssetsRepository.save(createdPayedAssetsEntity);
+
+            // 판매자 판매내역
+            CurrencyType currencyType = CurrencyType.valueOf(savedOrderPaymentEntity.getCurrency());
+            ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity(
+                currencyType);
+            productsSalesRepository.save(createdProductsSalesEntity);
         }
 
         PaymentResponse response = getPaymentResponse(user,
@@ -209,7 +229,11 @@ public class OrdersServiceImpl implements OrdersService {
             .receiptUrl(paymentResponse.getReceiptUrl())
             .type(paymentResponse.getPgProvider())
             .method(paymentResponse.getPayMethod()).currency(paymentResponse.getCurrency())
-            .purchasedAt(paymentResponse.getPaidAt()).build();
+            .purchasedAt(paymentResponse.getPaidAt())
+            .paidStatus(paymentResponse.getStatus())
+            .pgTid(paymentResponse.getPgTid())
+            .impUid(paymentResponse.getImpUid())
+            .build();
         orderPaymentRepository.save(createdOrderPaymentEntity);
         return orderPaymentRepository.findByOrderNo(orderNo);
     }
@@ -268,14 +292,14 @@ public class OrdersServiceImpl implements OrdersService {
         String orderNo = dto.getMerchantUid();
         String impUid = dto.getImpUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
-        cancelPayments(impUid, dto.getMerchantUid(),
-            BigDecimal.valueOf(foundOrdersEntity.getTotalPaymentPrice()),
+        portoneCancelPayments(impUid, dto.getMerchantUid(),
+            foundOrdersEntity.getTotalPaymentPrice(),
             dto.getReason());
         cancelOrder(foundOrdersEntity);
         return null;
     }
 
-    private IamportResponse<Payment> cancelPayments(String impUid, String merchantUid,
+    private IamportResponse<Payment> portoneCancelPayments(String impUid, String merchantUid,
         BigDecimal amount,
         String reason)
         throws IamportResponseException, IOException {

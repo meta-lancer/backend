@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.repository;
 
+import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.users.domain.PayedOrder;
 import com.metalancer.backend.users.entity.User;
@@ -15,4 +16,7 @@ public interface OrderPaymentRepository {
 
     Page<PayedOrder> findAllByUserWithDateOption(User foundUser, Pageable pageable,
         LocalDateTime beginAt, LocalDateTime endAt);
+
+    Page<PayedOrder> findAllByUserWithOrderStatusAndDateOption(User foundUser, Pageable pageable,
+        LocalDateTime beginAt, LocalDateTime endAt, OrderStatus orderStatus);
 }

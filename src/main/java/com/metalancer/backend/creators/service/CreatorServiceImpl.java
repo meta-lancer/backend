@@ -5,14 +5,20 @@ import com.metalancer.backend.common.constants.AssetType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.DuplicatedException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManagementCreate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManagementUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
+import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
 import com.metalancer.backend.creators.repository.CreatorRepository;
+import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
 import com.metalancer.backend.external.aws.s3.S3Service;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
@@ -30,7 +36,9 @@ import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.PortfolioEntity;
+import com.metalancer.backend.users.entity.PortfolioImagesEntity;
 import com.metalancer.backend.users.entity.User;
+import com.metalancer.backend.users.repository.PortfolioImagesRepository;
 import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
@@ -62,6 +70,8 @@ public class CreatorServiceImpl implements CreatorService {
     private final ProductsAssetFileRepository productsAssetFileRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final PortfolioImagesRepository portfolioImagesRepository;
+    private final PaymentInfoManagementRepository paymentInfoManagementRepository;
 
     @Override
     public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
@@ -113,7 +123,7 @@ public class CreatorServiceImpl implements CreatorService {
         AssetFile assetFile = productsAssetFileEntity.toAssetFile();
         assetFile.setThumbnailUrlList(thumbnailUrlList);
         assetFile.setViewUrlList(viewUrlList);
-        assetFile.setZipFileUrl(productsAssetFileEntity.getUrl());
+
         return assetFile;
     }
 
@@ -244,7 +254,7 @@ public class CreatorServiceImpl implements CreatorService {
         List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
             productsEntity);
         productsTagRepository.deleteAll(productsTagEntities);
-        updateTagList(dto, productsEntity);
+        updateTagList(dto.getTagList(), productsEntity);
 
         // 작업 수, 에셋 평점
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
@@ -265,6 +275,170 @@ public class CreatorServiceImpl implements CreatorService {
         String randomFileName = uploadService.getRandomStringForImageName(8);
         return uploadService.getThumbnailPresignedUrl(productsId, randomFileName, extension);
     }
+
+    @Override
+    public AssetUpdatedResponse updateAssetWithFile(MultipartFile[] thumbnails, Long productsId,
+        User user, AssetUpdateWithOutThumbnail dto) {
+        ProductsEntity productsEntity = productsRepository.findProductById(productsId);
+        // 본인만 접근 가능
+        CreatorEntity creatorEntity = productsEntity.getCreatorEntity();
+        if (!creatorEntity.getUser().getId().equals(user.getId())) {
+            throw new BaseException(ErrorCode.IS_NOT_WRITER);
+        }
+
+        productsEntity.update(dto);
+        productsEntity = productsRepository.findProductById(productsId);
+        // 혹시 몰라서 save까지
+        productsRepository.save(productsEntity);
+        productsEntity = productsRepository.findProductById(productsId);
+        // 에셋 파일 조회
+        ProductsAssetFileEntity foundProductsAssetFileEntity = productsAssetFileRepository.findByProducts(
+            productsEntity);
+        // 에셋 파일 업데이트
+        foundProductsAssetFileEntity.update(productsEntity, dto);
+        productsAssetFileRepository.save(foundProductsAssetFileEntity);
+
+        // 썸네일 수정. 만약 보낸다면 기존에 갖고있던 거 싹 다 없애버리고..!
+        // multipartFile은 빈값으로 보내도 무조건인듯?
+        if (thumbnails != null && thumbnails.length > 0) {
+            int index = 1;
+            List<ProductsThumbnailEntity> productsThumbnailEntities = new ArrayList<>();
+            // 전부 삭제
+            for (MultipartFile thumbnail : thumbnails) {
+                // Check if the file is not null and the size is greater than 0
+                if (thumbnail != null && thumbnail.getSize() > 0) {
+                    try {
+                        // 처음일 때만 지워준다.
+                        if (index == 1) {
+                            productsThumbnailRepository.deleteAllUrlByProduct(productsEntity);
+                        }
+                        String randomFileName = uploadService.getRandomStringForImageName(8);
+                        // 업로드한 url
+                        String uploadedThumbnailUrl = uploadService.uploadToAssetBucket(
+                            AssetType.THUMBNAIL,
+                            productsEntity.getId(), thumbnail, randomFileName);
+                        if (index == 1) {
+                            productsEntity.setThumbnail(uploadedThumbnailUrl);
+                        }
+                        ProductsThumbnailEntity createdProductsThumbnailEntity = ProductsThumbnailEntity.builder()
+                            .productsEntity(productsEntity).thumbnailOrd(index++)
+                            .thumbnailUrl(uploadedThumbnailUrl)
+                            .build();
+                        productsThumbnailEntities.add(createdProductsThumbnailEntity);
+                    } catch (Exception e) {
+                        log.error(e.getLocalizedMessage() + ": ", e);
+                        throw new BaseException(ErrorCode.THUMBNAILS_UPLOAD_FAILED);
+                    }
+                }
+            }
+            if (productsThumbnailEntities.size() > 0) {
+                productsThumbnailRepository.saveAll(productsThumbnailEntities);
+            }
+        }
+
+        // 태그 수정
+        List<ProductsTagEntity> productsTagEntities = productsTagRepository.findTagEntityListByProduct(
+            productsEntity);
+        productsTagRepository.deleteAll(productsTagEntities);
+        updateTagList(dto.getTagList(), productsEntity);
+
+        // 작업 수, 에셋 평점
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail productsDetail = productsEntity.toProductsDetail(taskCnt, satisficationRate);
+        // tag 목록
+        getProductsDetailTagList(productsEntity, productsDetail);
+        // 에셋 파일
+        AssetFile assetFile = getProductsDetailAssetFile(productsEntity,
+            productsDetail);
+        productsDetail.setAssetFile(assetFile);
+        return AssetUpdatedResponse.builder().productsDetail(productsDetail).build();
+    }
+
+    @Override
+    public boolean createMyPaymentInfoManagement(MultipartFile idCardCopyFile,
+        MultipartFile accountCopyFile,
+        MyPaymentInfoManagementCreate dto, PrincipalDetails user) throws IOException {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        if (optionalPaymentInfoManagement.isPresent()) {
+            throw new DuplicatedException("결제정보 관리", ErrorCode.DUPLICATED);
+        }
+        String randomString1 = uploadService.getRandomStringForImageName(8);
+        String randomString2 = uploadService.getRandomStringForImageName(8);
+        String idCardCopyUrl = uploadService.uploadToPaymentInfoManagement(creatorEntity.getId(),
+            idCardCopyFile, randomString1);
+        String accountCopyUrl = uploadService.uploadToPaymentInfoManagement(creatorEntity.getId(),
+            accountCopyFile, randomString2);
+
+        PaymentInfoManagementEntity createdPaymentInfoManagementEntity = PaymentInfoManagementEntity.builder()
+            .creatorEntity(creatorEntity).registerNo(dto.getRegisterNo()).idCardCopy(idCardCopyUrl)
+            .bank(dto.getBank()).accountCopy(accountCopyUrl)
+            .incomeAgree(dto.isIncomeAgree())
+            .build();
+        paymentInfoManagementRepository.save(createdPaymentInfoManagementEntity);
+        return paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity).isPresent();
+    }
+
+    @Override
+    public boolean updateMyPaymentInfoManagement(MultipartFile idCardCopyFile,
+        MultipartFile accountCopyFile,
+        MyPaymentInfoManagementUpdate dto, PrincipalDetails user) throws IOException {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        if (optionalPaymentInfoManagement.isEmpty()) {
+            throw new NotFoundException("결제정보 관리", ErrorCode.NOT_FOUND);
+        }
+        PaymentInfoManagementEntity paymentInfoManagementEntity = optionalPaymentInfoManagement.get();
+        paymentInfoManagementEntity.update(dto.getRegisterNo(), dto.getBank());
+
+        if (idCardCopyFile != null && !idCardCopyFile.isEmpty()) {
+            String randomString1 = uploadService.getRandomStringForImageName(8);
+            String idCardCopyUrl = uploadService.uploadToPaymentInfoManagement(
+                creatorEntity.getId(),
+                idCardCopyFile, randomString1);
+            paymentInfoManagementEntity.setIdCardCopy(idCardCopyUrl);
+        }
+
+        if (accountCopyFile != null && !accountCopyFile.isEmpty()) {
+            String randomString2 = uploadService.getRandomStringForImageName(8);
+            String accountCopyUrl = uploadService.uploadToPaymentInfoManagement(
+                creatorEntity.getId(),
+                accountCopyFile, randomString2);
+            paymentInfoManagementEntity.setAccountCopy(accountCopyUrl);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteMyPaymentInfoManagement(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Optional<PaymentInfoManagementEntity> optionalPaymentInfoManagement = paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity);
+        optionalPaymentInfoManagement.ifPresent(paymentInfoManagementRepository::delete);
+        return paymentInfoManagementRepository.findByCreatorEntity(
+            creatorEntity).isEmpty();
+    }
+
 
     private void setUpdatedThumbnailList(List<String> thumbnailList,
         ProductsEntity productsEntity) {
@@ -294,9 +468,9 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
 
-    private void updateTagList(AssetUpdate dto, ProductsEntity productsEntity) {
+    private void updateTagList(List<String> tagList, ProductsEntity productsEntity) {
         List<ProductsTagEntity> tagEntities = new ArrayList<>();
-        for (String tag : dto.getTagList()) {
+        for (String tag : tagList) {
             ProductsTagEntity createdProductsTagEntity = ProductsTagEntity.builder()
                 .productsEntity(productsEntity).name(tag).build();
             tagEntities.add(createdProductsTagEntity);
@@ -391,7 +565,8 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
-    public List<Portfolio> createMyPortfolio(PortfolioCreate dto, PrincipalDetails user) {
+    public List<Portfolio> createMyPortfolio(MultipartFile[] files, PortfolioCreate dto,
+        PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
@@ -400,14 +575,50 @@ public class CreatorServiceImpl implements CreatorService {
             DataStatus.ACTIVE);
         PortfolioEntity portfolioEntity = PortfolioEntity.builder().creatorEntity(creatorEntity)
             .title(dto.getTitle()).beginAt(dto.getBeginAt()).endAt(dto.getEndAt())
-            .workerCnt(dto.getWorkerCnt()).tool(dto.getTool()).referenceFile(dto.getReferenceFile())
+            .workerCnt(dto.getWorkerCnt()).tool(dto.getTool())
+            .seq(1)
             .build();
         portfolioRepository.save(portfolioEntity);
+        // 포트폴리오와 관련하여 파일 등록
+        if (files != null && files.length > 0) {
+            savePortfolioImageList(files, creatorEntity, portfolioEntity);
+        }
+
         return portfolioRepository.findAllByCreator(creatorEntity);
     }
 
+    private void savePortfolioImageList(MultipartFile[] files, CreatorEntity creatorEntity,
+        PortfolioEntity portfolioEntity) {
+        int index = 1;
+        List<PortfolioImagesEntity> portfolioReferenceEntities = new ArrayList<>();
+        // 전부 삭제
+        for (MultipartFile file : files) {
+            // Check if the file is not null and the size is greater than 0
+            if (file != null && file.getSize() > 0) {
+                try {
+                    String randomFileName = uploadService.getRandomStringForImageName(8);
+                    // 업로드한 url
+                    String uploadedUrl = uploadService.uploadToPortfolioReference(
+                        creatorEntity.getId(), portfolioEntity.getId(), file,
+                        randomFileName);
+                    PortfolioImagesEntity createdPortfolioReferenceEntity = PortfolioImagesEntity.builder()
+                        .portfolioEntity(portfolioEntity).imagePath(uploadedUrl).seq(index++)
+                        .build();
+                    portfolioReferenceEntities.add(createdPortfolioReferenceEntity);
+                } catch (Exception e) {
+                    log.error(e.getLocalizedMessage() + ": ", e);
+                    throw new BaseException(ErrorCode.REFERENCE_UPLOAD_FAILED);
+                }
+            }
+        }
+        if (portfolioReferenceEntities.size() > 0) {
+            portfolioImagesRepository.saveAll(portfolioReferenceEntities);
+        }
+    }
+
     @Override
-    public List<Portfolio> updateMyPortfolio(Long portfolioId, PortfolioUpdate dto,
+    public List<Portfolio> updateMyPortfolio(MultipartFile[] files, Long portfolioId,
+        PortfolioUpdate dto,
         PrincipalDetails user) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
@@ -418,8 +629,14 @@ public class CreatorServiceImpl implements CreatorService {
         PortfolioEntity portfolioEntity = portfolioRepository.findEntityByIdAndCreator(portfolioId,
             creatorEntity);
         portfolioEntity.update(dto.getTitle(), dto.getBeginAt(), dto.getEndAt(), dto.getWorkerCnt(),
-            dto.getTool(), dto.getReferenceFile());
+            dto.getTool());
         portfolioRepository.save(portfolioEntity);
+        portfolioImagesRepository.deleteAllByPortfolioEntity(portfolioEntity);
+
+        if (files != null && files.length > 0) {
+            savePortfolioImageList(files, creatorEntity, portfolioEntity);
+        }
+
         return portfolioRepository.findAllByCreator(creatorEntity);
     }
 

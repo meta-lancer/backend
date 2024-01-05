@@ -1,5 +1,7 @@
 package com.metalancer.backend.common.config.redis;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +12,9 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 @Configuration
-@EnableRedisHttpSession
+// maxInactiveIntervalInSeconds는 세션만료시간이고 초단위
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600)
 public class RedisConfig extends AbstractHttpSessionApplicationInitializer {
 
     @Value("${spring.redis.host}")
@@ -45,7 +45,6 @@ public class RedisConfig extends AbstractHttpSessionApplicationInitializer {
         serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // Match main domain
 //        }
         return serializer;
-
 
 //        if (isLocalEnvironment()) {
 //            // Local environment-specific configurations

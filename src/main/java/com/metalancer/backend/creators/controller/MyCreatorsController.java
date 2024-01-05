@@ -5,10 +5,13 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.service.CreatorReadService;
@@ -22,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,11 +65,12 @@ public class MyCreatorsController {
         @RequestPart(required = true) CreatorRequestDTO.AssetRequest dto,
         @AuthenticationPrincipal PrincipalDetails user) {
         log.info("에셋 등록 DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<CreatorResponseDTO.AssetCreatedResponse>(
             creatorService.createAsset(user.getUser(), thumbnails, views, dto));
     }
 
-    @Operation(summary = "에셋 수정", description = "썸네일 업로드 다 하고나서 순서대로 url만 보내주시면 됩니다. 만약, 보낸 이미지들이 없으면 업데이트 하지 않습니다(수정된 썸네일이 없으면 보낼지 안 보낼지는 편하게 알아서 해주시면 됩니다.)")
+    @Operation(summary = "에셋 수정(url버전)", description = "썸네일 업로드 다 하고나서 순서대로 url만 보내주시면 됩니다. 만약, 보낸 이미지들이 없으면 업데이트 하지 않습니다(수정된 썸네일이 없으면 보낼지 안 보낼지는 편하게 알아서 해주시면 됩니다.)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetUpdatedResponse.class))),
         @ApiResponse(responseCode = "422 - E004", description = "등록자만 접근 가능", content = @Content(schema = @Schema(implementation = BaseResponse.class)))})
@@ -74,8 +79,26 @@ public class MyCreatorsController {
         @PathVariable Long productsId,
         @RequestBody(required = true) CreatorRequestDTO.AssetUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("에셋 수정(url) DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<AssetUpdatedResponse>(
             creatorService.updateAsset(productsId, user.getUser(), dto));
+    }
+
+    @Operation(summary = "에셋 수정(file버전)", description = "만약, 보낸 이미지들이 없으면 업데이트 하지 않습니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetUpdatedResponse.class))),
+        @ApiResponse(responseCode = "422 - E004", description = "등록자만 접근 가능", content = @Content(schema = @Schema(implementation = BaseResponse.class)))})
+    @PatchMapping("/{productsId}/file")
+    public BaseResponse<AssetUpdatedResponse> updateAssetWithFile(
+        @PathVariable Long productsId,
+        @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
+        @RequestPart(required = true) AssetUpdateWithOutThumbnail dto,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("에셋 수정(file) DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<AssetUpdatedResponse>(
+            creatorService.updateAssetWithFile(thumbnails, productsId, user.getUser(), dto));
     }
 
     @Operation(summary = "에셋 파일 presignedUrl 획득", description = "유효시간 5분")
@@ -106,7 +129,7 @@ public class MyCreatorsController {
     public BaseResponse<Boolean> successAsset(
         @PathVariable Long productsId,
         @AuthenticationPrincipal PrincipalDetails user) {
-
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.successAsset(productsId, user));
     }
@@ -117,7 +140,7 @@ public class MyCreatorsController {
     public BaseResponse<Boolean> failAsset(
         @PathVariable Long productsId,
         @AuthenticationPrincipal PrincipalDetails user) {
-
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.failAsset(productsId, user));
     }
@@ -128,6 +151,7 @@ public class MyCreatorsController {
     public BaseResponse<Boolean> deleteAsset(
         @PathVariable Long productsId,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.deleteAsset(productsId, user));
     }
@@ -141,6 +165,7 @@ public class MyCreatorsController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageable(pageable);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<CreatorAssetList>>(
             creatorReadService.getMyRegisteredAssets(user, pageable));
     }
@@ -152,6 +177,7 @@ public class MyCreatorsController {
     @GetMapping("/portfolio")
     public BaseResponse<List<Portfolio>> getMyPortfolio(
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(creatorReadService.getMyPortfolio(user));
     }
 
@@ -161,10 +187,12 @@ public class MyCreatorsController {
     })
     @PostMapping("/portfolio")
     public BaseResponse<List<Portfolio>> createMyPortfolio(
-        @RequestBody CreatorRequestDTO.PortfolioCreate dto,
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.PortfolioCreate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(
-            creatorService.createMyPortfolio(dto, user));
+            creatorService.createMyPortfolio(files, dto, user));
     }
 
     @Operation(summary = "내 포트폴리오 수정", description = "")
@@ -174,11 +202,12 @@ public class MyCreatorsController {
     @PatchMapping("/portfolio/{portfolioId}")
     public BaseResponse<List<Portfolio>> updateMyPortfolio(
         @PathVariable Long portfolioId,
-        @RequestBody CreatorRequestDTO.PortfolioUpdate dto,
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        @RequestPart CreatorRequestDTO.PortfolioUpdate dto,
         @AuthenticationPrincipal PrincipalDetails user) {
-
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(
-            creatorService.updateMyPortfolio(portfolioId, dto, user));
+            creatorService.updateMyPortfolio(files, portfolioId, dto, user));
     }
 
 
@@ -190,6 +219,7 @@ public class MyCreatorsController {
     public BaseResponse<List<Portfolio>> deleteMyPortfolio(
         @PathVariable Long portfolioId,
         @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<List<Portfolio>>(
             creatorService.deleteMyPortfolio(portfolioId, user));
     }
@@ -203,6 +233,7 @@ public class MyCreatorsController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageable(pageable);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<ManageAsset>>(
             creatorReadService.getMyManageAssetList(user, pageable));
     }
@@ -211,5 +242,61 @@ public class MyCreatorsController {
         String[] imageTypeArr = {"jpg", "png", "jpeg", "JPG", "PNG", "JPEG"};
         List<String> strList = new ArrayList<>(Arrays.asList(imageTypeArr));
         return strList.contains(fileType);
+    }
+
+    @Operation(summary = "결제정보 관리 조회", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = ManageAsset.class)))
+    })
+    @GetMapping("/payment-info/management")
+    public BaseResponse<PaymentInfoManagement> getMyPaymentInfoManagement(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<PaymentInfoManagement>(
+            creatorReadService.getMyPaymentInfoManagement(user));
+    }
+
+    @Operation(summary = "결제정보 관리 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @PostMapping("/payment-info/management")
+    public BaseResponse<Boolean> createMyPaymentInfoManagement(
+        @RequestPart(value = "idCardCopyFile", required = true) MultipartFile idCardCopyFile,
+        @RequestPart(value = "accountCopyFile", required = true) MultipartFile accountCopyFile,
+        @RequestPart CreatorRequestDTO.MyPaymentInfoManagementCreate dto,
+        @AuthenticationPrincipal PrincipalDetails user) throws IOException {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            creatorService.createMyPaymentInfoManagement(idCardCopyFile, accountCopyFile, dto,
+                user));
+    }
+
+    @Operation(summary = "결제정보 관리 수정", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @PatchMapping("/payment-info/management")
+    public BaseResponse<Boolean> updateMyPaymentInfoManagement(
+        @RequestPart(value = "idCardCopyFile", required = false) MultipartFile idCardCopyFile,
+        @RequestPart(value = "accountCopyFile", required = false) MultipartFile accountCopyFile,
+        @RequestPart CreatorRequestDTO.MyPaymentInfoManagementUpdate dto,
+        @AuthenticationPrincipal PrincipalDetails user) throws IOException {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            creatorService.updateMyPaymentInfoManagement(idCardCopyFile, accountCopyFile, dto,
+                user));
+    }
+
+    @Operation(summary = "결제정보 관리 삭제", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @DeleteMapping("/payment-info/management")
+    public BaseResponse<Boolean> deleteMyPaymentInfoManagement(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            creatorService.deleteMyPaymentInfoManagement(user));
     }
 }

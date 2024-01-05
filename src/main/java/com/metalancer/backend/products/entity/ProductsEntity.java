@@ -4,10 +4,13 @@ import com.metalancer.backend.admin.domain.ProductsList;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
+import com.metalancer.backend.orders.domain.SettlementReportList;
 import com.metalancer.backend.products.domain.FilterAsset;
 import com.metalancer.backend.products.domain.GenreGalaxy;
 import com.metalancer.backend.products.domain.HotPickAsset;
@@ -18,6 +21,8 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -66,6 +71,9 @@ public class ProductsEntity extends BaseEntity implements Serializable {
     private String assetCopyRight;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productsEntity")
     private ProductsAssetFileEntity productsAssetFileEntity;
+    @Enumerated(EnumType.STRING)
+    private ProductsType productsType = ProductsType.NORMAL;
+
 
     public void setActive() {
         active();
@@ -83,10 +91,22 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         this.assetCopyRight = dto.getCopyRight();
     }
 
+    public void update(AssetUpdateWithOutThumbnail dto) {
+        this.title = dto.getTitle();
+        this.price = dto.getPrice();
+        this.assetDetail = dto.getAssetDetail();
+        this.assetNotice = dto.getAssetNotice();
+        this.assetCopyRight = dto.getCopyRight();
+    }
+
     public void setSharedLink() {
         String baseLink = "https://www.metaovis.com/details?share_id=";
         int length = 10;
         this.sharedLink = baseLink + RandomStringUtils.randomAlphanumeric(length);
+    }
+
+    public void setProductsTypeRequest() {
+        this.productsType = ProductsType.REQUEST;
     }
 
     public void setDiscount(double discount) {
@@ -165,6 +185,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt)
             .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .productsType(productsType)
             .build();
     }
 
@@ -175,6 +196,7 @@ public class ProductsEntity extends BaseEntity implements Serializable {
             .sharedLink(sharedLink).title(title).price(price).salePrice(salePrice)
             .discount(discount).rate(rate).ratingCnt(ratingCnt)
             .assetDetail(assetDetail).assetNotice(assetNotice).assetCopyRight(assetCopyRight)
+            .productsType(productsType)
             .build();
     }
 
@@ -222,5 +244,11 @@ public class ProductsEntity extends BaseEntity implements Serializable {
         return ProductsList.builder().productsId(id).title(title).thumbnail(thumbnail).price(price)
             .dataStatus(getStatus()).createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
             .build();
+    }
+
+    public SettlementReportList toSettlementReportList(boolean hasSettled) {
+        return SettlementReportList.builder().assetsId(id).assetTitle(title)
+            .assetExtension(productsAssetFileEntity.getExtList())
+            .assetsFileSize(productsAssetFileEntity.getFileSize()).hasSettled(hasSettled).build();
     }
 }

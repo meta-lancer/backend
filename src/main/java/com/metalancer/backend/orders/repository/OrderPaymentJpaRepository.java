@@ -1,6 +1,7 @@
 package com.metalancer.backend.orders.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrdersEntity;
 import com.metalancer.backend.users.entity.User;
@@ -25,6 +26,15 @@ public interface OrderPaymentJpaRepository extends JpaRepository<OrderPaymentEnt
         @Param("endAt") LocalDateTime endAt,
         @Param("user") User user,
         Pageable pageable);
+
+    @Query("select op from orders_payment op where op.purchasedAt between :beginAt and :endAt and op.ordersEntity.orderer = :user and op.ordersEntity.orderStatus = :orderStatus and op.status = 'ACTIVE'")
+    Page<OrderPaymentEntity> findAllByPurchasedAtBetweenAndOrdererAndOrderStatus(
+        @Param("beginAt") LocalDateTime beginAt,
+        @Param("endAt") LocalDateTime endAt,
+        @Param("user") User user,
+        @Param("orderStatus") OrderStatus orderStatus,
+        Pageable pageable);
+
 
     @Query("select count(op) from orders_payment op where op.ordersEntity.orderer = :user and op.status ='ACTIVE'")
     int countAllByUser(@Param("user") User user);

@@ -1,5 +1,9 @@
 package com.metalancer.backend.users.domain;
 
+import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.utils.Time;
+import com.metalancer.backend.products.domain.RequestOption;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,32 +18,42 @@ public class PayedAssets {
     private String orderProductNo;
     private Long productsId;
     private String title;
-    private int price;
+    private BigDecimal price;
+    private String priceUnit;
     private String sellerNickname;
     private String sellerName;
     private String sellerPhone;
     private String thumbnail;
-    private LocalDateTime purchasedAt;
+    private String purchasedAt;
     private Integer downloadedCnt;
     private String downloadLink;
+    private OrderStatus orderStatus;
+    private RequestOption requestOption;
 
     @Builder
     public PayedAssets(Long payedAssetsId, String orderNo, String orderProductNo, Long productsId,
         String title,
-        int price, String sellerNickname, String sellerName, String sellerPhone,
-        String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink) {
+        BigDecimal price, String sellerNickname, String sellerName, String sellerPhone,
+        String thumbnail, LocalDateTime purchasedAt, Integer downloadedCnt, String downloadLink,
+        OrderStatus orderStatus, String priceUnit) {
         this.payedAssetsId = payedAssetsId;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.productsId = productsId;
         this.title = title;
         this.price = price;
+        this.priceUnit = priceUnit;
         this.sellerNickname = sellerNickname;
         this.sellerName = sellerName;
         this.sellerPhone = sellerPhone;
         this.thumbnail = thumbnail;
-        this.purchasedAt = purchasedAt;
+        this.purchasedAt = Time.convertDateToStringWithDot(purchasedAt);
         this.downloadedCnt = downloadedCnt;
         this.downloadLink = downloadLink;
+        this.orderStatus = orderStatus;
+    }
+
+    public void setRequestOption(RequestOption requestOption) {
+        this.requestOption = requestOption;
     }
 }

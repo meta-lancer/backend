@@ -26,8 +26,9 @@ public class PayedAssetsRepositoryImpl implements PayedAssetsRepository {
     @Override
     public Page<PayedAssets> findAllPayedAssetListWithStatusAndDateOption(User user,
         Pageable pageable, LocalDateTime beginAt, LocalDateTime endAt, OrderStatus orderStatus) {
+        LocalDateTime adjustedEndAt = endAt.plusDays(1);
         Page<PayedAssetsEntity> payedAssetsEntities = payedAssetsJpaRepository.findAllByUser(
-            beginAt, endAt,
+            beginAt, adjustedEndAt,
             user, orderStatus,
             pageable);
         return payedAssetsEntities.map(PayedAssetsEntity::toDomain);
@@ -36,8 +37,9 @@ public class PayedAssetsRepositoryImpl implements PayedAssetsRepository {
     @Override
     public Page<PayedAssets> findAllPayedAssetListWithStatusAndDateOption(User foundUser,
         Pageable pageable, LocalDateTime beginAt, LocalDateTime endAt) {
+        LocalDateTime adjustedEndAt = endAt.plusDays(1);
         Page<PayedAssetsEntity> payedAssetsEntities = payedAssetsJpaRepository.findAllByUser(
-            beginAt, endAt,
+            beginAt, adjustedEndAt,
             foundUser, pageable);
         return payedAssetsEntities.map(PayedAssetsEntity::toDomain);
     }

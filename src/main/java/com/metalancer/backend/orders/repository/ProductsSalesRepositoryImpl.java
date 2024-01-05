@@ -14,7 +14,7 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
     private final ProductsSalesJpaRepository productsSalesJpaRepository;
 
     @Override
-    public Integer getTotalPriceByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
+    public Double getTotalPriceByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
         LocalDateTime startOfNextDay, CurrencyType currency) {
         return productsSalesJpaRepository.getTotalPriceByCreatorAndDate(creatorEntity, date,
             startOfNextDay, currency);

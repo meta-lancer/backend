@@ -100,7 +100,7 @@ public class OrdersServiceImpl implements OrdersService {
                 .orderer(user)
                 .ordersEntity(createdOrdersEntity).productsEntity(foundProductEntity)
                 .orderNo(orderNo).orderProductNo(orderNo + String.format("%04d", index++))
-                .price(price)
+                .price(Double.valueOf(price))
                 .build();
             orderProductsRepository.save(createdOrderProductsEntity);
         }

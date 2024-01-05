@@ -57,7 +57,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
-    private Integer price;
+    private Double price;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderProductStatus = OrderStatus.PAY_ING;
     @Enumerated(EnumType.STRING)
@@ -69,7 +69,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     public OrderProductsEntity(User orderer, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, String orderNo,
         String orderProductNo,
-        Integer price, ProductsRequestOptionEntity productsRequestOptionEntity) {
+        Double price, ProductsRequestOptionEntity productsRequestOptionEntity) {
         this.orderer = orderer;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;

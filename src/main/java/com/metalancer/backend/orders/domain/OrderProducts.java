@@ -13,13 +13,13 @@ public class OrderProducts {
 
     private ProductsDetail productsDetail;
     private String orderProductNo;
-    private Integer price;
+    private Double price;
     private OrderStatus orderProductStatus;
     private ClaimType claimType;
     private ClaimStatus claimStatus;
 
     @Builder
-    public OrderProducts(ProductsDetail productsDetail, String orderProductNo, Integer price,
+    public OrderProducts(ProductsDetail productsDetail, String orderProductNo, Double price,
         OrderStatus orderProductStatus, ClaimType claimType, ClaimStatus claimStatus) {
         this.productsDetail = productsDetail;
         this.orderProductNo = orderProductNo;

@@ -68,14 +68,15 @@ public class SalesServiceImpl implements SalesService {
             for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusMonths(1)) {
                 String formattedDate = date.format(dateFormatter);
                 LocalDateTime startOfNextMonth = date.plusMonths(1);
-                Integer totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
-                    creatorEntity, date, startOfNextMonth, CurrencyType.KRW);
-                Integer totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
+                Double totalPriceKRW = (productsSalesRepository.getTotalPriceByCreatorAndDate(
+                    creatorEntity, date, startOfNextMonth, CurrencyType.KRW));
+                Double totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth, CurrencyType.USD);
                 int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth);
                 DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-                    .totalPrice(totalPriceKRW).totalPriceUSD(totalPriceUSD).salesCnt(salesCnt)
+                    .totalPrice(convertDoubleToInteger(totalPriceKRW)).totalPriceUSD(totalPriceUSD)
+                    .salesCnt(salesCnt)
                     .build();
                 response.add(daySalesReport);
             }
@@ -83,19 +84,27 @@ public class SalesServiceImpl implements SalesService {
         return response;
     }
 
+    public Integer convertDoubleToInteger(Double doubleValue) {
+        if (doubleValue == null) {
+            return null;
+        }
+        return doubleValue.intValue();
+    }
+
     private void setTotalPriceAndSalesCntBasedOnDate(CreatorEntity creatorEntity,
         DateTimeFormatter dateFormatter,
         List<DaySalesReport> response, LocalDateTime date) {
         String formattedDate = date.format(dateFormatter);
         LocalDateTime startOfNextDay = date.plusDays(1);
-        Integer totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
+        Double totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
             creatorEntity, date, startOfNextDay, CurrencyType.KRW);
-        Integer totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
+        Double totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
             creatorEntity, date, startOfNextDay, CurrencyType.USD);
         int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
             creatorEntity, date, startOfNextDay);
         DaySalesReport daySalesReport = DaySalesReport.builder().day(formattedDate)
-            .totalPrice(totalPriceKRW).totalPriceUSD(totalPriceUSD).salesCnt(salesCnt).build();
+            .totalPrice(convertDoubleToInteger(totalPriceKRW)).totalPriceUSD(totalPriceUSD)
+            .salesCnt(salesCnt).build();
         response.add(daySalesReport);
     }
 

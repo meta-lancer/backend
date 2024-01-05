@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public interface ProductsSalesRepository {
 
-    Integer getTotalPriceByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
+    Double getTotalPriceByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
         LocalDateTime startOfNextDay, CurrencyType currency);
 
     int getSalesCntByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,

@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesEntity, Long> {
 
     @Query("select SUM(pse.price) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.createdAt between :startDate and :startOfNextDay and pse.currency = :currency")
-    Integer getTotalPriceByCreatorAndDate(@Param("creatorEntity") CreatorEntity creatorEntity,
+    Double getTotalPriceByCreatorAndDate(@Param("creatorEntity") CreatorEntity creatorEntity,
         @Param("startDate") LocalDateTime startDate,
         @Param("startOfNextDay") LocalDateTime startOfNextDay,
         @Param("currency") CurrencyType currency

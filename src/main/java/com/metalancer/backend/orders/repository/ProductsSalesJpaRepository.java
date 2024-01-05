@@ -45,4 +45,6 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
     BigDecimal getProductsTotalPriceByCreator(@Param("creatorEntity") CreatorEntity creatorEntity,
         @Param("products") ProductsEntity products,
         @Param("currency") CurrencyType currency);
+
+    int countAllByCreatorEntityAndSettledIsFalse(CreatorEntity creatorEntity);
 }

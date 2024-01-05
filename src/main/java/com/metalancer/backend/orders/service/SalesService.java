@@ -27,4 +27,6 @@ public interface SalesService {
     List<DaySalesReport> getProductsDaySalesReportByExcel(Long productsId,
         PrincipalDetails user, String beginDate,
         String endDate);
+
+    Boolean checkSettlementRequestAvailable(PrincipalDetails user);
 }

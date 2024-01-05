@@ -3,6 +3,8 @@ package com.metalancer.backend.orders.repository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.orders.entity.SettlementEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,5 +20,12 @@ public class SettlementRepositoryImpl implements SettlementRepository {
     public Page<SettlementEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable) {
         return settlementJpaRepository.findAllByCreatorEntityAndStatus(creatorEntity,
             DataStatus.ACTIVE, pageable);
+    }
+
+    @Override
+    public LocalDateTime getRecentSettlementRequestDate(CreatorEntity creatorEntity) {
+        Optional<SettlementEntity> recentSettlementEntity = settlementJpaRepository.findFirstByCreatorEntityOrderByCreatedAt(
+            creatorEntity);
+        return recentSettlementEntity.map(SettlementEntity::getSettlementDate).orElse(null);
     }
 }

@@ -58,6 +58,15 @@ public class SettlementController {
         return new BaseResponse<>(salesService.getDaySalesReportByExcel(user, beginDate, endDate));
     }
 
+    @Operation(summary = "정산관리-정산요청 가능여부", description = "true면 정산요청 가능. 정산요청 불가능의 경우: 1. 판매 건수 0. 2. 이미 정산 전체 완료 3. 이미 정산요청 진행함(최근 정산 요청일이 판매내역보다 더 뒤인 경우)")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementReportList.class)))
+    @GetMapping("/request/possiblity")
+    public BaseResponse<Boolean> checkSettlementRequestAvailable(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(salesService.checkSettlementRequestAvailable(user));
+    }
+
     @Operation(summary = "정산관리-정산리포트", description = "정산상태: 판매한 갯수와 정산 요청된 갯수가 같다면 true, 아니면 false(판매갯수 0이라면도 추가!")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementReportList.class)))
     @GetMapping

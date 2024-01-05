@@ -30,4 +30,8 @@ public interface ProductsSalesRepository {
     BigDecimal getProductsTotalPriceByCreator(CreatorEntity creatorEntity,
         ProductsEntity productsEntity,
         CurrencyType currency);
+
+    int countAllUnSettled(CreatorEntity creatorEntity);
+
+    LocalDateTime getLastProductsSalesDate(CreatorEntity creatorEntity);
 }

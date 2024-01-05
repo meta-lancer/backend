@@ -53,6 +53,8 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private CurrencyType currency;
+    @Column(name = "is_settled", nullable = false, columnDefinition = "정산요청 가능여부를 갯수만으로 비교하지않기위해")
+    private boolean settled = false;
 
     @Builder
     public ProductsSalesEntity(CreatorEntity creatorEntity, OrdersEntity ordersEntity,
@@ -66,5 +68,9 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
         this.orderProductNo = orderProductNo;
         this.price = price;
         this.currency = currency;
+    }
+
+    public void setSettled() {
+        this.settled = true;
     }
 }

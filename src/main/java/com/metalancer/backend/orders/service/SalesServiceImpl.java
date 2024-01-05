@@ -284,4 +284,28 @@ public class SalesServiceImpl implements SalesService {
         Collections.reverse(response);
         return response;
     }
+
+    @Override
+    public Boolean checkSettlementRequestAvailable(PrincipalDetails user) {
+        CreatorEntity creatorEntity = getCreatorEntity(user);
+        int totalSettlementRequiredProductsCnt = productsSalesRepository.countAllUnSettled(
+            creatorEntity);
+        LocalDateTime lastProductsSalesDate = productsSalesRepository.getLastProductsSalesDate(
+            creatorEntity);
+        LocalDateTime recentSettlementRequestDate = settlementRepository.getRecentSettlementRequestDate(
+            creatorEntity);
+        boolean hasAnyRecentSettlementRequest = getHasAnyRecentSettlementRequest(
+            lastProductsSalesDate, recentSettlementRequestDate);
+        // 정산할 것들이 있고, 최근 정산 요청이 없어야
+        return totalSettlementRequiredProductsCnt > 0 && !hasAnyRecentSettlementRequest;
+    }
+
+    // 최근에 등록한 정산 요청이 있는지
+    private boolean getHasAnyRecentSettlementRequest(LocalDateTime lastProductsSalesDate,
+        LocalDateTime recentSettlementRequestDate) {
+        if (recentSettlementRequestDate == null) {
+            return false;
+        }
+        return lastProductsSalesDate.isBefore(recentSettlementRequestDate);
+    }
 }

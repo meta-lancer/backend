@@ -63,4 +63,9 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
         return productsSalesJpaRepository.getProductsTotalPriceByCreator(creatorEntity,
             productsEntity, currency);
     }
+
+    @Override
+    public int countAllUnSettled(CreatorEntity creatorEntity) {
+        return productsSalesJpaRepository.countAllByCreatorEntityAndSettledIsFalse(creatorEntity);
+    }
 }

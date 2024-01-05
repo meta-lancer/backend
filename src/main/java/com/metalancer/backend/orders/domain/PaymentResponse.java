@@ -1,6 +1,7 @@
 package com.metalancer.backend.orders.domain;
 
 import com.metalancer.backend.common.constants.OrderStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -13,9 +14,9 @@ public class PaymentResponse {
 
     private final Long ordererId;
     private final String orderNo;
-    private final Double totalPrice;
-    private final Double totalPayment;
-    private final Integer totalPoint;
+    private final BigDecimal totalPrice;
+    private final BigDecimal totalPayment;
+    private final BigDecimal totalPoint;
     private final OrderStatus orderStatus;
     private final String ordererNm;
     private final String ordererPhone;
@@ -24,8 +25,8 @@ public class PaymentResponse {
     private List<OrderProducts> orderProductList;
 
     @Builder
-    public PaymentResponse(Long ordererId, String orderNo, Double totalPrice,
-        Double totalPayment, Integer totalPoint, OrderStatus orderStatus, String ordererNm,
+    public PaymentResponse(Long ordererId, String orderNo, BigDecimal totalPrice,
+        BigDecimal totalPayment, BigDecimal totalPoint, OrderStatus orderStatus, String ordererNm,
         String ordererPhone, String ordererEmail,
         Date purchasedAt) {
         this.ordererId = ordererId;

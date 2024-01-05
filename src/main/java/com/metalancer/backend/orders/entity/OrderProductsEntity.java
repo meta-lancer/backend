@@ -22,6 +22,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,7 +58,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
-    private Double price;
+    private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderProductStatus = OrderStatus.PAY_ING;
     @Enumerated(EnumType.STRING)
@@ -69,7 +70,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     public OrderProductsEntity(User orderer, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, String orderNo,
         String orderProductNo,
-        Double price, ProductsRequestOptionEntity productsRequestOptionEntity) {
+        BigDecimal price, ProductsRequestOptionEntity productsRequestOptionEntity) {
         this.orderer = orderer;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;

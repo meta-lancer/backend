@@ -3,6 +3,7 @@ package com.metalancer.backend.orders.repository;
 import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
     private final ProductsSalesJpaRepository productsSalesJpaRepository;
 
     @Override
-    public Double getTotalPriceByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
+    public BigDecimal getTotalPriceByCreatorAndDate(CreatorEntity creatorEntity, LocalDateTime date,
         LocalDateTime startOfNextDay, CurrencyType currency) {
         return productsSalesJpaRepository.getTotalPriceByCreatorAndDate(creatorEntity, date,
             startOfNextDay, currency);

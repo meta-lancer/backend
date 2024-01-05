@@ -3,6 +3,7 @@ package com.metalancer.backend.users.domain;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.products.domain.RequestOption;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class PayedOrder {
     private String title;
     private OrderStatus orderStatus;
     private String payMethod;
-    private Double price;
+    private BigDecimal price;
     private String priceUnit;
     private String purchasedAt;
     private String receiptUrl;
@@ -24,7 +25,7 @@ public class PayedOrder {
 
     @Builder
     public PayedOrder(Long orderId, String orderNo, String title, OrderStatus orderStatus,
-        String payMethod, Double price, LocalDateTime purchasedAt,
+        String payMethod, BigDecimal price, LocalDateTime purchasedAt,
         String receiptUrl) {
         this.orderId = orderId;
         this.orderNo = orderNo;

@@ -100,7 +100,7 @@ public class OrdersServiceImpl implements OrdersService {
                 .orderer(user)
                 .ordersEntity(createdOrdersEntity).productsEntity(foundProductEntity)
                 .orderNo(orderNo).orderProductNo(orderNo + String.format("%04d", index++))
-                .price(Double.valueOf(price))
+                .price(BigDecimal.valueOf(price))
                 .build();
             orderProductsRepository.save(createdOrderProductsEntity);
         }
@@ -134,7 +134,7 @@ public class OrdersServiceImpl implements OrdersService {
         OrderStatus orderStatus = foundOrdersEntity.getOrderStatus();
         checkOrderStatusEqualsPAY_ING_OR_PAY_DONE(orderStatus);
         // 금액 비교
-        BigDecimal createdOrderTotalPrice = new BigDecimal(foundOrdersEntity.getTotalPrice());
+        BigDecimal createdOrderTotalPrice = foundOrdersEntity.getTotalPrice();
         BigDecimal paymentResponseTotalPrice = payment_response.getResponse().getAmount();
         return createdOrderTotalPrice.equals(paymentResponseTotalPrice);
     }
@@ -293,7 +293,7 @@ public class OrdersServiceImpl implements OrdersService {
         String impUid = dto.getImpUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
         portoneCancelPayments(impUid, dto.getMerchantUid(),
-            BigDecimal.valueOf(foundOrdersEntity.getTotalPaymentPrice()),
+            foundOrdersEntity.getTotalPaymentPrice(),
             dto.getReason());
         cancelOrder(foundOrdersEntity);
         return null;

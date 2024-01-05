@@ -20,6 +20,7 @@ import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.UserRepository;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -68,9 +69,9 @@ public class SalesServiceImpl implements SalesService {
             for (LocalDateTime date = beginAt; date.isBefore(endAt); date = date.plusMonths(1)) {
                 String formattedDate = date.format(dateFormatter);
                 LocalDateTime startOfNextMonth = date.plusMonths(1);
-                Double totalPriceKRW = (productsSalesRepository.getTotalPriceByCreatorAndDate(
+                BigDecimal totalPriceKRW = (productsSalesRepository.getTotalPriceByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth, CurrencyType.KRW));
-                Double totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
+                BigDecimal totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth, CurrencyType.USD);
                 int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
                     creatorEntity, date, startOfNextMonth);
@@ -84,7 +85,7 @@ public class SalesServiceImpl implements SalesService {
         return response;
     }
 
-    public Integer convertDoubleToInteger(Double doubleValue) {
+    public Integer convertDoubleToInteger(BigDecimal doubleValue) {
         if (doubleValue == null) {
             return null;
         }
@@ -96,9 +97,9 @@ public class SalesServiceImpl implements SalesService {
         List<DaySalesReport> response, LocalDateTime date) {
         String formattedDate = date.format(dateFormatter);
         LocalDateTime startOfNextDay = date.plusDays(1);
-        Double totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
+        BigDecimal totalPriceKRW = productsSalesRepository.getTotalPriceByCreatorAndDate(
             creatorEntity, date, startOfNextDay, CurrencyType.KRW);
-        Double totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
+        BigDecimal totalPriceUSD = productsSalesRepository.getTotalPriceByCreatorAndDate(
             creatorEntity, date, startOfNextDay, CurrencyType.USD);
         int salesCnt = productsSalesRepository.getSalesCntByCreatorAndDate(
             creatorEntity, date, startOfNextDay);

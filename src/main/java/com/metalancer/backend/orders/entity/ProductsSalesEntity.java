@@ -1,10 +1,13 @@
 package com.metalancer.backend.orders.entity;
 
 import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,12 +50,14 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
-    private Integer price;
+    private BigDecimal price;
+    @Enumerated(EnumType.STRING)
+    private CurrencyType currency;
 
     @Builder
     public ProductsSalesEntity(CreatorEntity creatorEntity, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, Long ordererId, String orderNo, String orderProductNo,
-        Integer price) {
+        BigDecimal price, CurrencyType currency) {
         this.creatorEntity = creatorEntity;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;
@@ -59,5 +65,6 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.price = price;
+        this.currency = currency;
     }
 }

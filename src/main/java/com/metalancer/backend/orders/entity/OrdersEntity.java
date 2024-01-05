@@ -19,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,22 +47,21 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private String orderNo;
     @Column(nullable = false)
-    private Integer totalPoint = 0;
+    private BigDecimal totalPoint = BigDecimal.valueOf(0);
     @Column(nullable = false)
-    private Double totalPrice;
+    private BigDecimal totalPrice;
     @Column(nullable = false)
-    private Double totalPaymentPrice;
+    private BigDecimal totalPaymentPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PAY_ING;
 
     @Builder
-    public OrdersEntity(User orderer, String orderNo, Double totalPrice,
-        Double totalPaymentPrice) {
+    public OrdersEntity(User orderer, String orderNo, BigDecimal totalPrice,
+        BigDecimal totalPaymentPrice) {
         this.orderer = orderer;
         this.orderNo = orderNo;
-        this.totalPoint = 0;
         this.totalPrice = totalPrice;
-        if (totalPrice - this.totalPoint == totalPaymentPrice) {
+        if (totalPrice.subtract(this.totalPoint).equals(totalPaymentPrice)) {
             this.totalPaymentPrice = totalPaymentPrice;
         } else {
             throw new InvalidParamException("check totalPrice, totalPaymentPrice, totalPoint",

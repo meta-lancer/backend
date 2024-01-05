@@ -1,6 +1,7 @@
 package com.metalancer.backend.orders.domain;
 
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +11,7 @@ public class CreatedOrder {
 
     private final Long ordererId;
     private final String orderNo;
-    private final Double totalPrice;
+    private final BigDecimal totalPrice;
     private final String orderStatus;
     private String orderProductList;
     private final String buyerNm;
@@ -18,7 +19,7 @@ public class CreatedOrder {
     private final String buyerEmail;
 
     @Builder
-    public CreatedOrder(Long ordererId, String orderNo, Double totalPrice,
+    public CreatedOrder(Long ordererId, String orderNo, BigDecimal totalPrice,
         String orderStatus, String buyerNm, String buyerPhone, String buyerEmail) {
         this.ordererId = ordererId;
         this.orderNo = orderNo;

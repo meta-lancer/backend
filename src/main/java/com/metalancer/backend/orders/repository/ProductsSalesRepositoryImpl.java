@@ -68,4 +68,11 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
     public int countAllUnSettled(CreatorEntity creatorEntity) {
         return productsSalesJpaRepository.countAllByCreatorEntityAndSettledIsFalse(creatorEntity);
     }
+
+    @Override
+    public LocalDateTime getLastProductsSalesDate(CreatorEntity creatorEntity) {
+        return productsSalesJpaRepository.findFirstByCreatorEntityOrderByCreatedAtDesc(
+            creatorEntity).map(
+            ProductsSalesEntity::getCreatedAt).orElse(null);
+    }
 }

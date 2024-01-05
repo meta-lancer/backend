@@ -24,8 +24,8 @@ public class SettlementRepositoryImpl implements SettlementRepository {
 
     @Override
     public LocalDateTime getRecentSettlementRequestDate(CreatorEntity creatorEntity) {
-        Optional<SettlementEntity> recentSettlementEntity = settlementJpaRepository.findFirstByCreatorEntityOrderByCreatedAt(
+        Optional<SettlementEntity> recentSettlementEntity = settlementJpaRepository.findFirstByCreatorEntityOrderByCreatedAtDesc(
             creatorEntity);
-        return recentSettlementEntity.map(SettlementEntity::getSettlementDate).orElse(null);
+        return recentSettlementEntity.map(SettlementEntity::getCreatedAt).orElse(null);
     }
 }

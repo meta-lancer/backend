@@ -6,6 +6,7 @@ import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,4 +48,7 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
         @Param("currency") CurrencyType currency);
 
     int countAllByCreatorEntityAndSettledIsFalse(CreatorEntity creatorEntity);
+
+    Optional<ProductsSalesEntity> findFirstByCreatorEntityOrderByCreatedAtDesc(
+        CreatorEntity creatorEntity);
 }

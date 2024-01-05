@@ -13,6 +13,6 @@ public interface SettlementJpaRepository extends JpaRepository<SettlementEntity,
     Page<SettlementEntity> findAllByCreatorEntityAndStatus(CreatorEntity creatorEntity,
         DataStatus status, Pageable pageable);
 
-    Optional<SettlementEntity> findFirstByCreatorEntityOrderByCreatedAt(
+    Optional<SettlementEntity> findFirstByCreatorEntityOrderByCreatedAtDesc(
         CreatorEntity creatorEntity);
 }

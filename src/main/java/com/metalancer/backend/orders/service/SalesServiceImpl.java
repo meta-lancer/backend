@@ -14,6 +14,7 @@ import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
 import com.metalancer.backend.orders.entity.SettlementEntity;
 import com.metalancer.backend.orders.repository.ProductsSalesRepository;
+import com.metalancer.backend.orders.repository.SettlementProductsRepository;
 import com.metalancer.backend.orders.repository.SettlementRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
@@ -47,6 +48,7 @@ public class SalesServiceImpl implements SalesService {
     private final CreatorRepository creatorRepository;
     private final ProductsRepository productsRepository;
     private final SettlementRepository settlementRepository;
+    private final SettlementProductsRepository settlementProductsRepository;
     private final CartRepository cartRepository;
 
     @Override
@@ -179,6 +181,14 @@ public class SalesServiceImpl implements SalesService {
             // 정산 요청 - 정산 요청된 상품 목록 이런식으로...!
             // 판매한 갯수와 정산 요청된 갯수가 같다면 true, 아니면 false(판매갯수 0이라면도 추가!)
             boolean hasSettled = false;
+            int totalSalesCnt = productsSalesRepository.countAllByProducts(productsEntity);
+            int totalSettlementCnt = settlementProductsRepository.countAllByProducts(
+                productsEntity);
+            boolean noMoreSettlement = totalSalesCnt == totalSettlementCnt;
+            if (totalSalesCnt > 0 && noMoreSettlement) {
+                hasSettled = true;
+            }
+
             SettlementReportList settlementReport = productsEntity.toSettlementReportList(
                 hasSettled);
             reportLists.add(settlementReport);

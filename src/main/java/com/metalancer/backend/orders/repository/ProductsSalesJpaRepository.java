@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesEntity, Long> {
 
-    @Query("select nullif(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.createdAt between :startDate and :startOfNextDay and pse.currency = :currency")
+    @Query("select COALESCE(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.createdAt between :startDate and :startOfNextDay and pse.currency = :currency")
     BigDecimal getTotalPriceByCreatorAndDate(@Param("creatorEntity") CreatorEntity creatorEntity,
         @Param("startDate") LocalDateTime startDate,
         @Param("startOfNextDay") LocalDateTime startOfNextDay,
@@ -24,7 +24,7 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
         @Param("startDate") LocalDateTime startDate,
         @Param("startOfNextDay") LocalDateTime startOfNextDay);
 
-    @Query("select nullif(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity = :products and pse.createdAt between :startDate and :startOfNextDay and pse.currency = :currency")
+    @Query("select COALESCE(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity = :products and pse.createdAt between :startDate and :startOfNextDay and pse.currency = :currency")
     BigDecimal getProductsTotalPriceByCreatorAndDate(
         @Param("creatorEntity") CreatorEntity creatorEntity,
         @Param("products") ProductsEntity products,
@@ -41,7 +41,7 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
 
     int countAllByProductsEntity(ProductsEntity products);
 
-    @Query("select nullif(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity = :products and pse.currency = :currency")
+    @Query("select COALESCE(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity = :products and pse.currency = :currency")
     BigDecimal getProductsTotalPriceByCreator(@Param("creatorEntity") CreatorEntity creatorEntity,
         @Param("products") ProductsEntity products,
         @Param("currency") CurrencyType currency);

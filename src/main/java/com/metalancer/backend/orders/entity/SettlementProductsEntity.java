@@ -69,4 +69,7 @@ public class SettlementProductsEntity extends BaseEntity implements Serializable
     @Schema(name = "첨부파일")
     private String referenceFile;
 
+    public int getSalesQuantity() {
+        return this.salesQuantity;
+    }
 }

@@ -58,7 +58,7 @@ public class SettlementController {
         return new BaseResponse<>(salesService.getDaySalesReportByExcel(user, beginDate, endDate));
     }
 
-    @Operation(summary = "정산관리-정산리포트", description = "")
+    @Operation(summary = "정산관리-정산리포트", description = "정산상태: 판매한 갯수와 정산 요청된 갯수가 같다면 true, 아니면 false(판매갯수 0이라면도 추가!")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementReportList.class)))
     @GetMapping
     public BaseResponse<Page<SettlementReportList>> getSettlementReportList(

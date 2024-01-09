@@ -1,7 +1,7 @@
-package com.metalancer.backend.orders.repository;
+package com.metalancer.backend.creators.repository;
 
 import com.metalancer.backend.common.constants.CurrencyType;
-import com.metalancer.backend.orders.entity.ProductsSalesEntity;
+import com.metalancer.backend.creators.entity.ProductsSalesEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.math.BigDecimal;

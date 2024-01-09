@@ -1,7 +1,7 @@
-package com.metalancer.backend.orders.repository;
+package com.metalancer.backend.creators.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
-import com.metalancer.backend.orders.entity.SettlementEntity;
+import com.metalancer.backend.creators.entity.SettlementEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.time.LocalDateTime;
 import java.util.Optional;

@@ -1,9 +1,9 @@
-package com.metalancer.backend.orders.entity;
+package com.metalancer.backend.creators.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.common.utils.Time;
-import com.metalancer.backend.orders.domain.SettlementRecordList;
+import com.metalancer.backend.creators.domain.SettlementRecordList;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;

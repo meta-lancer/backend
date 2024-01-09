@@ -1,9 +1,10 @@
-package com.metalancer.backend.orders.entity;
+package com.metalancer.backend.creators.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.PaymentType;
-import com.metalancer.backend.orders.domain.SettlementRequestList;
+import com.metalancer.backend.creators.domain.SettlementRequestList;
+import com.metalancer.backend.orders.entity.OrdersEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;

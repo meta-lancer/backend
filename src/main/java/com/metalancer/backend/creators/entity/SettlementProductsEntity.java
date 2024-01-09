@@ -1,4 +1,4 @@
-package com.metalancer.backend.orders.entity;
+package com.metalancer.backend.creators.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.SettlementStatus;

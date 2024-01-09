@@ -1,4 +1,4 @@
-package com.metalancer.backend.orders.repository;
+package com.metalancer.backend.creators.repository;
 
 import com.metalancer.backend.products.entity.ProductsEntity;
 

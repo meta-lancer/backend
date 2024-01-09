@@ -1,4 +1,4 @@
-package com.metalancer.backend.orders.domain;
+package com.metalancer.backend.creators.domain;
 
 import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.PaymentType;

@@ -1,6 +1,6 @@
-package com.metalancer.backend.orders.repository;
+package com.metalancer.backend.creators.repository;
 
-import com.metalancer.backend.orders.entity.SettlementProductsEntity;
+import com.metalancer.backend.creators.entity.SettlementProductsEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

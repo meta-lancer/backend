@@ -28,4 +28,14 @@ public class SettlementRepositoryImpl implements SettlementRepository {
             creatorEntity);
         return recentSettlementEntity.map(SettlementEntity::getCreatedAt).orElse(null);
     }
+
+    @Override
+    public void save(SettlementEntity settlementEntity) {
+        settlementJpaRepository.save(settlementEntity);
+    }
+
+    @Override
+    public Optional<SettlementEntity> findById(Long id) {
+        return settlementJpaRepository.findById(id);
+    }
 }

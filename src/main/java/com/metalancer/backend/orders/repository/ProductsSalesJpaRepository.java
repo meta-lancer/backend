@@ -56,4 +56,12 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
 
     Page<ProductsSalesEntity> findAllByCreatorEntityAndSettledIsFalse(CreatorEntity creatorEntity,
         Pageable pageable);
+
+    @Query("select COALESCE(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.currency = :currency")
+    BigDecimal getTotalPriceByCreator(@Param("creatorEntity") CreatorEntity creatorEntity,
+        @Param("currency") CurrencyType currency);
+
+    @Query("select COALESCE(SUM(pse.price * pse.chargeRate), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.currency = :currency")
+    BigDecimal getTotalPortoneChargesByCreator(@Param("creatorEntity") CreatorEntity creatorEntity,
+        @Param("currency") CurrencyType currency);
 }

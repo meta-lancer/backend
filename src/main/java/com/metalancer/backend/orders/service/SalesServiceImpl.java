@@ -9,10 +9,12 @@ import com.metalancer.backend.common.constants.ServiceChargesType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.repository.CreatorRepository;
+import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
 import com.metalancer.backend.orders.domain.DaySalesReport;
 import com.metalancer.backend.orders.domain.EachSalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
+import com.metalancer.backend.orders.domain.SettlementRequestInfo;
 import com.metalancer.backend.orders.domain.SettlementRequestList;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.ProductsSalesEntity;
@@ -29,6 +31,7 @@ import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,6 +61,7 @@ public class SalesServiceImpl implements SalesService {
     private final CartRepository cartRepository;
     private final ServiceChargeRepository serviceChargeRepository;
     private final OrderPaymentRepository orderPaymentRepository;
+    private final PaymentInfoManagementRepository paymentInfoManagementRepository;
 
     @Override
     public List<DaySalesReport> getDaySalesReport(PrincipalDetails user, PeriodType periodType) {
@@ -329,6 +333,65 @@ public class SalesServiceImpl implements SalesService {
         }
         return new PageImpl<>(settlementRequestLists, pageable,
             productsSalesEntities.getTotalElements());
+    }
+
+    @Override
+    public SettlementRequestInfo getSettlementRequestInfo(PrincipalDetails user) {
+        CreatorEntity creatorEntity = getCreatorEntity(user);
+        BigDecimal serviceRate = serviceChargeRepository.getChargeRate(ServiceChargesType.SERVICE);
+        BigDecimal freelancerRate = serviceChargeRepository.getChargeRate(
+            ServiceChargesType.FREELANCER);
+        BigDecimal totalSalesPriceKRW = productsSalesRepository.getTotalPriceByCreator(
+            creatorEntity, CurrencyType.KRW);
+        BigDecimal totalSalesPriceUSD = productsSalesRepository.getTotalPriceByCreator(
+            creatorEntity, CurrencyType.USD);
+        BigDecimal totalServiceChargeKRW = getChargeWithRate(serviceRate, totalSalesPriceKRW);
+        BigDecimal totalServiceChargeUSD = getChargeWithRate(serviceRate, totalSalesPriceUSD);
+        BigDecimal totalFreeLancerChargeKRW = getChargeWithRate(freelancerRate,
+            totalSalesPriceKRW);
+        BigDecimal totalFreeLancerChargeUSD = getChargeWithRate(freelancerRate,
+            totalSalesPriceUSD);
+        BigDecimal totalPortoneChargeKRW = productsSalesRepository.getTotalPortoneChargesByCreator(
+            creatorEntity, CurrencyType.KRW);
+        BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
+            creatorEntity, CurrencyType.USD);
+        return SettlementRequestInfo.builder().totalSalesPriceKRW(totalSalesPriceKRW)
+            .totalSalesPriceUSD(totalSalesPriceUSD)
+            .totalServiceChargeKRW(totalServiceChargeKRW)
+            .totalServiceChargeUSD(totalServiceChargeUSD)
+            .totalFreeLancerChargeKRW(totalFreeLancerChargeKRW)
+            .totalFreeLancerChargeUSD(totalFreeLancerChargeUSD)
+            .totalPortoneChargeKRW(totalPortoneChargeKRW)
+            .totalPortoneChargeUSD(totalPortoneChargeUSD).build();
+    }
+
+    @NotNull
+    private static BigDecimal getChargeWithRate(BigDecimal serviceRate,
+        BigDecimal totalSalesPriceKRW) {
+        return totalSalesPriceKRW.multiply(serviceRate)
+            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public Boolean createSettlementRequest(PrincipalDetails user) {
+        CreatorEntity creatorEntity = getCreatorEntity(user);
+
+//        int totalAmountKRW = 0;
+//        int totalAmountUSD = 0;
+//        BigDecimal serviceRate = serviceChargeRepository.getChargeRate(ServiceChargesType.SERVICE);
+//        BigDecimal freelancerRate = serviceChargeRepository.getChargeRate(
+//            ServiceChargesType.FREELANCER);
+//
+//        SettlementEntity settlementEntity = SettlementEntity.builder().creatorEntity(creatorEntity)
+//            .totalAmountKRW(totalAmountKRW).settlementAmountKRW().deductAmountKRW()
+//            .serviceChargeAmountKRW()
+//            .freelancerChargeAmountKRW().portoneChargeAmountKRW()
+//            .totalAmountUSD(totalAmountUSD).settlementAmountUSD().deductAmountUSD()
+//            .serviceChargeAmountUSD()
+//            .freelancerChargeAmountUSD().portoneChargeAmountUSD()
+//            .build();
+//        settlementRepository.save(settlementEntity);
+        return settlementRepository.findById(1L).isPresent();
     }
 
     // 최근에 등록한 정산 요청이 있는지

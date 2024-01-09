@@ -38,4 +38,9 @@ public interface ProductsSalesRepository {
     LocalDateTime getLastProductsSalesDate(CreatorEntity creatorEntity);
 
     Page<ProductsSalesEntity> findAllByNotSettled(CreatorEntity creatorEntity, Pageable pageable);
+
+    BigDecimal getTotalPriceByCreator(CreatorEntity creatorEntity, CurrencyType currencyType);
+
+    BigDecimal getTotalPortoneChargesByCreator(CreatorEntity creatorEntity,
+        CurrencyType currencyType);
 }

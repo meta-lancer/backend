@@ -5,6 +5,7 @@ import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -83,5 +84,18 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
         Pageable pageable) {
         return productsSalesJpaRepository.findAllByCreatorEntityAndSettledIsFalse(creatorEntity,
             pageable);
+    }
+
+    @Override
+    public BigDecimal getTotalPriceByCreator(CreatorEntity creatorEntity,
+        CurrencyType currencyType) {
+        return productsSalesJpaRepository.getTotalPriceByCreator(creatorEntity, currencyType);
+    }
+
+    @Override
+    public BigDecimal getTotalPortoneChargesByCreator(CreatorEntity creatorEntity,
+        CurrencyType currencyType) {
+        return productsSalesJpaRepository.getTotalPortoneChargesByCreator(creatorEntity,
+            currencyType).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 }

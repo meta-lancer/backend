@@ -19,6 +19,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -50,15 +51,31 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     private SettlementStatus settlementStatus = SettlementStatus.REQUEST;
     @Column(nullable = false)
     @Schema(name = "요청일")
-    private LocalDateTime requestDay;
+    private LocalDateTime requestDay = LocalDateTime.now();
     @Schema(name = "총 판매 금액")
-    private Integer totalAmount;
+    private Integer totalAmountKRW;
     @Schema(name = "정산받은 금액")
-    private Integer settlementAmount;
-    @Schema(name = "수수료 금액")
-    private Integer feeAmount;
+    private Integer settlementAmountKRW;
+    @Schema(name = "카드사 수수료 금액")
+    private Integer portoneChargeAmountKRW;
+    @Schema(name = "서비스 수수료 금액")
+    private Integer serviceChargeAmountKRW;
+    @Schema(name = "프리랜서 수수료 금액")
+    private Integer freelancerChargeAmountKRW;
     @Schema(name = "공제 금액(환불, 분쟁 시)")
-    private Integer deductAmount;
+    private Integer deductAmountKRW;
+    @Schema(name = "총 판매 금액")
+    private Integer totalAmountUSD;
+    @Schema(name = "정산받은 금액")
+    private Integer settlementAmountUSD;
+    @Schema(name = "카드사 수수료 금액")
+    private Integer portoneChargeAmountUSD;
+    @Schema(name = "서비스 수수료 금액")
+    private Integer serviceChargeAmountUSD;
+    @Schema(name = "프리랜서 수수료 금액")
+    private Integer freelancerChargeAmountUSD;
+    @Schema(name = "공제 금액(환불, 분쟁 시)")
+    private Integer deductAmountUSD;
     @Schema(name = "처리일")
     private LocalDateTime settlementDate;
     @Schema(name = "은행명")
@@ -71,6 +88,30 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     private String referenceMemo;
     @Schema(name = "첨부파일")
     private String referenceFile;
+
+    @Builder
+    public SettlementEntity(CreatorEntity creatorEntity,
+        Integer totalAmountKRW, Integer settlementAmountKRW,
+        Integer portoneChargeAmountKRW, Integer serviceChargeAmountKRW,
+        Integer freelancerChargeAmountKRW,
+        Integer deductAmountKRW, Integer totalAmountUSD, Integer settlementAmountUSD,
+        Integer portoneChargeAmountUSD, Integer serviceChargeAmountUSD,
+        Integer freelancerChargeAmountUSD,
+        Integer deductAmountUSD) {
+        this.creatorEntity = creatorEntity;
+        this.totalAmountKRW = totalAmountKRW;
+        this.settlementAmountKRW = settlementAmountKRW;
+        this.portoneChargeAmountKRW = portoneChargeAmountKRW;
+        this.serviceChargeAmountKRW = serviceChargeAmountKRW;
+        this.freelancerChargeAmountKRW = freelancerChargeAmountKRW;
+        this.deductAmountKRW = deductAmountKRW;
+        this.totalAmountUSD = totalAmountUSD;
+        this.settlementAmountUSD = settlementAmountUSD;
+        this.portoneChargeAmountUSD = portoneChargeAmountUSD;
+        this.serviceChargeAmountUSD = serviceChargeAmountUSD;
+        this.freelancerChargeAmountUSD = freelancerChargeAmountUSD;
+        this.deductAmountUSD = deductAmountUSD;
+    }
 
     public SettlementRecordList toSettlementRecordList() {
         return SettlementRecordList.builder().settlementId(id)

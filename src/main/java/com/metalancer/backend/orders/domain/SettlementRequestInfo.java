@@ -10,6 +10,8 @@ public class SettlementRequestInfo {
     private final Long settlementRequestId;
     private final BigDecimal totalSalesPriceKRW;
     private final BigDecimal totalSalesPriceUSD;
+    private final BigDecimal totalSettlementPriceKRW;
+    private final BigDecimal totalSettlementPriceUSD;
     private final BigDecimal totalServiceChargeKRW;
     private final BigDecimal totalServiceChargeUSD;
     private final BigDecimal totalFreeLancerChargeKRW;
@@ -19,13 +21,16 @@ public class SettlementRequestInfo {
 
     @Builder
     public SettlementRequestInfo(Long settlementRequestId, BigDecimal totalSalesPriceKRW,
-        BigDecimal totalSalesPriceUSD, BigDecimal totalServiceChargeKRW,
+        BigDecimal totalSalesPriceUSD, BigDecimal totalSettlementPriceKRW,
+        BigDecimal totalSettlementPriceUSD, BigDecimal totalServiceChargeKRW,
         BigDecimal totalServiceChargeUSD, BigDecimal totalFreeLancerChargeKRW,
         BigDecimal totalFreeLancerChargeUSD, BigDecimal totalPortoneChargeKRW,
         BigDecimal totalPortoneChargeUSD) {
         this.settlementRequestId = settlementRequestId;
         this.totalSalesPriceKRW = totalSalesPriceKRW;
         this.totalSalesPriceUSD = totalSalesPriceUSD;
+        this.totalSettlementPriceKRW = totalSettlementPriceKRW;
+        this.totalSettlementPriceUSD = totalSettlementPriceUSD;
         this.totalServiceChargeKRW = totalServiceChargeKRW;
         this.totalServiceChargeUSD = totalServiceChargeUSD;
         this.totalFreeLancerChargeKRW = totalFreeLancerChargeKRW;

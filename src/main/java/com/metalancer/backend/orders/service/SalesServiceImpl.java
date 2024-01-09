@@ -355,7 +355,14 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity, CurrencyType.KRW);
         BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.USD);
-        return SettlementRequestInfo.builder().totalSalesPriceKRW(totalSalesPriceKRW)
+        BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
+            .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW);
+        BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
+            .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD);
+        return SettlementRequestInfo.builder()
+            .totalSettlementPriceKRW(totalSettlementPriceKRW)
+            .totalSettlementPriceUSD(totalSettlementPriceUSD)
+            .totalSalesPriceKRW(totalSalesPriceKRW)
             .totalSalesPriceUSD(totalSalesPriceUSD)
             .totalServiceChargeKRW(totalServiceChargeKRW)
             .totalServiceChargeUSD(totalServiceChargeUSD)

@@ -7,6 +7,8 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -74,5 +76,12 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
         return productsSalesJpaRepository.findFirstByCreatorEntityOrderByCreatedAtDesc(
             creatorEntity).map(
             ProductsSalesEntity::getCreatedAt).orElse(null);
+    }
+
+    @Override
+    public Page<ProductsSalesEntity> findAllByNotSettled(CreatorEntity creatorEntity,
+        Pageable pageable) {
+        return productsSalesJpaRepository.findAllByCreatorEntityAndSettledIsFalse(creatorEntity,
+            pageable);
     }
 }

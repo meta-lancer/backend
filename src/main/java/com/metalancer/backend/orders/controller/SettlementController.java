@@ -10,6 +10,7 @@ import com.metalancer.backend.orders.domain.DaySalesReport;
 import com.metalancer.backend.orders.domain.EachSalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
+import com.metalancer.backend.orders.domain.SettlementRequestList;
 import com.metalancer.backend.orders.service.SalesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -90,7 +91,7 @@ public class SettlementController {
     }
 
     @Operation(summary = "정산관리-정산리포트 상품별", description = "")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = DaySalesReport.class)))
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = EachSalesReport.class)))
     @GetMapping("/products/{productsId}")
     public BaseResponse<EachSalesReport> getSettlementProductsReport(
         @PathVariable("productsId") Long productsId,
@@ -113,4 +114,21 @@ public class SettlementController {
         return new BaseResponse<>(
             salesService.getProductsDaySalesReportByExcel(productsId, user, beginDate, endDate));
     }
+
+    // 정산요청 시 상세
+    @Operation(summary = "정산관리-정산요청 시 상세내용 상품리스트", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementRequestList.class)))
+    @GetMapping("/request/products")
+    public BaseResponse<Page<SettlementRequestList>> getSettlementRequestList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        Pageable pageable) {
+        AuthUtils.validateUserAuthentication(user);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        return new BaseResponse<Page<SettlementRequestList>>(
+            salesService.getSettlementRequestList(user, pageable));
+    }
+
+    // 정산요청 후 기록에서 보여줄 상세
+
+    // 정산요청에 필요한 수수료
 }

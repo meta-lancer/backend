@@ -3,6 +3,7 @@ package com.metalancer.backend.orders.entity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.PaymentType;
+import com.metalancer.backend.orders.domain.SettlementRequestList;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
@@ -90,5 +91,11 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
 
     public void setSettled() {
         this.settled = true;
+    }
+
+    public SettlementRequestList toSettlementRequestList() {
+        return SettlementRequestList.builder().assetsId(productsEntity.getId())
+            .assetTitle(productsEntity.getTitle()).price(price).currencyType(currency)
+            .chargeRate(chargeRate).paymentType(paymentType).build();
     }
 }

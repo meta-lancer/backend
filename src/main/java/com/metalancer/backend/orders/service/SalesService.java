@@ -6,6 +6,7 @@ import com.metalancer.backend.orders.domain.DaySalesReport;
 import com.metalancer.backend.orders.domain.EachSalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
+import com.metalancer.backend.orders.domain.SettlementRequestList;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +30,6 @@ public interface SalesService {
         String endDate);
 
     Boolean checkSettlementRequestAvailable(PrincipalDetails user);
+
+    Page<SettlementRequestList> getSettlementRequestList(PrincipalDetails user, Pageable pageable);
 }

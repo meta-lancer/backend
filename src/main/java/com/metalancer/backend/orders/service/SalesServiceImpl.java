@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
+import com.metalancer.backend.common.constants.ServiceChargesType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.repository.CreatorRepository;
@@ -12,12 +13,17 @@ import com.metalancer.backend.orders.domain.DaySalesReport;
 import com.metalancer.backend.orders.domain.EachSalesReport;
 import com.metalancer.backend.orders.domain.SettlementRecordList;
 import com.metalancer.backend.orders.domain.SettlementReportList;
+import com.metalancer.backend.orders.domain.SettlementRequestList;
+import com.metalancer.backend.orders.entity.OrderPaymentEntity;
+import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.orders.entity.SettlementEntity;
+import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.ProductsSalesRepository;
 import com.metalancer.backend.orders.repository.SettlementProductsRepository;
 import com.metalancer.backend.orders.repository.SettlementRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.service.repository.ServiceChargeRepository;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
@@ -50,6 +56,8 @@ public class SalesServiceImpl implements SalesService {
     private final SettlementRepository settlementRepository;
     private final SettlementProductsRepository settlementProductsRepository;
     private final CartRepository cartRepository;
+    private final ServiceChargeRepository serviceChargeRepository;
+    private final OrderPaymentRepository orderPaymentRepository;
 
     @Override
     public List<DaySalesReport> getDaySalesReport(PrincipalDetails user, PeriodType periodType) {
@@ -298,6 +306,29 @@ public class SalesServiceImpl implements SalesService {
             lastProductsSalesDate, recentSettlementRequestDate);
         // 정산할 것들이 있고, 최근 정산 요청이 없어야
         return totalSettlementRequiredProductsCnt > 0 && !hasAnyRecentSettlementRequest;
+    }
+
+    @Override
+    public Page<SettlementRequestList> getSettlementRequestList(PrincipalDetails user,
+        Pageable pageable) {
+        CreatorEntity creatorEntity = getCreatorEntity(user);
+        Page<ProductsSalesEntity> productsSalesEntities = productsSalesRepository.findAllByNotSettled(
+            creatorEntity, pageable);
+        BigDecimal serviceRate = serviceChargeRepository.getChargeRate(ServiceChargesType.SERVICE);
+        BigDecimal freelancerRate = serviceChargeRepository.getChargeRate(
+            ServiceChargesType.FREELANCER);
+        List<SettlementRequestList> settlementRequestLists = new ArrayList<>();
+        for (ProductsSalesEntity productsSalesEntity : productsSalesEntities) {
+            SettlementRequestList settlementRequestList = productsSalesEntity.toSettlementRequestList();
+            OrderPaymentEntity orderPaymentEntity = orderPaymentRepository.findByOrderNo(
+                productsSalesEntity.getOrderNo());
+            settlementRequestList.setSoldAt(orderPaymentEntity.getPurchasedAt());
+            settlementRequestList.setServiceRate(serviceRate);
+            settlementRequestList.setFreelancerRate(freelancerRate);
+            settlementRequestLists.add(settlementRequestList);
+        }
+        return new PageImpl<>(settlementRequestLists, pageable,
+            productsSalesEntities.getTotalElements());
     }
 
     // 최근에 등록한 정산 요청이 있는지

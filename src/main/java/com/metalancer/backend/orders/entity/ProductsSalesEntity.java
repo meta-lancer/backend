@@ -2,6 +2,7 @@ package com.metalancer.backend.orders.entity;
 
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.CurrencyType;
+import com.metalancer.backend.common.constants.PaymentType;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
@@ -51,6 +52,9 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
     private String orderNo;
     private String orderProductNo;
     private BigDecimal price;
+    private BigDecimal chargeRate;
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
     @Enumerated(EnumType.STRING)
     private CurrencyType currency;
     @Column(name = "is_settled", nullable = false, columnDefinition = "정산요청 가능여부를 갯수만으로 비교하지않기위해")
@@ -59,7 +63,7 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
     @Builder
     public ProductsSalesEntity(CreatorEntity creatorEntity, OrdersEntity ordersEntity,
         ProductsEntity productsEntity, Long ordererId, String orderNo, String orderProductNo,
-        BigDecimal price, CurrencyType currency) {
+        BigDecimal price, BigDecimal chargeRate, PaymentType paymentType, CurrencyType currency) {
         this.creatorEntity = creatorEntity;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;
@@ -67,6 +71,20 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.price = price;
+        this.chargeRate = chargeRate;
+        this.paymentType = paymentType;
+        this.currency = currency;
+    }
+
+    public void setChargeRate(BigDecimal chargeRate) {
+        this.chargeRate = chargeRate;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    public void setCurrency(CurrencyType currency) {
         this.currency = currency;
     }
 

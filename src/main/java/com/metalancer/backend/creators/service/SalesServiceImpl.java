@@ -358,10 +358,10 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity, CurrencyType.USD);
         BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
             .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW)
-            .setScale(0, RoundingMode.HALF_UP);
+            .setScale(0, RoundingMode.HALF_DOWN);
         BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
             .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD)
-            .setScale(0, RoundingMode.HALF_UP);
+            .setScale(0, RoundingMode.HALF_DOWN);
         return SettlementRequestInfo.builder()
             .totalSettlementPriceKRW(totalSettlementPriceKRW)
             .totalSettlementPriceUSD(totalSettlementPriceUSD)
@@ -406,10 +406,10 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity, CurrencyType.USD);
         BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
             .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW)
-            .setScale(0, RoundingMode.HALF_UP);
+            .setScale(0, RoundingMode.HALF_DOWN);
         BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
             .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD)
-            .setScale(0, RoundingMode.HALF_UP);
+            .setScale(0, RoundingMode.HALF_DOWN);
 
         // 공제 금액
         BigDecimal deductAmountKRW = BigDecimal.valueOf(0);
@@ -458,15 +458,15 @@ public class SalesServiceImpl implements SalesService {
                     totalAmountKRW);
                 BigDecimal freelancerChargeAmountUSD = getChargeWithRate(freelancerRate,
                     totalAmountUSD);
-                // 반올림 처리
+                // 버림 처리
                 BigDecimal settlementAmountKRW = totalAmountKRW.subtract(
                         freelancerChargeAmountKRW)
                     .subtract(portoneChargeAmountKRW).subtract(serviceChargeAmountKRW)
-                    .setScale(0, RoundingMode.HALF_UP);
+                    .setScale(0, RoundingMode.HALF_DOWN);
                 BigDecimal settlementAmountUSD = totalAmountUSD.subtract(
                         freelancerChargeAmountUSD)
                     .subtract(portoneChargeAmountUSD).subtract(serviceChargeAmountUSD)
-                    .setScale(0, RoundingMode.HALF_UP);
+                    .setScale(0, RoundingMode.HALF_DOWN);
 
                 SettlementProductsEntity settlementProductsEntity = SettlementProductsEntity.builder()
                     .creatorEntity(creatorEntity).settlementEntity(settlementEntity)

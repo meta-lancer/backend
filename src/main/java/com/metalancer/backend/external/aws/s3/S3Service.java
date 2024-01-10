@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.metalancer.backend.common.constants.AssetType;
 import com.metalancer.backend.common.constants.ErrorCode;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +44,12 @@ public class S3Service {
 
     @Value("${cloud.aws.region.static}")
     private String region;
-    @Value("${cloud.aws.s3.cloudfront}")
-    private String readBucket;
+    @Value("${cloud.aws.s3.cloudfront.asset}")
+    private String readAssetBucket;
+    @Value("${cloud.aws.s3.cloudfront.user}")
+    private String readUserBucket;
+    @Value("${cloud.aws.s3.cloudfront.service}")
+    private String readServiceBucket;
 
     private AmazonS3 s3Client;
 
@@ -59,7 +65,7 @@ public class S3Service {
     public String getAssetFilePresignedUrl(Long productsId, String fileName) {
         String prefix = "asset/" + productsId + "/zip";
         fileName = prefix + "/" + fileName;
-        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequestForAssetFile(
             fileName);
         URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
@@ -87,6 +93,18 @@ public class S3Service {
         return generatePresignedUrlRequest;
     }
 
+    private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequestForAssetFile(
+        String fileName) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+            new GeneratePresignedUrlRequest(assetBucket, fileName)
+                .withMethod(HttpMethod.PUT).withContentType("application/zip")
+                .withExpiration(getPreSignedUrlExpiration());
+        generatePresignedUrlRequest.addRequestParameter(
+            Headers.S3_CANNED_ACL,
+            CannedAccessControlList.PublicRead.toString());
+        return generatePresignedUrlRequest;
+    }
+
     private Date getPreSignedUrlExpiration() {
         Date expiration = new Date();
         long expTimeMillis = expiration.getTime();
@@ -104,8 +122,10 @@ public class S3Service {
         String bucketName = constructBucketName(assetId, assetType);
         String readBucketName = constructReadBucketName(assetId, assetType);
 
+        ObjectMetadata metadata = getObjectMetadata(file, ext);
+
         s3Client.putObject(
-            new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return readBucketName + "/" + fileName;
@@ -117,13 +137,25 @@ public class S3Service {
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         String fileName = randomString + "." + ext;
         String bucketName = assetBucket + "/creator/" + creatorId + "/portfolio/" + portfolioId;
-        String readBucketName = readBucket + "/creator/" + creatorId + "/portfolio/" + portfolioId;
+        String readBucketName =
+            readAssetBucket + "/creator/" + creatorId + "/portfolio/" + portfolioId;
+
+        ObjectMetadata metadata = getObjectMetadata(file, ext);
 
         s3Client.putObject(
-            new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return readBucketName + "/" + fileName;
+    }
+
+    @NotNull
+    private ObjectMetadata getObjectMetadata(MultipartFile file, String ext) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        String mimeType = getMimeType(ext);
+        metadata.setContentType(mimeType);
+        metadata.setContentLength(file.getSize());
+        return metadata;
     }
 
     private String constructBucketName(Long assetId, AssetType assetType) {
@@ -131,7 +163,7 @@ public class S3Service {
     }
 
     private String constructReadBucketName(Long assetId, AssetType assetType) {
-        return readBucket + "/asset/" + assetId + "/" + assetType.getPath();
+        return readAssetBucket + "/asset/" + assetId + "/" + assetType.getPath();
     }
 
     public String getRandomStringForImageName(int size) {
@@ -166,13 +198,30 @@ public class S3Service {
         String bucketName =
             assetBucket + "/creator/" + creatorId + "/paymentInfo-management";
         String readBucketName =
-            readBucket + "/creator/" + creatorId + "/paymentInfo-management";
+            readAssetBucket + "/creator/" + creatorId + "/paymentInfo-management";
+
+        ObjectMetadata metadata = getObjectMetadata(file, ext);
 
         s3Client.putObject(
-            new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return readBucketName + "/" + fileName;
+    }
+
+    private String getMimeType(String ext) {
+        // Implement logic to determine the MIME type based on the file extension
+        // Example:
+        switch (ext.toLowerCase()) {
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            // Add more cases for other file types
+            default:
+                return "application/octet-stream";
+        }
     }
 
     public String extractBaseUrl(String signedUrl) {

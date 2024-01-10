@@ -16,8 +16,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -54,14 +56,30 @@ public class SettlementProductsEntity extends BaseEntity implements Serializable
     @Column(nullable = false)
     @Schema(name = "요청일")
     private LocalDateTime requestDay;
-    @Schema(name = "상품별 총 판매 금액")
-    private Integer totalAmount;
+    @Schema(name = "총 판매 금액")
+    private BigDecimal totalAmountKRW;
     @Schema(name = "정산받은 금액")
-    private Integer settlementAmount;
-    @Schema(name = "수수료 금액")
-    private Integer feeAmount;
+    private Integer settlementAmountKRW;
+    @Schema(name = "카드사 수수료 금액")
+    private BigDecimal portoneChargeAmountKRW;
+    @Schema(name = "서비스 수수료 금액")
+    private BigDecimal serviceChargeAmountKRW;
+    @Schema(name = "프리랜서 수수료 금액")
+    private BigDecimal freelancerChargeAmountKRW;
     @Schema(name = "공제 금액(환불, 분쟁 시)")
-    private Integer deductAmount;
+    private BigDecimal deductAmountKRW;
+    @Schema(name = "총 판매 금액")
+    private BigDecimal totalAmountUSD;
+    @Schema(name = "정산받은 금액")
+    private BigDecimal settlementAmountUSD;
+    @Schema(name = "카드사 수수료 금액")
+    private BigDecimal portoneChargeAmountUSD;
+    @Schema(name = "서비스 수수료 금액")
+    private BigDecimal serviceChargeAmountUSD;
+    @Schema(name = "프리랜서 수수료 금액")
+    private BigDecimal freelancerChargeAmountUSD;
+    @Schema(name = "공제 금액(환불, 분쟁 시)")
+    private BigDecimal deductAmountUSD;
     @Schema(name = "처리일")
     private LocalDateTime settlementDate;
     @Schema(name = "비고사항")
@@ -71,5 +89,32 @@ public class SettlementProductsEntity extends BaseEntity implements Serializable
 
     public int getSalesQuantity() {
         return this.salesQuantity;
+    }
+
+    @Builder
+    public SettlementProductsEntity(CreatorEntity creatorEntity, ProductsEntity productsEntity,
+        SettlementEntity settlementEntity, int salesQuantity,
+        BigDecimal totalAmountKRW, Integer settlementAmountKRW, BigDecimal portoneChargeAmountKRW,
+        BigDecimal serviceChargeAmountKRW, BigDecimal freelancerChargeAmountKRW,
+        BigDecimal deductAmountKRW, BigDecimal totalAmountUSD, BigDecimal settlementAmountUSD,
+        BigDecimal portoneChargeAmountUSD, BigDecimal serviceChargeAmountUSD,
+        BigDecimal freelancerChargeAmountUSD, BigDecimal deductAmountUSD) {
+        this.creatorEntity = creatorEntity;
+        this.productsEntity = productsEntity;
+        this.settlementEntity = settlementEntity;
+        this.salesQuantity = salesQuantity;
+        this.requestDay = LocalDateTime.now();
+        this.totalAmountKRW = totalAmountKRW;
+        this.settlementAmountKRW = settlementAmountKRW;
+        this.portoneChargeAmountKRW = portoneChargeAmountKRW;
+        this.serviceChargeAmountKRW = serviceChargeAmountKRW;
+        this.freelancerChargeAmountKRW = freelancerChargeAmountKRW;
+        this.deductAmountKRW = deductAmountKRW;
+        this.totalAmountUSD = totalAmountUSD;
+        this.settlementAmountUSD = settlementAmountUSD;
+        this.portoneChargeAmountUSD = portoneChargeAmountUSD;
+        this.serviceChargeAmountUSD = serviceChargeAmountUSD;
+        this.freelancerChargeAmountUSD = freelancerChargeAmountUSD;
+        this.deductAmountUSD = deductAmountUSD;
     }
 }

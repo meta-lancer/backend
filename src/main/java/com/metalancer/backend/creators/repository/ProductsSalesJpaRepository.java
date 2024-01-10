@@ -6,6 +6,7 @@ import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,11 +58,32 @@ public interface ProductsSalesJpaRepository extends JpaRepository<ProductsSalesE
     Page<ProductsSalesEntity> findAllByCreatorEntityAndSettledIsFalse(CreatorEntity creatorEntity,
         Pageable pageable);
 
+    @Query("select DISTINCT pse.productsEntity from product_sales pse where pse.creatorEntity = :creatorEntity and pse.settled = false")
+    List<ProductsEntity> findAllProductsDistinctByCreatorEntityAndSettledIsFalse(
+        CreatorEntity creatorEntity);
+
+    List<ProductsSalesEntity> findAllByCreatorEntityAndSettledIsFalse(
+        CreatorEntity creatorEntity);
+
     @Query("select COALESCE(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.currency = :currency")
     BigDecimal getTotalPriceByCreator(@Param("creatorEntity") CreatorEntity creatorEntity,
         @Param("currency") CurrencyType currency);
 
     @Query("select COALESCE(SUM(pse.price * pse.chargeRate), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.currency = :currency")
     BigDecimal getTotalPortoneChargesByCreator(@Param("creatorEntity") CreatorEntity creatorEntity,
+        @Param("currency") CurrencyType currency);
+
+    int countAllByProductsEntityAndSettledIsFalse(ProductsEntity productsEntity);
+
+    @Query("select COALESCE(SUM(pse.price), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity =:productsEntity and pse.currency = :currency and pse.settled = false")
+    BigDecimal getTotalAmountByCreatorAndProductsAndSettledIsFalse(
+        @Param("creatorEntity") CreatorEntity creatorEntity,
+        @Param("productsEntity") ProductsEntity productsEntity,
+        @Param("currency") CurrencyType currency);
+
+    @Query("select COALESCE(SUM(pse.price * pse.chargeRate), 0) from product_sales pse where pse.creatorEntity = :creatorEntity and pse.productsEntity =:productsEntity and pse.currency = :currency and pse.settled = false")
+    BigDecimal getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
+        @Param("creatorEntity") CreatorEntity creatorEntity,
+        @Param("productsEntity") ProductsEntity productsEntity,
         @Param("currency") CurrencyType currency);
 }

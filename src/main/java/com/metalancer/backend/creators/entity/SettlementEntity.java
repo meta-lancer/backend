@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,10 +42,6 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private CreatorEntity creatorEntity;
-    @Schema(name = "현황")
-    private String currentSituation;
-    @Schema(name = "담당자")
-    private String manager;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Schema(name = "정산 상태")
@@ -53,29 +50,33 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     @Schema(name = "요청일")
     private LocalDateTime requestDay = LocalDateTime.now();
     @Schema(name = "총 판매 금액")
-    private Integer totalAmountKRW;
+    private BigDecimal totalAmountKRW;
     @Schema(name = "정산받은 금액")
     private Integer settlementAmountKRW;
     @Schema(name = "카드사 수수료 금액")
-    private Integer portoneChargeAmountKRW;
+    private BigDecimal portoneChargeAmountKRW;
     @Schema(name = "서비스 수수료 금액")
-    private Integer serviceChargeAmountKRW;
+    private BigDecimal serviceChargeAmountKRW;
     @Schema(name = "프리랜서 수수료 금액")
-    private Integer freelancerChargeAmountKRW;
+    private BigDecimal freelancerChargeAmountKRW;
     @Schema(name = "공제 금액(환불, 분쟁 시)")
-    private Integer deductAmountKRW;
+    private BigDecimal deductAmountKRW;
     @Schema(name = "총 판매 금액")
-    private Integer totalAmountUSD;
+    private BigDecimal totalAmountUSD;
     @Schema(name = "정산받은 금액")
-    private Integer settlementAmountUSD;
+    private BigDecimal settlementAmountUSD;
     @Schema(name = "카드사 수수료 금액")
-    private Integer portoneChargeAmountUSD;
+    private BigDecimal portoneChargeAmountUSD;
     @Schema(name = "서비스 수수료 금액")
-    private Integer serviceChargeAmountUSD;
+    private BigDecimal serviceChargeAmountUSD;
     @Schema(name = "프리랜서 수수료 금액")
-    private Integer freelancerChargeAmountUSD;
+    private BigDecimal freelancerChargeAmountUSD;
     @Schema(name = "공제 금액(환불, 분쟁 시)")
-    private Integer deductAmountUSD;
+    private BigDecimal deductAmountUSD;
+    @Schema(name = "현황")
+    private String currentSituation;
+    @Schema(name = "담당자")
+    private String manager;
     @Schema(name = "처리일")
     private LocalDateTime settlementDate;
     @Schema(name = "은행명")
@@ -91,13 +92,13 @@ public class SettlementEntity extends BaseEntity implements Serializable {
 
     @Builder
     public SettlementEntity(CreatorEntity creatorEntity,
-        Integer totalAmountKRW, Integer settlementAmountKRW,
-        Integer portoneChargeAmountKRW, Integer serviceChargeAmountKRW,
-        Integer freelancerChargeAmountKRW,
-        Integer deductAmountKRW, Integer totalAmountUSD, Integer settlementAmountUSD,
-        Integer portoneChargeAmountUSD, Integer serviceChargeAmountUSD,
-        Integer freelancerChargeAmountUSD,
-        Integer deductAmountUSD) {
+        BigDecimal totalAmountKRW, Integer settlementAmountKRW,
+        BigDecimal portoneChargeAmountKRW, BigDecimal serviceChargeAmountKRW,
+        BigDecimal freelancerChargeAmountKRW,
+        BigDecimal deductAmountKRW, BigDecimal totalAmountUSD, BigDecimal settlementAmountUSD,
+        BigDecimal portoneChargeAmountUSD, BigDecimal serviceChargeAmountUSD,
+        BigDecimal freelancerChargeAmountUSD,
+        BigDecimal deductAmountUSD) {
         this.creatorEntity = creatorEntity;
         this.totalAmountKRW = totalAmountKRW;
         this.settlementAmountKRW = settlementAmountKRW;
@@ -118,5 +119,23 @@ public class SettlementEntity extends BaseEntity implements Serializable {
             .requestDay(Time.convertDateToString(requestDay))
             .currentSituation(currentSituation)
             .manager(manager).settlementStatus(settlementStatus).build();
+    }
+
+    public void adminSettle(
+        String currentSituation,
+        String manager,
+        String bank,
+        String receiverNm,
+        String accountNo,
+        String referenceMemo,
+        String referenceFile) {
+        this.currentSituation = currentSituation;
+        this.manager = manager;
+        this.settlementDate = LocalDateTime.now();
+        this.bank = bank;
+        this.receiverNm = receiverNm;
+        this.accountNo = accountNo;
+        this.referenceMemo = referenceMemo;
+        this.referenceFile = referenceFile;
     }
 }

@@ -129,7 +129,7 @@ public class SettlementController {
             salesService.getSettlementRequestList(user, pageable));
     }
 
-    @Operation(summary = "정산관리-정산요청 시 상세 정보", description = "")
+    @Operation(summary = "정산관리-정산요청 시 상세 정보", description = "정산금액은 반올림해서 보여준다.")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementRequestList.class)))
     @GetMapping("/request/info")
     public BaseResponse<SettlementRequestInfo> getSettlementRequestInfo(
@@ -139,7 +139,6 @@ public class SettlementController {
             salesService.getSettlementRequestInfo(user));
     }
 
-    // 정산요청
     @Operation(summary = "정산관리-정산요청", description = "")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = Boolean.class)))
     @PostMapping("/request")

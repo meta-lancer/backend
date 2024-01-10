@@ -7,6 +7,7 @@ import com.metalancer.backend.users.entity.CreatorEntity;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -87,6 +88,19 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
     }
 
     @Override
+    public List<ProductsEntity> findAllProductsDistinctByCreatorEntityAndSettledIsFalse(
+        CreatorEntity creatorEntity) {
+        return productsSalesJpaRepository.findAllProductsDistinctByCreatorEntityAndSettledIsFalse(
+            creatorEntity);
+    }
+
+    @Override
+    public List<ProductsSalesEntity> findAllByCreatorEntityAndSettledIsFalse(
+        CreatorEntity creatorEntity) {
+        return productsSalesJpaRepository.findAllByCreatorEntityAndSettledIsFalse(creatorEntity);
+    }
+
+    @Override
     public BigDecimal getTotalPriceByCreator(CreatorEntity creatorEntity,
         CurrencyType currencyType) {
         return productsSalesJpaRepository.getTotalPriceByCreator(creatorEntity, currencyType);
@@ -97,5 +111,24 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
         CurrencyType currencyType) {
         return productsSalesJpaRepository.getTotalPortoneChargesByCreator(creatorEntity,
             currencyType).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public int countAllByProductsAndSettledIsFalse(ProductsEntity productsEntity) {
+        return productsSalesJpaRepository.countAllByProductsEntityAndSettledIsFalse(productsEntity);
+    }
+
+    @Override
+    public BigDecimal getTotalAmountByCreatorAndProductsAndSettledIsFalse(
+        CreatorEntity creatorEntity, ProductsEntity productsEntity, CurrencyType currencyType) {
+        return productsSalesJpaRepository.getTotalAmountByCreatorAndProductsAndSettledIsFalse(
+            creatorEntity, productsEntity, currencyType);
+    }
+
+    @Override
+    public BigDecimal getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
+        CreatorEntity creatorEntity, ProductsEntity productsEntity, CurrencyType currencyType) {
+        return productsSalesJpaRepository.getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
+            creatorEntity, productsEntity, currencyType);
     }
 }

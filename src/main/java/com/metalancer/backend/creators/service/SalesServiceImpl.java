@@ -16,6 +16,7 @@ import com.metalancer.backend.creators.domain.SettlementRequestInfo;
 import com.metalancer.backend.creators.domain.SettlementRequestList;
 import com.metalancer.backend.creators.entity.ProductsSalesEntity;
 import com.metalancer.backend.creators.entity.SettlementEntity;
+import com.metalancer.backend.creators.entity.SettlementProductsEntity;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
 import com.metalancer.backend.creators.repository.ProductsSalesRepository;
@@ -356,9 +357,11 @@ public class SalesServiceImpl implements SalesService {
         BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.USD);
         BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
-            .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW);
+            .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW)
+            .setScale(0, RoundingMode.HALF_UP);
         BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
-            .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD);
+            .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD)
+            .setScale(0, RoundingMode.HALF_UP);
         return SettlementRequestInfo.builder()
             .totalSettlementPriceKRW(totalSettlementPriceKRW)
             .totalSettlementPriceUSD(totalSettlementPriceUSD)
@@ -383,22 +386,112 @@ public class SalesServiceImpl implements SalesService {
     public Boolean createSettlementRequest(PrincipalDetails user) {
         CreatorEntity creatorEntity = getCreatorEntity(user);
 
-//        int totalAmountKRW = 0;
-//        int totalAmountUSD = 0;
-//        BigDecimal serviceRate = serviceChargeRepository.getChargeRate(ServiceChargesType.SERVICE);
-//        BigDecimal freelancerRate = serviceChargeRepository.getChargeRate(
-//            ServiceChargesType.FREELANCER);
-//
-//        SettlementEntity settlementEntity = SettlementEntity.builder().creatorEntity(creatorEntity)
-//            .totalAmountKRW(totalAmountKRW).settlementAmountKRW().deductAmountKRW()
-//            .serviceChargeAmountKRW()
-//            .freelancerChargeAmountKRW().portoneChargeAmountKRW()
-//            .totalAmountUSD(totalAmountUSD).settlementAmountUSD().deductAmountUSD()
-//            .serviceChargeAmountUSD()
-//            .freelancerChargeAmountUSD().portoneChargeAmountUSD()
-//            .build();
-//        settlementRepository.save(settlementEntity);
-        return settlementRepository.findById(1L).isPresent();
+        BigDecimal serviceRate = serviceChargeRepository.getChargeRate(ServiceChargesType.SERVICE);
+        BigDecimal freelancerRate = serviceChargeRepository.getChargeRate(
+            ServiceChargesType.FREELANCER);
+
+        BigDecimal totalSalesPriceKRW = productsSalesRepository.getTotalPriceByCreator(
+            creatorEntity, CurrencyType.KRW);
+        BigDecimal totalSalesPriceUSD = productsSalesRepository.getTotalPriceByCreator(
+            creatorEntity, CurrencyType.USD);
+        BigDecimal totalServiceChargeKRW = getChargeWithRate(serviceRate, totalSalesPriceKRW);
+        BigDecimal totalServiceChargeUSD = getChargeWithRate(serviceRate, totalSalesPriceUSD);
+        BigDecimal totalFreeLancerChargeKRW = getChargeWithRate(freelancerRate,
+            totalSalesPriceKRW);
+        BigDecimal totalFreeLancerChargeUSD = getChargeWithRate(freelancerRate,
+            totalSalesPriceUSD);
+        BigDecimal totalPortoneChargeKRW = productsSalesRepository.getTotalPortoneChargesByCreator(
+            creatorEntity, CurrencyType.KRW);
+        BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
+            creatorEntity, CurrencyType.USD);
+        BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
+            .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW)
+            .setScale(0, RoundingMode.HALF_UP);
+        BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
+            .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD)
+            .setScale(0, RoundingMode.HALF_UP);
+
+        // 공제 금액
+        BigDecimal deductAmountKRW = BigDecimal.valueOf(0);
+        BigDecimal deductAmountUSD = BigDecimal.valueOf(0);
+
+        SettlementEntity settlementEntity = SettlementEntity.builder().creatorEntity(creatorEntity)
+            .totalAmountKRW(totalSalesPriceKRW)
+            .settlementAmountKRW(totalSettlementPriceKRW.intValue())
+            .freelancerChargeAmountKRW(totalFreeLancerChargeKRW)
+            .portoneChargeAmountKRW(totalPortoneChargeKRW)
+            .serviceChargeAmountKRW(totalServiceChargeKRW)
+            .deductAmountKRW(deductAmountKRW)
+            .totalAmountUSD(totalSalesPriceUSD)
+            .settlementAmountUSD(totalSettlementPriceUSD)
+            .deductAmountUSD(deductAmountUSD)
+            .serviceChargeAmountUSD(totalServiceChargeUSD)
+            .freelancerChargeAmountUSD(totalFreeLancerChargeUSD)
+            .portoneChargeAmountUSD(totalPortoneChargeUSD)
+            .build();
+        settlementRepository.save(settlementEntity);
+
+        // distinct 상품별
+        List<ProductsEntity> productsEntities = productsSalesRepository.findAllProductsDistinctByCreatorEntityAndSettledIsFalse(
+            creatorEntity);
+        productsEntities.forEach(
+            ProductsEntity -> {
+                // 상품별 공제 금액
+                BigDecimal eachProductDeductAmountKRW = BigDecimal.valueOf(0);
+                BigDecimal eachProductDeductAmountUSD = BigDecimal.valueOf(0);
+                int salesQuantity = productsSalesRepository.countAllByProductsAndSettledIsFalse(
+                    ProductsEntity);
+                BigDecimal totalAmountKRW = productsSalesRepository.getTotalAmountByCreatorAndProductsAndSettledIsFalse(
+                    creatorEntity, ProductsEntity, CurrencyType.KRW);
+                BigDecimal totalAmountUSD = productsSalesRepository.getTotalAmountByCreatorAndProductsAndSettledIsFalse(
+                    creatorEntity, ProductsEntity, CurrencyType.USD);
+                BigDecimal portoneChargeAmountKRW = productsSalesRepository.getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
+                    creatorEntity, ProductsEntity, CurrencyType.KRW);
+                BigDecimal portoneChargeAmountUSD = productsSalesRepository.getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
+                    creatorEntity, ProductsEntity, CurrencyType.USD);
+
+                BigDecimal serviceChargeAmountKRW = getChargeWithRate(serviceRate,
+                    totalAmountKRW);
+                BigDecimal serviceChargeAmountUSD = getChargeWithRate(serviceRate,
+                    totalAmountUSD);
+                BigDecimal freelancerChargeAmountKRW = getChargeWithRate(freelancerRate,
+                    totalAmountKRW);
+                BigDecimal freelancerChargeAmountUSD = getChargeWithRate(freelancerRate,
+                    totalAmountUSD);
+                // 반올림 처리
+                BigDecimal settlementAmountKRW = totalAmountKRW.subtract(
+                        freelancerChargeAmountKRW)
+                    .subtract(portoneChargeAmountKRW).subtract(serviceChargeAmountKRW)
+                    .setScale(0, RoundingMode.HALF_UP);
+                BigDecimal settlementAmountUSD = totalAmountUSD.subtract(
+                        freelancerChargeAmountUSD)
+                    .subtract(portoneChargeAmountUSD).subtract(serviceChargeAmountUSD)
+                    .setScale(0, RoundingMode.HALF_UP);
+
+                SettlementProductsEntity settlementProductsEntity = SettlementProductsEntity.builder()
+                    .creatorEntity(creatorEntity).settlementEntity(settlementEntity)
+                    .productsEntity(ProductsEntity).salesQuantity(salesQuantity)
+                    .totalAmountKRW(totalAmountKRW)
+                    .settlementAmountKRW(settlementAmountKRW.intValue())
+                    .serviceChargeAmountKRW(serviceChargeAmountKRW)
+                    .freelancerChargeAmountKRW(freelancerChargeAmountKRW)
+                    .portoneChargeAmountKRW(portoneChargeAmountKRW)
+                    .deductAmountKRW(eachProductDeductAmountKRW)
+                    .totalAmountUSD(totalAmountUSD).settlementAmountUSD(settlementAmountUSD)
+                    .serviceChargeAmountUSD(serviceChargeAmountUSD)
+                    .freelancerChargeAmountUSD(freelancerChargeAmountUSD)
+                    .portoneChargeAmountUSD(portoneChargeAmountUSD)
+                    .deductAmountUSD(eachProductDeductAmountUSD)
+                    .build();
+                settlementProductsRepository.save(settlementProductsEntity);
+            }
+        );
+
+        List<ProductsSalesEntity> productsSalesEntityList = productsSalesRepository.findAllByCreatorEntityAndSettledIsFalse(
+            creatorEntity);
+        productsSalesEntityList.forEach(ProductsSalesEntity::setSettled);
+
+        return settlementRepository.findById(settlementEntity.getId()).isPresent();
     }
 
     // 최근에 등록한 정산 요청이 있는지

@@ -20,4 +20,9 @@ public class SettlementProductsRepositoryImpl implements SettlementProductsRepos
             .mapToInt(SettlementProductsEntity::getSalesQuantity)
             .sum();
     }
+
+    @Override
+    public void save(SettlementProductsEntity settlementProductsEntity) {
+        settlementProductsJpaRepository.save(settlementProductsEntity);
+    }
 }

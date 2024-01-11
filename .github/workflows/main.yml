@@ -32,7 +32,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build --stacktrace
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1

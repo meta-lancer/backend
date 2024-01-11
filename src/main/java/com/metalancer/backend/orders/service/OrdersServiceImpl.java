@@ -4,10 +4,13 @@ import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.constants.PaymentType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.exception.OrderStatusException;
+import com.metalancer.backend.creators.entity.ProductsSalesEntity;
+import com.metalancer.backend.creators.repository.ProductsSalesRepository;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.OrderProducts;
 import com.metalancer.backend.orders.domain.PaymentResponse;
@@ -19,14 +22,13 @@ import com.metalancer.backend.orders.dto.OrdersRequestDTO.CreateOrder;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
 import com.metalancer.backend.orders.entity.OrdersEntity;
-import com.metalancer.backend.orders.entity.ProductsSalesEntity;
 import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
-import com.metalancer.backend.orders.repository.ProductsSalesRepository;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.service.repository.PortOneChargeRepository;
 import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
@@ -69,6 +71,7 @@ public class OrdersServiceImpl implements OrdersService {
     private final PayedAssetsRepository payedAssetsRepository;
     private final ProductsAssetFileRepository productsAssetFileRepository;
     private final ProductsSalesRepository productsSalesRepository;
+    private final PortOneChargeRepository portOneChargeRepository;
 
     @Override
     public CreatedOrder createOrder(User user, CreateOrder dto) {
@@ -184,15 +187,17 @@ public class OrdersServiceImpl implements OrdersService {
             foundOrdersEntity);
 
         if (orderStatus.equals(OrderStatus.PAY_DONE)) {
-            PaymentResponse response = getPaymentResponse(user,
+            return getPaymentResponse(user,
                 foundOrdersEntity, orderStatus, paymentResponse);
-            return response;
         }
         // 결제 처리 완료
         completeOrder(foundOrdersEntity, orderProductsEntityList);
         // 결제 완료 저장 => 일부 데이터는 결제 완료 받은 값이 필요
         OrderPaymentEntity savedOrderPaymentEntity = createOrderPaymentEntity(orderNo,
             foundOrdersEntity, paymentResponse);
+        String paymentMethod = savedOrderPaymentEntity.getMethod();
+        String paymentPgType = savedOrderPaymentEntity.getType();
+        PaymentType paymentType = PaymentType.getType(paymentMethod, paymentPgType);
         // 장바구니에서 삭제
         for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
             cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity());
@@ -208,8 +213,11 @@ public class OrdersServiceImpl implements OrdersService {
 
             // 판매자 판매내역
             CurrencyType currencyType = CurrencyType.valueOf(savedOrderPaymentEntity.getCurrency());
-            ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity(
-                currencyType);
+            ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity();
+            createdProductsSalesEntity.setCurrency(currencyType);
+            createdProductsSalesEntity.setPaymentType(paymentType);
+            BigDecimal chargeRate = portOneChargeRepository.getChargeRate(paymentType);
+            createdProductsSalesEntity.setChargeRate(chargeRate);
             productsSalesRepository.save(createdProductsSalesEntity);
         }
 

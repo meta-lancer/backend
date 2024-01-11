@@ -1,4 +1,4 @@
-package com.metalancer.backend.orders.domain;
+package com.metalancer.backend.creators.domain;
 
 import java.math.BigDecimal;
 import lombok.Builder;

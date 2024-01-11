@@ -1,11 +1,13 @@
-package com.metalancer.backend.orders.service;
+package com.metalancer.backend.creators.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.PeriodType;
-import com.metalancer.backend.orders.domain.DaySalesReport;
-import com.metalancer.backend.orders.domain.EachSalesReport;
-import com.metalancer.backend.orders.domain.SettlementRecordList;
-import com.metalancer.backend.orders.domain.SettlementReportList;
+import com.metalancer.backend.creators.domain.DaySalesReport;
+import com.metalancer.backend.creators.domain.EachSalesReport;
+import com.metalancer.backend.creators.domain.SettlementRecordList;
+import com.metalancer.backend.creators.domain.SettlementReportList;
+import com.metalancer.backend.creators.domain.SettlementRequestInfo;
+import com.metalancer.backend.creators.domain.SettlementRequestList;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +29,12 @@ public interface SalesService {
     List<DaySalesReport> getProductsDaySalesReportByExcel(Long productsId,
         PrincipalDetails user, String beginDate,
         String endDate);
+
+    Boolean checkSettlementRequestAvailable(PrincipalDetails user);
+
+    Page<SettlementRequestList> getSettlementRequestList(PrincipalDetails user, Pageable pageable);
+
+    SettlementRequestInfo getSettlementRequestInfo(PrincipalDetails user);
+
+    Boolean createSettlementRequest(PrincipalDetails user);
 }

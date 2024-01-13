@@ -5,9 +5,13 @@ import com.metalancer.backend.category.entity.TagsEntity;
 import com.metalancer.backend.category.entity.TrendSpotlightTypeEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsTagEntity;
+import com.metalancer.backend.products.repository.ProductsTagJpaRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Repository;
 public class TagsRepositoryImpl implements TagsRepository {
 
     private final TagsJpaRepository tagsJpaRepository;
+    private final ProductsTagJpaRepository productsTagJpaRepository;
     private final GenreGalaxyTypeJpaRepository genreGalaxyTypeJpaRepository;
 
     @Override
@@ -103,6 +108,37 @@ public class TagsRepositoryImpl implements TagsRepository {
                 () -> new NotFoundException("TagsEntity: ", ErrorCode.NOT_FOUND)
             );
         return tagsEntity.getTagName();
+    }
+
+    @Override
+    public List<TagsEntity> findAllParentsTagName(int depth) {
+        return tagsJpaRepository.findAllByDepth(depth);
+    }
+
+    @Override
+    public List<TagsEntity> findAllParentsTagAndChildTagsByParentTag(TagsEntity parentTag) {
+        Long parentId = parentTag.getId();
+        List<TagsEntity> response = tagsJpaRepository.findAllByParentId(parentId);
+        response.add(parentTag);
+        return response;
+    }
+
+    @Override
+    public boolean productsHasAnyTagInTagList(ProductsEntity productsEntity,
+        List<TagsEntity> parentTagAndChildTagList) {
+        List<String> tagsNameProductsHas = productsTagJpaRepository.findAllByProductsEntityOrderByNameAsc(
+            productsEntity).stream().map(
+            ProductsTagEntity::getName).toList();
+        List<TagsEntity> tagsEntityProductsHas = new ArrayList<>();
+        for (String tagsName : tagsNameProductsHas) {
+            // 영문이나 한글 태그명
+            Optional<TagsEntity> tagsEntityOptional = tagsJpaRepository.findByTagNameOrTagNameEn(
+                tagsName);
+            tagsEntityOptional.ifPresent(tagsEntityProductsHas::add);
+        }
+        // 하나라도 포함되면 true
+        return tagsEntityProductsHas.stream()
+            .anyMatch(parentTagAndChildTagList::contains);
     }
 
     @Override

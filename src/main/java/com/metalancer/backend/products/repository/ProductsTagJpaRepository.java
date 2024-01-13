@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ProductsTagJpaRepository extends JpaRepository<ProductsTagEntity, Long> {
 
     List<ProductsTagEntity> findAllByProductsEntityOrderByNameAsc(ProductsEntity products);
+
 }

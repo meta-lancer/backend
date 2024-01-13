@@ -348,19 +348,25 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity, CurrencyType.USD);
         BigDecimal totalServiceChargeKRW = getChargeWithRate(serviceRate, totalSalesPriceKRW);
         BigDecimal totalServiceChargeUSD = getChargeWithRate(serviceRate, totalSalesPriceUSD);
-        BigDecimal totalFreeLancerChargeKRW = getChargeWithRate(freelancerRate,
-            totalSalesPriceKRW);
-        BigDecimal totalFreeLancerChargeUSD = getChargeWithRate(freelancerRate,
-            totalSalesPriceUSD);
         BigDecimal totalPortoneChargeKRW = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.KRW);
         BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.USD);
-        BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
-            .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW)
+
+        BigDecimal totalSettlementPriceKRWBeforeSubStractFreeLancerChargeKRW = totalSalesPriceKRW.subtract(
+            totalPortoneChargeKRW).subtract(totalServiceChargeKRW);
+        BigDecimal totalSettlementPriceUSDBeforeSubStractFreeLancerChargeUSD = totalSalesPriceUSD.subtract(
+            totalPortoneChargeUSD).subtract(totalServiceChargeUSD);
+        BigDecimal totalFreeLancerChargeKRW = getChargeWithRate(freelancerRate,
+            totalSettlementPriceKRWBeforeSubStractFreeLancerChargeKRW);
+        BigDecimal totalFreeLancerChargeUSD = getChargeWithRate(freelancerRate,
+            totalSettlementPriceUSDBeforeSubStractFreeLancerChargeUSD);
+
+        BigDecimal totalSettlementPriceKRW = totalSettlementPriceKRWBeforeSubStractFreeLancerChargeKRW.subtract(
+                totalFreeLancerChargeKRW)
             .setScale(0, RoundingMode.HALF_DOWN);
-        BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
-            .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD)
+        BigDecimal totalSettlementPriceUSD = totalSettlementPriceUSDBeforeSubStractFreeLancerChargeUSD.subtract(
+                totalFreeLancerChargeUSD)
             .setScale(0, RoundingMode.HALF_DOWN);
         return SettlementRequestInfo.builder()
             .totalSettlementPriceKRW(totalSettlementPriceKRW)
@@ -396,19 +402,25 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity, CurrencyType.USD);
         BigDecimal totalServiceChargeKRW = getChargeWithRate(serviceRate, totalSalesPriceKRW);
         BigDecimal totalServiceChargeUSD = getChargeWithRate(serviceRate, totalSalesPriceUSD);
-        BigDecimal totalFreeLancerChargeKRW = getChargeWithRate(freelancerRate,
-            totalSalesPriceKRW);
-        BigDecimal totalFreeLancerChargeUSD = getChargeWithRate(freelancerRate,
-            totalSalesPriceUSD);
         BigDecimal totalPortoneChargeKRW = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.KRW);
         BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.USD);
-        BigDecimal totalSettlementPriceKRW = totalSalesPriceKRW.subtract(totalFreeLancerChargeKRW)
-            .subtract(totalPortoneChargeKRW).subtract(totalServiceChargeKRW)
+
+        BigDecimal totalSettlementPriceKRWBeforeSubstractFreeLancerChargeKRW = totalSalesPriceKRW.subtract(
+            totalPortoneChargeKRW).subtract(totalServiceChargeKRW);
+        BigDecimal totalSettlementPriceUSDBeforeSubstractFreeLancerChargeUSD = totalSalesPriceUSD.subtract(
+            totalPortoneChargeUSD).subtract(totalServiceChargeUSD);
+        BigDecimal totalFreeLancerChargeKRW = getChargeWithRate(freelancerRate,
+            totalSettlementPriceKRWBeforeSubstractFreeLancerChargeKRW);
+        BigDecimal totalFreeLancerChargeUSD = getChargeWithRate(freelancerRate,
+            totalSettlementPriceUSDBeforeSubstractFreeLancerChargeUSD);
+
+        BigDecimal totalSettlementPriceKRW = totalSettlementPriceKRWBeforeSubstractFreeLancerChargeKRW.subtract(
+                totalFreeLancerChargeKRW)
             .setScale(0, RoundingMode.HALF_DOWN);
-        BigDecimal totalSettlementPriceUSD = totalSalesPriceUSD.subtract(totalFreeLancerChargeUSD)
-            .subtract(totalPortoneChargeUSD).subtract(totalServiceChargeUSD)
+        BigDecimal totalSettlementPriceUSD = totalSettlementPriceUSDBeforeSubstractFreeLancerChargeUSD.subtract(
+                totalFreeLancerChargeUSD)
             .setScale(0, RoundingMode.HALF_DOWN);
 
         // 공제 금액
@@ -454,18 +466,21 @@ public class SalesServiceImpl implements SalesService {
                     totalAmountKRW);
                 BigDecimal serviceChargeAmountUSD = getChargeWithRate(serviceRate,
                     totalAmountUSD);
+                BigDecimal settlementAmountKRWBeforeSubstractFreeLancerChargeKRW = totalAmountKRW
+                    .subtract(portoneChargeAmountKRW).subtract(serviceChargeAmountKRW);
+                BigDecimal settlementAmountKRWBeforeSubstractFreeLancerChargeUSD = totalAmountUSD
+                    .subtract(portoneChargeAmountUSD).subtract(serviceChargeAmountUSD);
+
                 BigDecimal freelancerChargeAmountKRW = getChargeWithRate(freelancerRate,
-                    totalAmountKRW);
+                    settlementAmountKRWBeforeSubstractFreeLancerChargeKRW);
                 BigDecimal freelancerChargeAmountUSD = getChargeWithRate(freelancerRate,
-                    totalAmountUSD);
+                    settlementAmountKRWBeforeSubstractFreeLancerChargeUSD);
                 // 버림 처리
-                BigDecimal settlementAmountKRW = totalAmountKRW.subtract(
+                BigDecimal settlementAmountKRW = settlementAmountKRWBeforeSubstractFreeLancerChargeKRW.subtract(
                         freelancerChargeAmountKRW)
-                    .subtract(portoneChargeAmountKRW).subtract(serviceChargeAmountKRW)
                     .setScale(0, RoundingMode.HALF_DOWN);
-                BigDecimal settlementAmountUSD = totalAmountUSD.subtract(
+                BigDecimal settlementAmountUSD = settlementAmountKRWBeforeSubstractFreeLancerChargeUSD.subtract(
                         freelancerChargeAmountUSD)
-                    .subtract(portoneChargeAmountUSD).subtract(serviceChargeAmountUSD)
                     .setScale(0, RoundingMode.HALF_DOWN);
 
                 SettlementProductsEntity settlementProductsEntity = SettlementProductsEntity.builder()

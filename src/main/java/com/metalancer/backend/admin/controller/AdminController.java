@@ -34,6 +34,10 @@ public class AdminController {
     @GetMapping("/role")
     public BaseResponse<Boolean> checkIfAdmin(
         @AuthenticationPrincipal PrincipalDetails user) {
+        if (user != null) {
+            log.info("어드민 여부 체크 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+                user.getUser().getName());
+        }
         return new BaseResponse<Boolean>(
             adminService.checkIfAdmin(user));
     }

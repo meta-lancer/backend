@@ -30,6 +30,7 @@ public class AdminInquiryController {
 
     @GetMapping("/list")
     public BaseResponse<Page<InquiryList>> getAdminInquiryList(
+        @AuthenticationPrincipal PrincipalDetails user,
         @Parameter(description = "페이징") Pageable pageable) {
         pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<InquiryList>>(
@@ -37,7 +38,8 @@ public class AdminInquiryController {
     }
 
     @GetMapping("/new/count")
-    public BaseResponse<Integer> getAdminInquiryNewCount() {
+    public BaseResponse<Integer> getAdminInquiryNewCount(
+        @AuthenticationPrincipal PrincipalDetails user) {
         return new BaseResponse<Integer>(
             adminInquiryService.getAdminInquiryNewCount());
     }
@@ -47,6 +49,9 @@ public class AdminInquiryController {
         @AuthenticationPrincipal PrincipalDetails user,
         @PathVariable("inquiryId") Long inquiryId,
         @RequestBody AdminMemberDTO.CreateUpdateReply dto) {
+        log.info("문의 답변 달기 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        log.info("문의 답변 달기 API dto - {}", dto);
         return new BaseResponse<Boolean>(
             adminInquiryService.replyInquiry(user, inquiryId, dto));
     }

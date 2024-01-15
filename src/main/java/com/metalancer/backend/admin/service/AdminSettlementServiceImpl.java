@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.AdminSettlementComplete;
+import com.metalancer.backend.admin.domain.AdminSettlementCreatorAndPrice;
 import com.metalancer.backend.admin.domain.AdminSettlementIng;
 import com.metalancer.backend.admin.domain.AdminSettlementReject;
 import com.metalancer.backend.admin.domain.AdminSettlementRequest;
@@ -65,11 +66,10 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
         return response;
     }
 
-    private AdminSettlementIng convertToAdminSettlementIng(
+    private AdminSettlementCreatorAndPrice convertToAdminSettlementBase(
         SettlementEntity settlementEntity) {
         Creator creator = settlementEntity.getCreatorEntity().toDomain();
-
-        return AdminSettlementIng.builder()
+        return AdminSettlementCreatorAndPrice.builder()
             .creator(creator)
             .settlementRequestId(settlementEntity.getId())
             .totalSalesPriceKRW(settlementEntity.getTotalAmountKRW())
@@ -82,70 +82,86 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             .totalFreeLancerChargeUSD(settlementEntity.getFreelancerChargeAmountUSD())
             .totalPortoneChargeKRW(settlementEntity.getPortoneChargeAmountKRW())
             .totalPortoneChargeUSD(settlementEntity.getPortoneChargeAmountUSD())
-            .processDate(Time.convertDateToFullString(settlementEntity.getProcessDate()))
             .build();
+    }
+
+    private AdminSettlementIng convertToAdminSettlementIng(
+        SettlementEntity settlementEntity) {
+        AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        return new AdminSettlementIng(
+            base.getCreator(),
+            base.getSettlementRequestId(),
+            base.getTotalSalesPriceKRW(),
+            base.getTotalSalesPriceUSD(),
+            base.getTotalSettlementPriceKRW(),
+            base.getTotalSettlementPriceUSD(),
+            base.getTotalServiceChargeKRW(),
+            base.getTotalServiceChargeUSD(),
+            base.getTotalFreeLancerChargeKRW(),
+            base.getTotalFreeLancerChargeUSD(),
+            base.getTotalPortoneChargeKRW(),
+            base.getTotalPortoneChargeUSD(),
+            Time.convertDateToFullString(settlementEntity.getProcessDate())
+        );
     }
 
     private AdminSettlementComplete convertToAdminSettlementComplete(
         SettlementEntity settlementEntity) {
-        Creator creator = settlementEntity.getCreatorEntity().toDomain();
-
-        return AdminSettlementComplete.builder()
-            .creator(creator)
-            .settlementRequestId(settlementEntity.getId())
-            .totalSalesPriceKRW(settlementEntity.getTotalAmountKRW())
-            .totalSalesPriceUSD(settlementEntity.getTotalAmountUSD())
-            .totalSettlementPriceKRW(BigDecimal.valueOf(settlementEntity.getSettlementAmountKRW()))
-            .totalSettlementPriceUSD(settlementEntity.getSettlementAmountUSD())
-            .totalServiceChargeKRW(settlementEntity.getServiceChargeAmountKRW())
-            .totalServiceChargeUSD(settlementEntity.getServiceChargeAmountUSD())
-            .totalFreeLancerChargeKRW(settlementEntity.getFreelancerChargeAmountKRW())
-            .totalFreeLancerChargeUSD(settlementEntity.getFreelancerChargeAmountUSD())
-            .totalPortoneChargeKRW(settlementEntity.getPortoneChargeAmountKRW())
-            .totalPortoneChargeUSD(settlementEntity.getPortoneChargeAmountUSD())
-            .settlementDate(Time.convertDateToFullString(settlementEntity.getSettlementDate()))
-            .build();
+        AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        return new AdminSettlementComplete(
+            base.getCreator(),
+            base.getSettlementRequestId(),
+            base.getTotalSalesPriceKRW(),
+            base.getTotalSalesPriceUSD(),
+            base.getTotalSettlementPriceKRW(),
+            base.getTotalSettlementPriceUSD(),
+            base.getTotalServiceChargeKRW(),
+            base.getTotalServiceChargeUSD(),
+            base.getTotalFreeLancerChargeKRW(),
+            base.getTotalFreeLancerChargeUSD(),
+            base.getTotalPortoneChargeKRW(),
+            base.getTotalPortoneChargeUSD(),
+            Time.convertDateToFullString(settlementEntity.getSettlementDate())
+        );
     }
 
     private AdminSettlementRequest convertToAdminSettlementRequest(
         SettlementEntity settlementEntity) {
-        Creator creator = settlementEntity.getCreatorEntity().toDomain();
-
-        return AdminSettlementRequest.builder()
-            .creator(creator)
-            .settlementRequestId(settlementEntity.getId())
-            .totalSalesPriceKRW(settlementEntity.getTotalAmountKRW())
-            .totalSalesPriceUSD(settlementEntity.getTotalAmountUSD())
-            .totalSettlementPriceKRW(BigDecimal.valueOf(settlementEntity.getSettlementAmountKRW()))
-            .totalSettlementPriceUSD(settlementEntity.getSettlementAmountUSD())
-            .totalServiceChargeKRW(settlementEntity.getServiceChargeAmountKRW())
-            .totalServiceChargeUSD(settlementEntity.getServiceChargeAmountUSD())
-            .totalFreeLancerChargeKRW(settlementEntity.getFreelancerChargeAmountKRW())
-            .totalFreeLancerChargeUSD(settlementEntity.getFreelancerChargeAmountUSD())
-            .totalPortoneChargeKRW(settlementEntity.getPortoneChargeAmountKRW())
-            .totalPortoneChargeUSD(settlementEntity.getPortoneChargeAmountUSD())
-            .requestDate(Time.convertDateToFullString(settlementEntity.getRequestDate()))
-            .build();
+        AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        return new AdminSettlementRequest(
+            base.getCreator(),
+            base.getSettlementRequestId(),
+            base.getTotalSalesPriceKRW(),
+            base.getTotalSalesPriceUSD(),
+            base.getTotalSettlementPriceKRW(),
+            base.getTotalSettlementPriceUSD(),
+            base.getTotalServiceChargeKRW(),
+            base.getTotalServiceChargeUSD(),
+            base.getTotalFreeLancerChargeKRW(),
+            base.getTotalFreeLancerChargeUSD(),
+            base.getTotalPortoneChargeKRW(),
+            base.getTotalPortoneChargeUSD(),
+            Time.convertDateToFullString(settlementEntity.getRequestDate())
+        );
     }
 
     private AdminSettlementReject convertToAdminSettlementReject(
         SettlementEntity settlementEntity) {
-        Creator creator = settlementEntity.getCreatorEntity().toDomain();
-
-        return AdminSettlementReject.builder()
-            .creator(creator)
-            .settlementRequestId(settlementEntity.getId())
-            .totalSalesPriceKRW(settlementEntity.getTotalAmountKRW())
-            .totalSalesPriceUSD(settlementEntity.getTotalAmountUSD())
-            .totalSettlementPriceKRW(BigDecimal.valueOf(settlementEntity.getSettlementAmountKRW()))
-            .totalSettlementPriceUSD(settlementEntity.getSettlementAmountUSD())
-            .totalServiceChargeKRW(settlementEntity.getServiceChargeAmountKRW())
-            .totalServiceChargeUSD(settlementEntity.getServiceChargeAmountUSD())
-            .totalFreeLancerChargeKRW(settlementEntity.getFreelancerChargeAmountKRW())
-            .totalFreeLancerChargeUSD(settlementEntity.getFreelancerChargeAmountUSD())
-            .totalPortoneChargeKRW(settlementEntity.getPortoneChargeAmountKRW())
-            .totalPortoneChargeUSD(settlementEntity.getPortoneChargeAmountUSD())
-            .rejectDate(Time.convertDateToFullString(settlementEntity.getRejectDate()))
-            .build();
+        AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        return new AdminSettlementReject(
+            base.getCreator(),
+            base.getSettlementRequestId(),
+            base.getTotalSalesPriceKRW(),
+            base.getTotalSalesPriceUSD(),
+            base.getTotalSettlementPriceKRW(),
+            base.getTotalSettlementPriceUSD(),
+            base.getTotalServiceChargeKRW(),
+            base.getTotalServiceChargeUSD(),
+            base.getTotalFreeLancerChargeKRW(),
+            base.getTotalFreeLancerChargeUSD(),
+            base.getTotalPortoneChargeKRW(),
+            base.getTotalPortoneChargeUSD(),
+            Time.convertDateToFullString(settlementEntity.getRejectDate())
+        );
     }
 }

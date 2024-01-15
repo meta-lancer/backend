@@ -2,7 +2,6 @@ package com.metalancer.backend.admin.domain;
 
 import com.metalancer.backend.users.domain.Creator;
 import java.math.BigDecimal;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -10,7 +9,6 @@ public class AdminSettlementRequest extends AdminSettlementCreatorAndPrice {
 
     private String requestDate;
 
-    @Builder
     public AdminSettlementRequest(Creator creator,
         Long settlementRequestId, BigDecimal totalSalesPriceKRW,
         BigDecimal totalSalesPriceUSD, BigDecimal totalSettlementPriceKRW,

@@ -272,4 +272,16 @@ public class User extends BaseEntity implements Serializable {
     public void setFirstNickName(String randomNickName) {
         this.nickname = randomNickName;
     }
+
+    public UserDomain toUserDomain() {
+        return UserDomain.builder()
+            .userId(id)
+            .email(email)
+            .nickname(nickname)
+            .role(role)
+            .mobile(mobile)
+            .profileImg(profileImg)
+            .loginType(loginType)
+            .build();
+    }
 }

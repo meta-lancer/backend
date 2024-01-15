@@ -1,5 +1,6 @@
 package com.metalancer.backend.orders.repository;
 
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.NotFoundException;
@@ -76,5 +77,10 @@ public class OrderPaymentRepositoryImpl implements OrderPaymentRepository {
         }
         long count = orderPaymentJpaRepository.countAllByUser(foundUser);
         return new PageImpl<>(payedOrderList, pageable, count);
+    }
+
+    @Override
+    public Page<OrderPaymentEntity> findAllByStatus(DataStatus dataStatus, Pageable pageable) {
+        return orderPaymentJpaRepository.findAllByStatus(dataStatus, pageable);
     }
 }

@@ -2,7 +2,11 @@ package com.metalancer.backend.orders.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.metalancer.backend.admin.domain.UserCompletedOrder;
 import com.metalancer.backend.common.BaseEntity;
+import com.metalancer.backend.common.constants.CurrencyType;
+import com.metalancer.backend.common.constants.PaymentType;
+import com.metalancer.backend.common.utils.Time;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -79,5 +83,20 @@ public class OrderPaymentEntity extends BaseEntity {
         ;
         this.paidStatus = paidStatus;
         this.pgTid = pgTid;
+    }
+
+    public UserCompletedOrder toUserCompletedOrder() {
+        String paymentMethod = method;
+        String paymentPgType = type;
+        return UserCompletedOrder.builder()
+            .user(ordersEntity.getOrderer().toUserDomain())
+            .orderId(ordersEntity.getId())
+            .orderNo(ordersEntity.getOrderNo())
+            .orderStatus(ordersEntity.getOrderStatus())
+            .price(paymentPrice)
+            .currencyType("KRW".equals(currency) ? CurrencyType.KRW : CurrencyType.USD)
+            .payMethod(PaymentType.getType(paymentMethod, paymentPgType))
+            .purchasedAt(Time.convertDateToFullString(purchasedAt))
+            .build();
     }
 }

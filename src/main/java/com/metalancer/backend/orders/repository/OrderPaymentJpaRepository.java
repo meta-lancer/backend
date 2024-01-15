@@ -38,4 +38,6 @@ public interface OrderPaymentJpaRepository extends JpaRepository<OrderPaymentEnt
 
     @Query("select count(op) from orders_payment op where op.ordersEntity.orderer = :user and op.status ='ACTIVE'")
     int countAllByUser(@Param("user") User user);
+
+    Page<OrderPaymentEntity> findAllByStatus(DataStatus dataStatus, Pageable pageable);
 }

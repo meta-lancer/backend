@@ -6,4 +6,6 @@ import java.util.List;
 public interface AdminOrdersStatService {
 
     List<OutLineOrdersStatList> getOutlineOrdersStat();
+
+    List<OutLineOrdersStatList> getAllOrdersStat();
 }

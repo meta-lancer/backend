@@ -28,4 +28,12 @@ public class AdminOrdersStatController {
         return new BaseResponse<List<OutLineOrdersStatList>>(
             adminOrdersStatService.getOutlineOrdersStat());
     }
+
+    @GetMapping("/list/all")
+    public BaseResponse<List<OutLineOrdersStatList>> getAllOrdersStat(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("getAllOrdersStat API 호출 - {}", user.getUser().getName());
+        return new BaseResponse<List<OutLineOrdersStatList>>(
+            adminOrdersStatService.getAllOrdersStat());
+    }
 }

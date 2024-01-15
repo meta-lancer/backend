@@ -56,4 +56,34 @@ public class AdminOrdersStatServiceImpl implements AdminOrdersStatService {
             .sorted(Comparator.comparing(OutLineOrdersStatList::getCnt).reversed()).limit(3)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public List<OutLineOrdersStatList> getAllOrdersStat() {
+        int depth = 2;
+        List<TagsEntity> parentTagList = tagsRepository.findAllParentsTagName(depth);
+        List<OutLineOrdersStatList> response = new ArrayList<>();
+        for (TagsEntity parentTag : parentTagList) {
+            OutLineOrdersStatList outLineOrdersStatList = parentTag.toOutLineOrdersStatList();
+            List<TagsEntity> parentTagAndChildTagList = tagsRepository.findAllParentsTagAndChildTagsByParentTag(
+                parentTag);
+            Integer cnt = 0;
+
+            List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrderProductStatusIsNotAndStatus(
+                OrderStatus.PAY_ING, DataStatus.ACTIVE);
+            // 하나라도 만족하면 cnt ++;
+            for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
+                ProductsEntity productsEntity = orderProductsEntity.getProductsEntity();
+                boolean productsHasAnyTagInTagList = tagsRepository.productsHasAnyTagInTagList(
+                    productsEntity, parentTagAndChildTagList);
+                if (productsHasAnyTagInTagList) {
+                    cnt++;
+                }
+            }
+            outLineOrdersStatList.setCnt(cnt);
+            response.add(outLineOrdersStatList);
+        }
+        return response.stream()
+            .sorted(Comparator.comparing(OutLineOrdersStatList::getCnt).reversed())
+            .collect(Collectors.toList());
+    }
 }

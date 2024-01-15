@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.entity;
 
+import com.metalancer.backend.admin.domain.AdminSettlementCreatorAndPrice;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.common.utils.Time;
@@ -46,9 +47,6 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     @Column(nullable = false)
     @Schema(name = "정산 상태")
     private SettlementStatus settlementStatus = SettlementStatus.REQUEST;
-    @Column(nullable = false)
-    @Schema(name = "요청일")
-    private LocalDateTime requestDay = LocalDateTime.now();
     @Schema(name = "총 판매 금액")
     private BigDecimal totalAmountKRW;
     @Schema(name = "정산받은 금액")
@@ -89,6 +87,14 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     private String referenceMemo;
     @Schema(name = "첨부파일")
     private String referenceFile;
+    @Column(nullable = false)
+    @Schema(name = "요청일")
+    private LocalDateTime requestDate = LocalDateTime.now();
+    @Schema(name = "접수일")
+    private LocalDateTime processDate = LocalDateTime.now();
+    @Schema(name = "거부일")
+    private LocalDateTime rejectDate = LocalDateTime.now();
+
 
     @Builder
     public SettlementEntity(CreatorEntity creatorEntity,
@@ -116,7 +122,7 @@ public class SettlementEntity extends BaseEntity implements Serializable {
 
     public SettlementRecordList toSettlementRecordList() {
         return SettlementRecordList.builder().settlementId(id)
-            .requestDay(Time.convertDateToString(requestDay))
+            .requestDay(Time.convertDateToString(requestDate))
             .currentSituation(currentSituation)
             .manager(manager).settlementStatus(settlementStatus).build();
     }
@@ -137,5 +143,34 @@ public class SettlementEntity extends BaseEntity implements Serializable {
         this.accountNo = accountNo;
         this.referenceMemo = referenceMemo;
         this.referenceFile = referenceFile;
+    }
+
+    public void settle() {
+        this.settlementDate = LocalDateTime.now();
+    }
+
+    public void process() {
+        this.processDate = LocalDateTime.now();
+    }
+
+    public void reject() {
+        this.rejectDate = LocalDateTime.now();
+    }
+
+    public AdminSettlementCreatorAndPrice toAdminSettlementCreatorAndPrice() {
+        return AdminSettlementCreatorAndPrice.builder()
+            .creator(creatorEntity.toDomain())
+            .settlementRequestId(id)
+            .totalSalesPriceKRW(totalAmountKRW)
+            .totalSalesPriceUSD(totalAmountUSD)
+            .totalSettlementPriceKRW(BigDecimal.valueOf(settlementAmountKRW))
+            .totalSettlementPriceUSD(settlementAmountUSD)
+            .totalServiceChargeKRW(serviceChargeAmountKRW)
+            .totalServiceChargeUSD(serviceChargeAmountUSD)
+            .totalFreeLancerChargeKRW(freelancerChargeAmountKRW)
+            .totalFreeLancerChargeUSD(freelancerChargeAmountUSD)
+            .totalPortoneChargeKRW(portoneChargeAmountKRW)
+            .totalPortoneChargeUSD(portoneChargeAmountUSD)
+            .build();
     }
 }

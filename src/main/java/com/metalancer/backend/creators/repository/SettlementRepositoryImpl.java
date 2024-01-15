@@ -1,6 +1,7 @@
 package com.metalancer.backend.creators.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.creators.entity.SettlementEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.time.LocalDateTime;
@@ -37,5 +38,11 @@ public class SettlementRepositoryImpl implements SettlementRepository {
     @Override
     public Optional<SettlementEntity> findById(Long id) {
         return settlementJpaRepository.findById(id);
+    }
+
+    @Override
+    public Page<SettlementEntity> findAllBySettlementStatus(SettlementStatus settlementStatus,
+        Pageable pageable) {
+        return settlementJpaRepository.findAllBySettlementStatus(settlementStatus, pageable);
     }
 }

@@ -1,6 +1,7 @@
 package com.metalancer.backend.creators.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.creators.entity.SettlementEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.util.Optional;
@@ -15,4 +16,7 @@ public interface SettlementJpaRepository extends JpaRepository<SettlementEntity,
 
     Optional<SettlementEntity> findFirstByCreatorEntityOrderByCreatedAtDesc(
         CreatorEntity creatorEntity);
+
+    Page<SettlementEntity> findAllBySettlementStatus(SettlementStatus settlementStatus,
+        Pageable pageable);
 }

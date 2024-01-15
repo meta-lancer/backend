@@ -163,7 +163,7 @@ public class SettlementEntity extends BaseEntity implements Serializable {
             .settlementRequestId(id)
             .totalSalesPriceKRW(totalAmountKRW)
             .totalSalesPriceUSD(totalAmountUSD)
-            .totalSettlementPriceKRW(BigDecimal.valueOf(settlementAmountKRW))
+            .totalSettlementPriceKRW(settlementAmountKRW)
             .totalSettlementPriceUSD(settlementAmountUSD)
             .totalServiceChargeKRW(serviceChargeAmountKRW)
             .totalServiceChargeUSD(serviceChargeAmountUSD)

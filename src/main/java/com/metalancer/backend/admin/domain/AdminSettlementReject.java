@@ -11,7 +11,7 @@ public class AdminSettlementReject extends AdminSettlementCreatorAndPrice {
 
     public AdminSettlementReject(Creator creator,
         Long settlementRequestId, BigDecimal totalSalesPriceKRW,
-        BigDecimal totalSalesPriceUSD, BigDecimal totalSettlementPriceKRW,
+        BigDecimal totalSalesPriceUSD, Integer totalSettlementPriceKRW,
         BigDecimal totalSettlementPriceUSD, BigDecimal totalServiceChargeKRW,
         BigDecimal totalServiceChargeUSD, BigDecimal totalFreeLancerChargeKRW,
         BigDecimal totalFreeLancerChargeUSD, BigDecimal totalPortoneChargeKRW,

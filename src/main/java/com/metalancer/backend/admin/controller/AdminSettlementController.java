@@ -8,6 +8,7 @@ import com.metalancer.backend.admin.domain.AdminSettlementRequest;
 import com.metalancer.backend.admin.service.AdminSettlementService;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.PageFunction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class AdminSettlementController {
         @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
         log.info("정산요청 request 목록 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
             user.getUser().getName());
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<AdminSettlementRequest>>(
             adminSettlementService.getAdminSettlementRequestList(pageable));
     }
@@ -39,6 +41,7 @@ public class AdminSettlementController {
         @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
         log.info("정산요청 ing 목록 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
             user.getUser().getName());
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<AdminSettlementIng>>(
             adminSettlementService.getAdminSettlementIngList(pageable));
     }
@@ -48,6 +51,7 @@ public class AdminSettlementController {
         @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
         log.info("정산요청 complete 목록 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
             user.getUser().getName());
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<AdminSettlementComplete>>(
             adminSettlementService.getAdminSettlementCompleteList(pageable));
     }
@@ -57,6 +61,7 @@ public class AdminSettlementController {
         @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
         log.info("정산요청 request 목록 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
             user.getUser().getName());
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<AdminSettlementReject>>(
             adminSettlementService.getAdminSettlementRejectList(pageable));
     }

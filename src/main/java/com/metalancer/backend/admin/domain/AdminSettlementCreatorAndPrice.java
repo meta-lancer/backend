@@ -12,7 +12,7 @@ public class AdminSettlementCreatorAndPrice {
     private Long settlementRequestId;
     private BigDecimal totalSalesPriceKRW;
     private BigDecimal totalSalesPriceUSD;
-    private BigDecimal totalSettlementPriceKRW;
+    private Integer totalSettlementPriceKRW;
     private BigDecimal totalSettlementPriceUSD;
     private BigDecimal totalServiceChargeKRW;
     private BigDecimal totalServiceChargeUSD;
@@ -24,7 +24,7 @@ public class AdminSettlementCreatorAndPrice {
     @Builder
     public AdminSettlementCreatorAndPrice(Creator creator, Long settlementRequestId,
         BigDecimal totalSalesPriceKRW,
-        BigDecimal totalSalesPriceUSD, BigDecimal totalSettlementPriceKRW,
+        BigDecimal totalSalesPriceUSD, Integer totalSettlementPriceKRW,
         BigDecimal totalSettlementPriceUSD, BigDecimal totalServiceChargeKRW,
         BigDecimal totalServiceChargeUSD, BigDecimal totalFreeLancerChargeKRW,
         BigDecimal totalFreeLancerChargeUSD, BigDecimal totalPortoneChargeKRW,

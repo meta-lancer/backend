@@ -11,7 +11,6 @@ import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.entity.SettlementEntity;
 import com.metalancer.backend.creators.repository.SettlementRepository;
 import com.metalancer.backend.users.domain.Creator;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -74,7 +73,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             .settlementRequestId(settlementEntity.getId())
             .totalSalesPriceKRW(settlementEntity.getTotalAmountKRW())
             .totalSalesPriceUSD(settlementEntity.getTotalAmountUSD())
-            .totalSettlementPriceKRW(BigDecimal.valueOf(settlementEntity.getSettlementAmountKRW()))
+            .totalSettlementPriceKRW(settlementEntity.getSettlementAmountKRW())
             .totalSettlementPriceUSD(settlementEntity.getSettlementAmountUSD())
             .totalServiceChargeKRW(settlementEntity.getServiceChargeAmountKRW())
             .totalServiceChargeUSD(settlementEntity.getServiceChargeAmountUSD())

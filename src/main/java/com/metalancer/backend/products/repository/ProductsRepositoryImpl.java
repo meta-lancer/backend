@@ -399,8 +399,10 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     private static LocalDateTime getStartDateTimeWeeklyOrMonthly(PeriodType period,
         LocalDateTime endDateTime) {
         LocalDateTime startDateTime = null;
-        if (period.equals(PeriodType.WEEKLY)) {
+        if (PeriodType.WEEKLY.equals(period)) {
             startDateTime = endDateTime.minusWeeks(1);
+        } else if (PeriodType.SIX_MONTHS.equals(period)) {
+            startDateTime = endDateTime.minusMonths(6);
         } else {
             startDateTime = endDateTime.minusMonths(1);
         }

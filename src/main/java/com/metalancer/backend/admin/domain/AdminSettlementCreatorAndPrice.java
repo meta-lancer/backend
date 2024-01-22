@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.domain;
 
 import com.metalancer.backend.common.constants.SettlementStatus;
+import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.users.domain.Creator;
 import java.math.BigDecimal;
 import lombok.Builder;
@@ -10,6 +11,8 @@ import lombok.Getter;
 public class AdminSettlementCreatorAndPrice {
 
     private final Creator creator;
+    private final PaymentInfoManagement paymentInfoManagement;
+    private final AdminManager adminManager;
     private final Long settlementRequestId;
     private final BigDecimal totalSalesPriceKRW;
     private final BigDecimal totalSalesPriceUSD;
@@ -34,7 +37,8 @@ public class AdminSettlementCreatorAndPrice {
         BigDecimal totalServiceChargeUSD, BigDecimal totalFreeLancerChargeKRW,
         BigDecimal totalFreeLancerChargeUSD, BigDecimal totalPortoneChargeKRW,
         BigDecimal totalPortoneChargeUSD, SettlementStatus settlementStatus,
-        Integer settlementSalesCnt) {
+        Integer settlementSalesCnt, PaymentInfoManagement paymentInfoManagement,
+        AdminManager adminManager) {
         this.creator = creator;
         this.settlementRequestId = settlementRequestId;
         this.totalSalesPriceKRW = totalSalesPriceKRW;
@@ -49,5 +53,7 @@ public class AdminSettlementCreatorAndPrice {
         this.totalPortoneChargeUSD = totalPortoneChargeUSD;
         this.settlementStatus = settlementStatus;
         this.settlementSalesCnt = settlementSalesCnt;
+        this.paymentInfoManagement = paymentInfoManagement;
+        this.adminManager = adminManager;
     }
 }

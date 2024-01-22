@@ -2,6 +2,7 @@ package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.LoginType;
+import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.users.entity.User;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -37,4 +38,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select count(u) from users u left join creators c on u = c.user where c.id is not null")
     Integer getCreatorUserCnt();
 
+    Optional<User> findByNameAndRoleAndStatus(String id, Role role, DataStatus status);
 }

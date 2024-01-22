@@ -1,6 +1,7 @@
 package com.metalancer.backend.creators.repository;
 
 import com.metalancer.backend.common.constants.SettlementStatus;
+import com.metalancer.backend.creators.entity.SettlementEntity;
 import com.metalancer.backend.creators.entity.SettlementProductsEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
@@ -36,5 +37,11 @@ public class SettlementProductsRepositoryImpl implements SettlementProductsRepos
         int processCnt = settlementProductsJpaRepository.findAllByCreatorEntityAndSettlementStatus(
             creatorEntity, SettlementStatus.ING);
         return requestCnt + processCnt;
+    }
+
+    @Override
+    public Integer countAllBySettlement(SettlementEntity settlementEntity) {
+        return settlementProductsJpaRepository.findAllBySettlementEntity(settlementEntity).stream()
+            .mapToInt(SettlementProductsEntity::getSalesQuantity).sum();
     }
 }

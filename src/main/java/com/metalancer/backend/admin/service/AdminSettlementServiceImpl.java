@@ -9,6 +9,7 @@ import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.entity.SettlementEntity;
+import com.metalancer.backend.creators.repository.SettlementProductsRepository;
 import com.metalancer.backend.creators.repository.SettlementRepository;
 import com.metalancer.backend.users.domain.Creator;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     private final SettlementRepository settlementRepository;
+    private final SettlementProductsRepository settlementProductsRepository;
 
     @Override
     public Page<AdminSettlementRequest> getAdminSettlementRequestList(
@@ -87,6 +89,8 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
     private AdminSettlementIng convertToAdminSettlementIng(
         SettlementEntity settlementEntity) {
         AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        Integer settlementSalesCnt = settlementProductsRepository.countAllBySettlement(
+            settlementEntity);
         return new AdminSettlementIng(
             base.getCreator(),
             base.getSettlementRequestId(),
@@ -100,13 +104,17 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             base.getTotalFreeLancerChargeUSD(),
             base.getTotalPortoneChargeKRW(),
             base.getTotalPortoneChargeUSD(),
-            Time.convertDateToFullString(settlementEntity.getProcessDate())
+            Time.convertDateToFullString(settlementEntity.getProcessDate()),
+            settlementEntity.getSettlementStatus(),
+            settlementSalesCnt
         );
     }
 
     private AdminSettlementComplete convertToAdminSettlementComplete(
         SettlementEntity settlementEntity) {
         AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        Integer settlementSalesCnt = settlementProductsRepository.countAllBySettlement(
+            settlementEntity);
         return new AdminSettlementComplete(
             base.getCreator(),
             base.getSettlementRequestId(),
@@ -120,13 +128,17 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             base.getTotalFreeLancerChargeUSD(),
             base.getTotalPortoneChargeKRW(),
             base.getTotalPortoneChargeUSD(),
-            Time.convertDateToFullString(settlementEntity.getSettlementDate())
+            Time.convertDateToFullString(settlementEntity.getSettlementDate()),
+            settlementEntity.getSettlementStatus(),
+            settlementSalesCnt
         );
     }
 
     private AdminSettlementRequest convertToAdminSettlementRequest(
         SettlementEntity settlementEntity) {
         AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        Integer settlementSalesCnt = settlementProductsRepository.countAllBySettlement(
+            settlementEntity);
         return new AdminSettlementRequest(
             base.getCreator(),
             base.getSettlementRequestId(),
@@ -140,13 +152,17 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             base.getTotalFreeLancerChargeUSD(),
             base.getTotalPortoneChargeKRW(),
             base.getTotalPortoneChargeUSD(),
-            Time.convertDateToFullString(settlementEntity.getRequestDate())
+            Time.convertDateToFullString(settlementEntity.getRequestDate()),
+            settlementEntity.getSettlementStatus(),
+            settlementSalesCnt
         );
     }
 
     private AdminSettlementReject convertToAdminSettlementReject(
         SettlementEntity settlementEntity) {
         AdminSettlementCreatorAndPrice base = convertToAdminSettlementBase(settlementEntity);
+        Integer settlementSalesCnt = settlementProductsRepository.countAllBySettlement(
+            settlementEntity);
         return new AdminSettlementReject(
             base.getCreator(),
             base.getSettlementRequestId(),
@@ -160,7 +176,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             base.getTotalFreeLancerChargeUSD(),
             base.getTotalPortoneChargeKRW(),
             base.getTotalPortoneChargeUSD(),
-            Time.convertDateToFullString(settlementEntity.getRejectDate())
+            Time.convertDateToFullString(settlementEntity.getRejectDate()),
+            settlementEntity.getSettlementStatus(),
+            settlementSalesCnt
         );
     }
 }

@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface SettlementProductsJpaRepository extends
     JpaRepository<SettlementProductsEntity, Long> {
 
-    List<SettlementProductsEntity> findAllByProductsEntityAndSettlementStatus(
-        ProductsEntity productsEntity, SettlementStatus settlementStatus);
+    List<SettlementProductsEntity> findAllByProductsEntityAndSettlementStatusIn(
+        ProductsEntity productsEntity, List<SettlementStatus> settlementStatus);
 
     int findAllByCreatorEntityAndSettlementStatus(CreatorEntity creatorEntity,
         SettlementStatus settlementStatus);

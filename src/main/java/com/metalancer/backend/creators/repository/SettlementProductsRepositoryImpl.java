@@ -16,9 +16,9 @@ public class SettlementProductsRepositoryImpl implements SettlementProductsRepos
 
     @Override
     public int countAllByProducts(ProductsEntity productsEntity,
-        SettlementStatus settlementStatus) {
-        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsJpaRepository.findAllByProductsEntityAndSettlementStatus(
-            productsEntity, settlementStatus);
+        List<SettlementStatus> settlementStatusList) {
+        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsJpaRepository.findAllByProductsEntityAndSettlementStatusIn(
+            productsEntity, settlementStatusList);
         return settlementProductsEntityList.stream()
             .mapToInt(SettlementProductsEntity::getSalesQuantity)
             .sum();

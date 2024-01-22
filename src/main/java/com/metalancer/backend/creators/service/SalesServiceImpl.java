@@ -365,9 +365,10 @@ public class SalesServiceImpl implements SalesService {
         BigDecimal totalSettlementPriceKRW = totalSettlementPriceKRWBeforeSubStractFreeLancerChargeKRW.subtract(
                 totalFreeLancerChargeKRW)
             .setScale(0, RoundingMode.HALF_DOWN);
-        BigDecimal totalSettlementPriceUSD = totalSettlementPriceUSDBeforeSubStractFreeLancerChargeUSD.subtract(
-                totalFreeLancerChargeUSD)
-            .setScale(0, RoundingMode.HALF_DOWN);
+        BigDecimal totalSettlementPriceUSD = (totalSettlementPriceUSDBeforeSubStractFreeLancerChargeUSD.subtract(
+            totalFreeLancerChargeUSD)).multiply(BigDecimal.valueOf(100))
+            .setScale(0, RoundingMode.HALF_DOWN)
+            .divide(BigDecimal.valueOf(100));
         return SettlementRequestInfo.builder()
             .totalSettlementPriceKRW(totalSettlementPriceKRW)
             .totalSettlementPriceUSD(totalSettlementPriceUSD)
@@ -420,8 +421,9 @@ public class SalesServiceImpl implements SalesService {
                 totalFreeLancerChargeKRW)
             .setScale(0, RoundingMode.HALF_DOWN);
         BigDecimal totalSettlementPriceUSD = totalSettlementPriceUSDBeforeSubstractFreeLancerChargeUSD.subtract(
-                totalFreeLancerChargeUSD)
-            .setScale(0, RoundingMode.HALF_DOWN);
+                totalFreeLancerChargeUSD).multiply(BigDecimal.valueOf(100))
+            .setScale(0, RoundingMode.HALF_DOWN)
+            .divide(BigDecimal.valueOf(100));
 
         // 공제 금액
         BigDecimal deductAmountKRW = BigDecimal.valueOf(0);

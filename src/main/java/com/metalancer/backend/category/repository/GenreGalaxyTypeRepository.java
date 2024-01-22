@@ -8,6 +8,8 @@ public interface GenreGalaxyTypeRepository {
 
     List<MainCategory> getGenreGalaxyCategoryList();
 
+    List<MainCategory> getGenreGalaxyCategoryListWithUseYnTrue();
+
     GenreGalaxyTypeEntity findByName(String type);
 
     List<MainCategory> getGenreGalaxyCategoryListWithOutAll();

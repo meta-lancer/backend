@@ -6,4 +6,6 @@ import java.util.List;
 public interface HotPickTypeRepository {
 
     List<MainCategory> getHotPickCategoryList();
+
+    List<MainCategory> getHotPickCategoryListWithUseYnTrue();
 }

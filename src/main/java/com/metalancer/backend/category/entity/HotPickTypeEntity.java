@@ -32,6 +32,7 @@ public class HotPickTypeEntity extends BaseTimeEntity implements Serializable {
 
     private String name;
     private String nameKor;
+    private boolean useYn = true;
 
     @Builder
     public HotPickTypeEntity(String name, String nameKor) {
@@ -41,5 +42,9 @@ public class HotPickTypeEntity extends BaseTimeEntity implements Serializable {
 
     public MainCategory ToMainCategory() {
         return MainCategory.builder().name(name).nameKor(nameKor).build();
+    }
+
+    public void toggleUse(boolean useYn) {
+        this.useYn = useYn;
     }
 }

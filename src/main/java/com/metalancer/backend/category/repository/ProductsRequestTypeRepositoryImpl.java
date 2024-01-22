@@ -18,4 +18,10 @@ public class ProductsRequestTypeRepositoryImpl implements ProductsRequestTypeRep
         return productsRequestTypeJpaRepository.findAll().stream()
             .map(ProductsRequestTypeEntity::ToRequestCategory).collect(Collectors.toList());
     }
+
+    @Override
+    public List<RequestCategory> getRequestCategoryListWithUseYn() {
+        return productsRequestTypeJpaRepository.findAllByUseYnTrue().stream()
+            .map(ProductsRequestTypeEntity::ToRequestCategory).collect(Collectors.toList());
+    }
 }

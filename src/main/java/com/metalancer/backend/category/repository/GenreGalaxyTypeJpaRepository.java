@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface GenreGalaxyTypeJpaRepository extends JpaRepository<GenreGalaxyTypeEntity, Long> {
 
+    List<GenreGalaxyTypeEntity> findAllByUseYnTrue();
+
     @Query("select ggt from genre_galaxy_type ggt where ggt.tagsEntity.tagNameEn = :name")
     Optional<GenreGalaxyTypeEntity> findByName(@Param("name") String name);
 

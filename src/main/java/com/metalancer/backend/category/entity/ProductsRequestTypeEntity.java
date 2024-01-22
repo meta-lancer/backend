@@ -34,6 +34,7 @@ public class ProductsRequestTypeEntity extends BaseTimeEntity implements Seriali
     private String name;
     @Column(nullable = false)
     private String nameKor;
+    private boolean useYn;
 
     @Builder
     public ProductsRequestTypeEntity(String name, String nameKor) {
@@ -43,5 +44,9 @@ public class ProductsRequestTypeEntity extends BaseTimeEntity implements Seriali
 
     public RequestCategory ToRequestCategory() {
         return RequestCategory.builder().name(name).nameKor(nameKor).build();
+    }
+
+    public void toggleUseYn(boolean useYn) {
+        this.useYn = useYn;
     }
 }

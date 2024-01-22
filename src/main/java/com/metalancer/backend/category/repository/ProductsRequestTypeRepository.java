@@ -6,4 +6,6 @@ import java.util.List;
 public interface ProductsRequestTypeRepository {
 
     List<RequestCategory> getRequestCategoryList();
+
+    List<RequestCategory> getRequestCategoryListWithUseYn();
 }

@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.repository;
 
+import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.creators.entity.SettlementProductsEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import java.util.List;
@@ -13,9 +14,10 @@ public class SettlementProductsRepositoryImpl implements SettlementProductsRepos
     private final SettlementProductsJpaRepository settlementProductsJpaRepository;
 
     @Override
-    public int countAllByProducts(ProductsEntity productsEntity) {
-        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsJpaRepository.findAllByProductsEntity(
-            productsEntity);
+    public int countAllByProducts(ProductsEntity productsEntity,
+        SettlementStatus settlementStatus) {
+        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsJpaRepository.findAllByProductsEntityAndSettlementStatus(
+            productsEntity, settlementStatus);
         return settlementProductsEntityList.stream()
             .mapToInt(SettlementProductsEntity::getSalesQuantity)
             .sum();

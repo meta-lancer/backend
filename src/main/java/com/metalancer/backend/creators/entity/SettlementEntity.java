@@ -72,7 +72,7 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     @Schema(name = "공제 금액(환불, 분쟁 시)")
     private BigDecimal deductAmountUSD;
     @Schema(name = "현황")
-    private String currentSituation;
+    private String currentSituation = "정산 요청";
     @Schema(name = "담당자")
     private String manager;
     @Schema(name = "처리일")

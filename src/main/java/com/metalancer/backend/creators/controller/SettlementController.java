@@ -77,7 +77,7 @@ public class SettlementController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         AuthUtils.validateUserAuthentication(user);
-        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(salesService.getSettlementReportList(user, pageable));
     }
 
@@ -88,7 +88,7 @@ public class SettlementController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         AuthUtils.validateUserAuthentication(user);
-        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(salesService.getSettlementRecordList(user, pageable));
     }
 

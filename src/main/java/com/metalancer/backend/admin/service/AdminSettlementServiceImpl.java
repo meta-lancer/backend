@@ -17,6 +17,7 @@ import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
 import com.metalancer.backend.creators.entity.SettlementEntity;
+import com.metalancer.backend.creators.entity.SettlementProductsEntity;
 import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
 import com.metalancer.backend.creators.repository.SettlementProductsRepository;
 import com.metalancer.backend.creators.repository.SettlementRepository;
@@ -24,6 +25,7 @@ import com.metalancer.backend.users.domain.Creator;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -267,5 +269,47 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             );
         settlementEntity.addManage(adminUser.getName());
         return settlementEntity.getManager().equals(adminUser.getName());
+    }
+
+    @Override
+    public Boolean processSettlementStatus(PrincipalDetails user, Long settlementRequestId) {
+        User adminUser = user.getUser();
+        SettlementEntity settlementEntity = settlementRepository.findById(settlementRequestId)
+            .orElseThrow(
+                () -> new NotFoundException("정산요청", ErrorCode.NOT_FOUND)
+            );
+        settlementEntity.process();
+        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsRepository.findAllBySettlementEntity(
+            settlementEntity);
+        settlementProductsEntityList.forEach(SettlementProductsEntity::process);
+        return SettlementStatus.ING.equals(settlementEntity.getSettlementStatus());
+    }
+
+    @Override
+    public Boolean completeSettlementStatus(PrincipalDetails user, Long settlementRequestId) {
+        User adminUser = user.getUser();
+        SettlementEntity settlementEntity = settlementRepository.findById(settlementRequestId)
+            .orElseThrow(
+                () -> new NotFoundException("정산요청", ErrorCode.NOT_FOUND)
+            );
+        settlementEntity.settle();
+        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsRepository.findAllBySettlementEntity(
+            settlementEntity);
+        settlementProductsEntityList.forEach(SettlementProductsEntity::settle);
+        return SettlementStatus.COMPLETE.equals(settlementEntity.getSettlementStatus());
+    }
+
+    @Override
+    public Boolean rejectSettlementStatus(PrincipalDetails user, Long settlementRequestId) {
+        User adminUser = user.getUser();
+        SettlementEntity settlementEntity = settlementRepository.findById(settlementRequestId)
+            .orElseThrow(
+                () -> new NotFoundException("정산요청", ErrorCode.NOT_FOUND)
+            );
+        settlementEntity.reject();
+        List<SettlementProductsEntity> settlementProductsEntityList = settlementProductsRepository.findAllBySettlementEntity(
+            settlementEntity);
+        settlementProductsEntityList.forEach(SettlementProductsEntity::reject);
+        return SettlementStatus.REJECT.equals(settlementEntity.getSettlementStatus());
     }
 }

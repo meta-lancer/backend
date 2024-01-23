@@ -44,4 +44,10 @@ public class SettlementProductsRepositoryImpl implements SettlementProductsRepos
         return settlementProductsJpaRepository.findAllBySettlementEntity(settlementEntity).stream()
             .mapToInt(SettlementProductsEntity::getSalesQuantity).sum();
     }
+
+    @Override
+    public List<SettlementProductsEntity> findAllBySettlementEntity(
+        SettlementEntity settlementEntity) {
+        return settlementProductsJpaRepository.findAllBySettlementEntity(settlementEntity);
+    }
 }

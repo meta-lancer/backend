@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,4 +80,38 @@ public class AdminSettlementController {
         return new BaseResponse<Boolean>(
             adminSettlementService.addManagerOfSettlement(user, settlementRequestId));
     }
+
+    @PatchMapping("/{settlementRequestId}/process")
+    public BaseResponse<Boolean> processSettlementStatus(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable Long settlementRequestId) {
+        log.info("정산요청 심사 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            adminSettlementService.processSettlementStatus(user, settlementRequestId));
+    }
+
+    @PatchMapping("/{settlementRequestId}/complete")
+    public BaseResponse<Boolean> completeSettlementStatus(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable Long settlementRequestId) {
+        log.info("정산요청 완료 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            adminSettlementService.completeSettlementStatus(user, settlementRequestId));
+    }
+
+    @PatchMapping("/{settlementRequestId}/reject")
+    public BaseResponse<Boolean> rejectSettlementStatus(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable Long settlementRequestId) {
+        log.info("정산요청 반려 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            adminSettlementService.rejectSettlementStatus(user, settlementRequestId));
+    }
+
 }

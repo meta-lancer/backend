@@ -162,14 +162,17 @@ public class SettlementEntity extends BaseEntity implements Serializable {
     }
 
     public void settle() {
+        this.settlementStatus = SettlementStatus.COMPLETE;
         this.settlementDate = LocalDateTime.now();
     }
 
     public void process() {
+        this.settlementStatus = SettlementStatus.ING;
         this.processDate = LocalDateTime.now();
     }
 
     public void reject() {
+        this.settlementStatus = SettlementStatus.REJECT;
         this.rejectDate = LocalDateTime.now();
     }
 

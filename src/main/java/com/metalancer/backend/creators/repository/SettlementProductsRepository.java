@@ -16,4 +16,7 @@ public interface SettlementProductsRepository {
     int countAllRemainByCreator(CreatorEntity creatorEntity);
 
     Integer countAllBySettlement(SettlementEntity settlementEntity);
+
+    List<SettlementProductsEntity> findAllBySettlementEntity(SettlementEntity settlementEntity);
+    
 }

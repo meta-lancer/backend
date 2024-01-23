@@ -19,4 +19,10 @@ public interface AdminSettlementService {
     Page<AdminSettlementReject> getAdminSettlementRejectList(Pageable pageable);
 
     Boolean addManagerOfSettlement(PrincipalDetails user, Long settlementRequestId);
+
+    Boolean processSettlementStatus(PrincipalDetails user, Long settlementRequestId);
+
+    Boolean completeSettlementStatus(PrincipalDetails user, Long settlementRequestId);
+
+    Boolean rejectSettlementStatus(PrincipalDetails user, Long settlementRequestId);
 }

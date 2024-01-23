@@ -12,7 +12,12 @@ public class AdminSettlementCreatorAndPrice {
 
     private final Creator creator;
     private final PaymentInfoManagement paymentInfoManagement;
-    private final AdminManager adminManager;
+    //    private final AdminManager adminManager;
+    private Long adminMemberId;
+    private String adminName;
+    private String adminNickname;
+    private String adminMobile;
+    private String adminEmail;
     private final Long settlementRequestId;
     private final BigDecimal totalSalesPriceKRW;
     private final BigDecimal totalSalesPriceUSD;
@@ -54,7 +59,11 @@ public class AdminSettlementCreatorAndPrice {
         this.settlementStatus = settlementStatus;
         this.settlementSalesCnt = settlementSalesCnt;
         this.paymentInfoManagement = paymentInfoManagement;
-        this.adminManager = adminManager;
+        this.adminMemberId = adminManager != null ? adminManager.getAdminMemberId() : null;
+        this.adminName = adminManager != null ? adminManager.getAdminName() : null;
+        this.adminNickname = adminManager != null ? adminManager.getAdminNickname() : null;
+        this.adminMobile = adminManager != null ? adminManager.getAdminMobile() : null;
+        this.adminEmail = adminManager != null ? adminManager.getAdminEmail() : null;
         this.referenceMemo = referenceMemo;
         this.referenceFile = referenceFile;
     }

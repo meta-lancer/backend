@@ -103,6 +103,19 @@ public class SettlementProductsEntity extends BaseEntity implements Serializable
         return this.salesQuantity;
     }
 
+    public void settle() {
+        this.settlementStatus = SettlementStatus.COMPLETE;
+        this.settlementDate = LocalDateTime.now();
+    }
+
+    public void process() {
+        this.settlementStatus = SettlementStatus.ING;
+    }
+
+    public void reject() {
+        this.settlementStatus = SettlementStatus.REJECT;
+    }
+
     @Builder
     public SettlementProductsEntity(CreatorEntity creatorEntity, ProductsEntity productsEntity,
         SettlementEntity settlementEntity, int salesQuantity,

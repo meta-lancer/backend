@@ -14,7 +14,7 @@ public interface SettlementProductsJpaRepository extends
     List<SettlementProductsEntity> findAllByProductsEntityAndSettlementStatusIn(
         ProductsEntity productsEntity, List<SettlementStatus> settlementStatus);
 
-    int findAllByCreatorEntityAndSettlementStatus(CreatorEntity creatorEntity,
+    int countAllByCreatorEntityAndSettlementStatus(CreatorEntity creatorEntity,
         SettlementStatus settlementStatus);
 
     List<SettlementProductsEntity> findAllBySettlementEntity(SettlementEntity settlementEntity);

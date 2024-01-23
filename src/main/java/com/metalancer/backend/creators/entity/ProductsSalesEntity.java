@@ -50,6 +50,8 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
     private ProductsEntity productsEntity;
     @Column(name = "orderer_Id", nullable = false)
     private Long ordererId;
+    @Column(name = "settlement_Id")
+    private Long settlementId;
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
@@ -90,8 +92,9 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
         this.currency = currency;
     }
 
-    public void setSettled() {
+    public void setSettled(SettlementEntity settlementEntity) {
         this.settled = true;
+        this.settlementId = settlementEntity.getId();
     }
 
     public SettlementRequestList toSettlementRequestList() {
@@ -99,4 +102,5 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
             .assetTitle(productsEntity.getTitle()).price(price).currencyType(currency)
             .chargeRate(chargeRate).paymentType(paymentType).build();
     }
+
 }

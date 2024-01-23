@@ -57,28 +57,40 @@ public class SettlementProductsEntity extends BaseEntity implements Serializable
     @Schema(name = "요청일")
     private LocalDateTime requestDay;
     @Schema(name = "총 판매 금액")
+    @Column(name = "total_amount_krw")
     private BigDecimal totalAmountKRW;
     @Schema(name = "정산받은 금액")
+    @Column(name = "settlement_amount_krw")
     private Integer settlementAmountKRW;
     @Schema(name = "카드사 수수료 금액")
+    @Column(name = "portone_charge_amount_krw")
     private BigDecimal portoneChargeAmountKRW;
     @Schema(name = "서비스 수수료 금액")
+    @Column(name = "service_charge_amount_krw")
     private BigDecimal serviceChargeAmountKRW;
     @Schema(name = "프리랜서 수수료 금액")
+    @Column(name = "freelancer_charge_amount_krw")
     private BigDecimal freelancerChargeAmountKRW;
     @Schema(name = "공제 금액(환불, 분쟁 시)")
+    @Column(name = "deduct_amount_krw")
     private BigDecimal deductAmountKRW;
     @Schema(name = "총 판매 금액")
+    @Column(name = "total_amount_usd")
     private BigDecimal totalAmountUSD;
     @Schema(name = "정산받은 금액")
+    @Column(name = "settlement_amount_usd")
     private BigDecimal settlementAmountUSD;
     @Schema(name = "카드사 수수료 금액")
+    @Column(name = "portone_charge_amount_usd")
     private BigDecimal portoneChargeAmountUSD;
     @Schema(name = "서비스 수수료 금액")
+    @Column(name = "service_charge_amount_usd")
     private BigDecimal serviceChargeAmountUSD;
     @Schema(name = "프리랜서 수수료 금액")
+    @Column(name = "freelancer_charge_amount_usd")
     private BigDecimal freelancerChargeAmountUSD;
     @Schema(name = "공제 금액(환불, 분쟁 시)")
+    @Column(name = "deduct_amount_usd")
     private BigDecimal deductAmountUSD;
     @Schema(name = "처리일")
     private LocalDateTime settlementDate;

@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
 import com.metalancer.backend.common.constants.ServiceChargesType;
+import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.DaySalesReport;
@@ -189,19 +190,28 @@ public class SalesServiceImpl implements SalesService {
             pageable);
         long totalCnt = productsEntityList.getTotalElements();
         List<SettlementReportList> reportLists = new ArrayList<>();
+        List<SettlementStatus> settlementStatusList = new ArrayList<>();
+        settlementStatusList.add(SettlementStatus.COMPLETE);
+        settlementStatusList.add(SettlementStatus.REJECT);
+
+        List<SettlementStatus> settlementProcessStatusList = new ArrayList<>();
+        settlementProcessStatusList.add(SettlementStatus.REJECT);
+        settlementProcessStatusList.add(SettlementStatus.ING);
 
         for (ProductsEntity productsEntity : productsEntityList.getContent()) {
             // 정산 요청 - 정산 요청된 상품 목록 이런식으로...!
-            // 판매한 갯수와 정산 요청된 갯수가 같다면 true, 아니면 false(판매갯수 0이라면도 추가!)
             boolean hasSettled = false;
+            // 판매한 갯수와 정산 요청된 갯수가 같다면 true, 아니면 false(판매갯수 0이라면도 추가!)
             int totalSalesCnt = productsSalesRepository.countAllByProducts(productsEntity);
             int totalSettlementCnt = settlementProductsRepository.countAllByProducts(
-                productsEntity);
+                productsEntity, settlementStatusList);
             boolean noMoreSettlement = totalSalesCnt == totalSettlementCnt;
-            if (totalSalesCnt > 0 && noMoreSettlement) {
+            // 정산요청 중인 게 있는지 여부
+            int settlementProcessCnt = settlementProductsRepository.countAllByProducts(
+                productsEntity, settlementProcessStatusList);
+            if (totalSalesCnt > 0 && noMoreSettlement && settlementProcessCnt == 0) {
                 hasSettled = true;
             }
-
             SettlementReportList settlementReport = productsEntity.toSettlementReportList(
                 hasSettled);
             reportLists.add(settlementReport);
@@ -223,10 +233,8 @@ public class SalesServiceImpl implements SalesService {
         PeriodType periodType) {
         List<DaySalesReport> daySalesReports = new ArrayList<>();
         CreatorEntity creatorEntity = getCreatorEntity(user);
-
         LocalDateTime endAt = LocalDateTime.now();
         LocalDateTime beginAt = getBeginAtBasedOnPeriodType(periodType, endAt);
-
         ProductsEntity productsEntity = productsRepository.findProductByIdWithoutStatus(productsId);
 
         if (!productsEntity.getCreatorEntity().equals(creatorEntity)) {
@@ -284,7 +292,6 @@ public class SalesServiceImpl implements SalesService {
         String endDate) {
         CreatorEntity creatorEntity = getCreatorEntity(user);
         ProductsEntity productsEntity = productsRepository.findProductByIdWithoutStatus(productsId);
-
         LocalDateTime beginAt = Time.convertDateToLocalDateTime(beginDate);
         LocalDateTime endAt = Time.convertDateToLocalDateTime(endDate);
         endAt = endAt.plusDays(1);
@@ -309,8 +316,16 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity);
         boolean hasAnyRecentSettlementRequest = getHasAnyRecentSettlementRequest(
             lastProductsSalesDate, recentSettlementRequestDate);
-        // 정산할 것들이 있고, 최근 정산 요청이 없어야
-        return totalSettlementRequiredProductsCnt > 0 && !hasAnyRecentSettlementRequest;
+        boolean recentSettlementRequestCompleted = checkRecentSettlementRequestCompleted(
+            creatorEntity);
+        return totalSettlementRequiredProductsCnt > 0 && !hasAnyRecentSettlementRequest
+            && recentSettlementRequestCompleted;
+    }
+
+    // true가 되려면 모두 completed이거나 rejected여야!
+    private boolean checkRecentSettlementRequestCompleted(CreatorEntity creatorEntity) {
+        int remainCnt = settlementProductsRepository.countAllRemainByCreator(creatorEntity);
+        return remainCnt == 0;
     }
 
     @Override
@@ -352,7 +367,6 @@ public class SalesServiceImpl implements SalesService {
             creatorEntity, CurrencyType.KRW);
         BigDecimal totalPortoneChargeUSD = productsSalesRepository.getTotalPortoneChargesByCreator(
             creatorEntity, CurrencyType.USD);
-
         BigDecimal totalSettlementPriceKRWBeforeSubStractFreeLancerChargeKRW = totalSalesPriceKRW.subtract(
             totalPortoneChargeKRW).subtract(totalServiceChargeKRW);
         BigDecimal totalSettlementPriceUSDBeforeSubStractFreeLancerChargeUSD = totalSalesPriceUSD.subtract(
@@ -483,7 +497,9 @@ public class SalesServiceImpl implements SalesService {
                     .setScale(0, RoundingMode.HALF_DOWN);
                 BigDecimal settlementAmountUSD = settlementAmountKRWBeforeSubstractFreeLancerChargeUSD.subtract(
                         freelancerChargeAmountUSD)
-                    .setScale(0, RoundingMode.HALF_DOWN);
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(0, RoundingMode.HALF_DOWN)
+                    .divide(BigDecimal.valueOf(100));
 
                 SettlementProductsEntity settlementProductsEntity = SettlementProductsEntity.builder()
                     .creatorEntity(creatorEntity).settlementEntity(settlementEntity)
@@ -506,7 +522,9 @@ public class SalesServiceImpl implements SalesService {
 
         List<ProductsSalesEntity> productsSalesEntityList = productsSalesRepository.findAllByCreatorEntityAndSettledIsFalse(
             creatorEntity);
-        productsSalesEntityList.forEach(ProductsSalesEntity::setSettled);
+        productsSalesEntityList.forEach(productsSalesEntity -> {
+            productsSalesEntity.setSettled(settlementEntity);
+        });
 
         return settlementRepository.findById(settlementEntity.getId()).isPresent();
     }

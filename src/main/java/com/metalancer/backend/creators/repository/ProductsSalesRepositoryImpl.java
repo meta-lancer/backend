@@ -129,6 +129,7 @@ public class ProductsSalesRepositoryImpl implements ProductsSalesRepository {
     public BigDecimal getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
         CreatorEntity creatorEntity, ProductsEntity productsEntity, CurrencyType currencyType) {
         return productsSalesJpaRepository.getPortoneChargesByCreatorAndProductsAndSettledIsFalse(
-            creatorEntity, productsEntity, currencyType);
+                creatorEntity, productsEntity, currencyType)
+            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 }

@@ -32,9 +32,9 @@ public class SettlementProductsRepositoryImpl implements SettlementProductsRepos
 
     @Override
     public int countAllRemainByCreator(CreatorEntity creatorEntity) {
-        int requestCnt = settlementProductsJpaRepository.findAllByCreatorEntityAndSettlementStatus(
+        int requestCnt = settlementProductsJpaRepository.countAllByCreatorEntityAndSettlementStatus(
             creatorEntity, SettlementStatus.REQUEST);
-        int processCnt = settlementProductsJpaRepository.findAllByCreatorEntityAndSettlementStatus(
+        int processCnt = settlementProductsJpaRepository.countAllByCreatorEntityAndSettlementStatus(
             creatorEntity, SettlementStatus.ING);
         return requestCnt + processCnt;
     }

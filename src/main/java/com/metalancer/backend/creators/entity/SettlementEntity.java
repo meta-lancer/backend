@@ -139,6 +139,10 @@ public class SettlementEntity extends BaseEntity implements Serializable {
             .manager(manager).settlementStatus(settlementStatus).build();
     }
 
+    public void addManage(String manager) {
+        this.manager = manager;
+    }
+
     public void adminSettle(
         String currentSituation,
         String manager,

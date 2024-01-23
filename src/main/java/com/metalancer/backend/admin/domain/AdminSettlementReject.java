@@ -22,12 +22,12 @@ public class AdminSettlementReject extends AdminSettlementCreatorAndPrice {
         BigDecimal totalPortoneChargeUSD, String requestDate, String processDate, String rejectDate,
         SettlementStatus settlementStatus,
         Integer settlementSalesCnt, PaymentInfoManagement paymentInfoManagement,
-        AdminManager adminManager) {
+        AdminManager adminManager, String referenceMemo, String referenceFile) {
         super(creator, settlementRequestId, totalSalesPriceKRW, totalSalesPriceUSD,
             totalSettlementPriceKRW, totalSettlementPriceUSD, totalServiceChargeKRW,
             totalServiceChargeUSD, totalFreeLancerChargeKRW, totalFreeLancerChargeUSD,
             totalPortoneChargeKRW, totalPortoneChargeUSD, settlementStatus, settlementSalesCnt,
-            paymentInfoManagement, adminManager);
+            paymentInfoManagement, adminManager, referenceMemo, referenceFile);
         this.requestDate = requestDate;
         this.processDate = processDate;
         this.rejectDate = rejectDate;

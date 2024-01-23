@@ -26,8 +26,8 @@ public class AdminSettlementCreatorAndPrice {
     private final BigDecimal totalPortoneChargeUSD;
     private final SettlementStatus settlementStatus;
     private final Integer settlementSalesCnt;
-    // 관리자 정보
-    // 처리 정보
+    private String referenceMemo;
+    private String referenceFile;
 
     @Builder
     public AdminSettlementCreatorAndPrice(Creator creator, Long settlementRequestId,
@@ -38,7 +38,7 @@ public class AdminSettlementCreatorAndPrice {
         BigDecimal totalFreeLancerChargeUSD, BigDecimal totalPortoneChargeKRW,
         BigDecimal totalPortoneChargeUSD, SettlementStatus settlementStatus,
         Integer settlementSalesCnt, PaymentInfoManagement paymentInfoManagement,
-        AdminManager adminManager) {
+        AdminManager adminManager, String referenceMemo, String referenceFile) {
         this.creator = creator;
         this.settlementRequestId = settlementRequestId;
         this.totalSalesPriceKRW = totalSalesPriceKRW;
@@ -55,5 +55,7 @@ public class AdminSettlementCreatorAndPrice {
         this.settlementSalesCnt = settlementSalesCnt;
         this.paymentInfoManagement = paymentInfoManagement;
         this.adminManager = adminManager;
+        this.referenceMemo = referenceMemo;
+        this.referenceFile = referenceFile;
     }
 }

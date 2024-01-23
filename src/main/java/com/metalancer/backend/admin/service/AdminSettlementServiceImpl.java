@@ -6,10 +6,13 @@ import com.metalancer.backend.admin.domain.AdminSettlementCreatorAndPrice;
 import com.metalancer.backend.admin.domain.AdminSettlementIng;
 import com.metalancer.backend.admin.domain.AdminSettlementReject;
 import com.metalancer.backend.admin.domain.AdminSettlementRequest;
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.Role;
 import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.common.exception.BaseException;
+import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.common.utils.Time;
 import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
@@ -131,7 +134,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             settlementEntity.getSettlementStatus(),
             settlementSalesCnt,
             paymentInfoManagement,
-            adminManager
+            adminManager,
+            settlementEntity.getReferenceMemo(),
+            settlementEntity.getReferenceFile()
         );
     }
 
@@ -169,7 +174,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             settlementEntity.getSettlementStatus(),
             settlementSalesCnt,
             paymentInfoManagement,
-            adminManager
+            adminManager,
+            settlementEntity.getReferenceMemo(),
+            settlementEntity.getReferenceFile()
         );
     }
 
@@ -205,7 +212,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             settlementEntity.getSettlementStatus(),
             settlementSalesCnt,
             paymentInfoManagement,
-            adminManager
+            adminManager,
+            settlementEntity.getReferenceMemo(),
+            settlementEntity.getReferenceFile()
         );
     }
 
@@ -243,7 +252,20 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             settlementEntity.getSettlementStatus(),
             settlementSalesCnt,
             paymentInfoManagement,
-            adminManager
+            adminManager,
+            settlementEntity.getReferenceMemo(),
+            settlementEntity.getReferenceFile()
         );
+    }
+
+    @Override
+    public Boolean addManagerOfSettlement(PrincipalDetails user, Long settlementRequestId) {
+        User adminUser = user.getUser();
+        SettlementEntity settlementEntity = settlementRepository.findById(settlementRequestId)
+            .orElseThrow(
+                () -> new NotFoundException("정산요청", ErrorCode.NOT_FOUND)
+            );
+        settlementEntity.addManage(adminUser.getName());
+        return settlementEntity.getManager().equals(adminUser.getName());
     }
 }

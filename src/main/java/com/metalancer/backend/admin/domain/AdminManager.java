@@ -10,30 +10,30 @@ import lombok.Getter;
 @Getter
 public class AdminManager {
 
-    private Long memberId;
-    private String name;
-    private String nickname;
-    private String mobile;
-    private String email;
-    private Role role;
-    private LoginType loginType;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private DataStatus status;
+    private Long adminMemberId;
+    private String adminName;
+    private String adminNickname;
+    private String adminMobile;
+    private String adminEmail;
+    private Role adminRole;
+    private LoginType adminLoginType;
+    private LocalDateTime adminCreatedAt;
+    private LocalDateTime adminUpdatedAt;
+    private DataStatus adminStatus;
 
     @Builder
     public AdminManager(Long memberId, String name, String nickname, String mobile, String email,
         Role role, LoginType loginType, LocalDateTime createdAt, LocalDateTime updatedAt,
         DataStatus status) {
-        this.memberId = memberId;
-        this.name = name;
-        this.nickname = nickname;
-        this.mobile = mobile;
-        this.email = email;
-        this.role = role;
-        this.loginType = loginType;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.status = status;
+        this.adminMemberId = memberId;
+        this.adminName = name;
+        this.adminNickname = nickname;
+        this.adminMobile = mobile;
+        this.adminEmail = email;
+        this.adminRole = role;
+        this.adminLoginType = loginType;
+        this.adminCreatedAt = createdAt;
+        this.adminUpdatedAt = updatedAt;
+        this.adminStatus = status;
     }
 }

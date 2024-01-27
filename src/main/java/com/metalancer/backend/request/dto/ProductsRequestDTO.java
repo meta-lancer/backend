@@ -14,6 +14,9 @@ public class ProductsRequestDTO {
         private String title;
         private String content;
         private ProductsRequestStatus productsRequestStatus;
+        private String relatedLink;
+        private String fileUrl;
+        private String fileName;
     }
 
     @Data
@@ -23,6 +26,9 @@ public class ProductsRequestDTO {
         private String title;
         private String content;
         private ProductsRequestStatus productsRequestStatus;
+        private String relatedLink;
+        private String fileUrl;
+        private String fileName;
     }
 
     @Data
@@ -31,5 +37,5 @@ public class ProductsRequestDTO {
         private String fileUrl;
         private String fileName;
     }
-    
+
 }

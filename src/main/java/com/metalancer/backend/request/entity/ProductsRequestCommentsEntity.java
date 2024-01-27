@@ -71,4 +71,7 @@ public class ProductsRequestCommentsEntity extends BaseEntity implements Seriali
         this.content = content;
     }
 
+    public void deleteComment() {
+        delete();
+    }
 }

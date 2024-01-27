@@ -6,6 +6,8 @@ import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.request.domain.ProductsRequest;
+import com.metalancer.backend.request.domain.ProductsRequestComment;
+import com.metalancer.backend.request.dto.ProductsRequestCommentsDTO;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Create;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.File;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Update;
@@ -126,5 +128,48 @@ public class RequestController {
 
         return new BaseResponse<>(
             requestService.updateRequestFile(user, requestId, dto));
+    }
+
+    @Operation(summary = "제작요청 댓글 - 게시판 댓글 목록", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = ProductsRequestComment.class)))
+    })
+    @GetMapping("/{requestId}/comments")
+    public BaseResponse<Page<ProductsRequestComment>> getProductsRequestCommentsList(
+        @PathVariable Long requestId,
+        Pageable pageable) {
+        log.info("페이징-{}", pageable);
+        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        return new BaseResponse<Page<ProductsRequestComment>>(
+            requestService.getProductsRequestCommentsList(requestId, pageable));
+    }
+
+    @Operation(summary = "제작요청 댓글 - 게시판 댓글 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping("/{requestId}/comments")
+    public BaseResponse<Boolean> createProductsRequestComments(
+        @PathVariable Long requestId, @RequestBody ProductsRequestCommentsDTO.Create dto,
+        @AuthenticationPrincipal PrincipalDetails user
+    ) {
+        log.info("댓글 등록 dto-{}", dto);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            requestService.createProductsRequestComments(requestId, dto, user));
+    }
+
+    @Operation(summary = "제작요청 댓글 - 게시판 댓글 삭제", description = "")
+    @ApiResponse(responseCode = "200", description = "삭제 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @DeleteMapping("/{requestId}/comments/{commentId}")
+    public BaseResponse<Boolean> deleteProductsRequestComments(
+        @PathVariable Long requestId, @RequestBody ProductsRequestCommentsDTO.Update dto,
+        @PathVariable Long commentId, @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("댓글 삭제 dto-{}", dto);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            requestService.deleteProductsRequestComments(requestId, dto, commentId, user));
     }
 }

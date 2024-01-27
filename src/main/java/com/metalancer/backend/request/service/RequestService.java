@@ -2,6 +2,8 @@ package com.metalancer.backend.request.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.request.domain.ProductsRequest;
+import com.metalancer.backend.request.domain.ProductsRequestComment;
+import com.metalancer.backend.request.dto.ProductsRequestCommentsDTO;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Create;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.File;
 import com.metalancer.backend.request.dto.ProductsRequestDTO.Update;
@@ -25,4 +27,13 @@ public interface RequestService {
     String getUploadRequestFilePreSignedUrl(PrincipalDetails user, Long requestId, String fileName);
 
     boolean updateRequestFile(PrincipalDetails user, Long requestId, File dto);
+
+    Page<ProductsRequestComment> getProductsRequestCommentsList(Long requestId, Pageable pageable);
+
+    Boolean createProductsRequestComments(Long requestId, ProductsRequestCommentsDTO.Create dto,
+        PrincipalDetails user);
+
+    Boolean deleteProductsRequestComments(Long requestId, ProductsRequestCommentsDTO.Update dto,
+        Long commentId, PrincipalDetails user);
+
 }

@@ -15,6 +15,7 @@ import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManage
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.RequestProductsCreate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.RequestProductsOption;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
@@ -26,6 +27,7 @@ import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.products.domain.RequestOption;
 import com.metalancer.backend.products.entity.ProductsAssetFileEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.products.entity.ProductsTagEntity;
 import com.metalancer.backend.products.entity.ProductsThumbnailEntity;
 import com.metalancer.backend.products.entity.ProductsViewsEntity;
@@ -651,6 +653,8 @@ public class CreatorServiceImpl implements CreatorService {
             DataStatus.ACTIVE);
         ProductsEntity savedRequestProductsEntity = createRequestProductsEntity(dto, creatorEntity);
         log.info("제작요청 판매글 등록 - products 생성");
+        createRequestProductsOptionEntityList(dto, creatorEntity, savedRequestProductsEntity);
+        log.info("제작요청 판매글 등록 - products 옵션 생성");
         createRequestProductsAssetFileInfoEntity(dto, savedRequestProductsEntity);
         log.info("제작요청 판매글 등록 - ProductsAssetFile 정보 생성");
         Long savedProductsId = savedRequestProductsEntity.getId();
@@ -670,6 +674,22 @@ public class CreatorServiceImpl implements CreatorService {
             savedRequestProductsEntity);
         productsDetail.setRequestOptionList(productsRequestOptionEntityList);
         return productsDetail;
+    }
+
+    private void createRequestProductsOptionEntityList(RequestProductsCreate dto,
+        CreatorEntity creatorEntity,
+        ProductsEntity savedRequestProductsEntity) {
+        int index = 1;
+        for (RequestProductsOption productsOption : dto.getOptionList()) {
+            ProductsRequestOptionEntity createdProductsRequestOptionEntity = ProductsRequestOptionEntity.builder()
+                .creatorEntity(creatorEntity)
+                .productsEntity(savedRequestProductsEntity)
+                .content(productsOption.getOptionName())
+                .ord(index++)
+                .price(productsOption.getAdditionalPrice())
+                .build();
+            productsRequestOptionRepository.save(createdProductsRequestOptionEntity);
+        }
     }
 
     private ProductsEntity createRequestProductsEntity(RequestProductsCreate dto,

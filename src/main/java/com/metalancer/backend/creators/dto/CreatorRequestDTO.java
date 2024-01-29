@@ -242,7 +242,5 @@ public class CreatorRequestDTO {
         private String optionName;
         @Schema(description = "추가 가격", example = "")
         private int additionalPrice;
-        @Schema(description = "순서", example = "")
-        private int ord;
     }
 }

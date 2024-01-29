@@ -230,7 +230,6 @@ public class CreatorRequestDTO {
         private String recentVersion;
         @Schema(description = "추천 태그 등록", example = "[\"리깅\", \"3D 모델링\"]")
         private List<String> tagList;
-
         @Schema(description = "옵션 목록", example = "")
         private List<RequestProductsOption> optionList;
     }

@@ -680,6 +680,7 @@ public class CreatorServiceImpl implements CreatorService {
             .assetNotice(
                 dto.getAssetNotice()).assetCopyRight(dto.getAssetCopyRight())
             .build();
+        createdProductsEntity.setProductsTypeRequest();
         productsRepository.save(createdProductsEntity);
         return productsRepository.findProductById(
             createdProductsEntity.getId());

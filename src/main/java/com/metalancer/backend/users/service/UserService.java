@@ -2,6 +2,7 @@ package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.ApplyCreator;
+import com.metalancer.backend.request.domain.ProductsRequest;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
@@ -55,4 +56,6 @@ public interface UserService {
     boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto);
 
     List<Portfolio> getMyPortfolio(PrincipalDetails user);
+
+    Page<ProductsRequest> getProductsRequestList(PrincipalDetails user, Pageable pageable);
 }

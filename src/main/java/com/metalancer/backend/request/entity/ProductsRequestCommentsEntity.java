@@ -53,7 +53,6 @@ public class ProductsRequestCommentsEntity extends BaseEntity implements Seriali
     public ProductsRequestComment toDomain() {
         return ProductsRequestComment.builder()
             .productsRequestCommentId(id)
-            .writerId(writer.getId())
             .productsRequest(productsRequestEntity.toDomain())
             .nickname(writer.getNickname())
             .profileImg(writer.getProfileImg())

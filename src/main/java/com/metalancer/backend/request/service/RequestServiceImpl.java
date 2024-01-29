@@ -16,10 +16,12 @@ import com.metalancer.backend.request.entity.ProductsRequestEntity;
 import com.metalancer.backend.request.repository.ProductsRequestCommentsRepository;
 import com.metalancer.backend.request.repository.ProductsRequestRepository;
 import com.metalancer.backend.users.entity.User;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,12 +89,21 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public Page<ProductsRequestComment> getProductsRequestCommentsList(Long requestId,
-        Pageable pageable) {
+        PrincipalDetails user, Pageable pageable) {
         ProductsRequestEntity productsRequestEntity = productsRequestRepository.findEntity(
             requestId);
         Page<ProductsRequestCommentsEntity> productsRequestCommentsEntities = productsRequestCommentsRepository.findAllByPage(
-            productsRequestEntity, pageable);
-        return productsRequestCommentsEntities.map(ProductsRequestCommentsEntity::toDomain);
+            productsRequestEntity, user, pageable);
+        List<ProductsRequestComment> productsRequestComments = new ArrayList<>();
+        for (ProductsRequestCommentsEntity productsRequestCommentsEntity : productsRequestCommentsEntities) {
+            ProductsRequestComment productsRequestComment = productsRequestCommentsEntity.toDomain();
+            productsRequestComment.checkIsWriter(
+                user != null && productsRequestCommentsEntity.getWriter().getId()
+                    .equals(user.getUser().getId()));
+            productsRequestComments.add(productsRequestComment);
+        }
+        return new PageImpl<>(productsRequestComments, pageable,
+            productsRequestCommentsEntities.getTotalElements());
     }
 
     @Override
@@ -113,7 +124,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public Boolean deleteProductsRequestComments(Long requestId,
-        ProductsRequestCommentsDTO.Update dto, Long commentId, PrincipalDetails user) {
+        Long commentId, PrincipalDetails user) {
         User foundUser = user.getUser();
         ProductsRequestEntity productsRequestEntity = productsRequestRepository.findEntity(
             requestId);

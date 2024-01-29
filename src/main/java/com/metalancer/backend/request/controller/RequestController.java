@@ -137,11 +137,12 @@ public class RequestController {
     @GetMapping("/{requestId}/comments")
     public BaseResponse<Page<ProductsRequestComment>> getProductsRequestCommentsList(
         @PathVariable Long requestId,
+        @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         log.info("페이징-{}", pageable);
-        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<Page<ProductsRequestComment>>(
-            requestService.getProductsRequestCommentsList(requestId, pageable));
+            requestService.getProductsRequestCommentsList(requestId, user, pageable));
     }
 
     @Operation(summary = "제작요청 댓글 - 게시판 댓글 등록", description = "")
@@ -165,11 +166,10 @@ public class RequestController {
     })
     @DeleteMapping("/{requestId}/comments/{commentId}")
     public BaseResponse<Boolean> deleteProductsRequestComments(
-        @PathVariable Long requestId, @RequestBody ProductsRequestCommentsDTO.Update dto,
+        @PathVariable Long requestId,
         @PathVariable Long commentId, @AuthenticationPrincipal PrincipalDetails user) {
-        log.info("댓글 삭제 dto-{}", dto);
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
-            requestService.deleteProductsRequestComments(requestId, dto, commentId, user));
+            requestService.deleteProductsRequestComments(requestId, commentId, user));
     }
 }

@@ -1,5 +1,6 @@
 package com.metalancer.backend.request.repository;
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
@@ -19,7 +20,7 @@ public class ProductsRequestCommentsRepositoryImpl implements ProductsRequestCom
 
     @Override
     public Page<ProductsRequestCommentsEntity> findAllByPage(
-        ProductsRequestEntity productsRequestEntity, Pageable pageable) {
+        ProductsRequestEntity productsRequestEntity, PrincipalDetails user, Pageable pageable) {
         return productsRequestCommentsJpaRepository.findAllByProductsRequestEntityAndStatus(
             productsRequestEntity, DataStatus.ACTIVE, pageable);
     }

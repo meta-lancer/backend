@@ -65,8 +65,7 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         List<RequestCategory> requestCategoryList = getRequestCategories(
             productsRequestEntity);
         response.setProductionRequestTypeList(requestCategoryList);
-        int commentCnt = 0;
-        response.setCommentCnt(commentCnt);
+
         return response;
     }
 
@@ -83,7 +82,11 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         ProductsRequestEntity createdProductsRequestEntity = ProductsRequestEntity.builder()
             .writer(user)
             .title(dto.getTitle()).content(
-                dto.getContent()).productsRequestStatus(dto.getProductsRequestStatus()).build();
+                dto.getContent()).productsRequestStatus(dto.getProductsRequestStatus())
+            .fileName(dto.getFileName())
+            .fileUrl(dto.getFileUrl())
+            .relatedLink(dto.getRelatedLink())
+            .build();
         productsRequestJpaRepository.save(createdProductsRequestEntity);
         for (String productsRequestType : dto.getProductionRequestTypeList()) {
             createProductsRequestAndType(createdProductsRequestEntity, productsRequestType);
@@ -95,7 +98,6 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         List<RequestCategory> requestCategoryList = getRequestCategories(
             createdProductsRequestEntity);
         response.setProductionRequestTypeList(requestCategoryList);
-        response.setCommentCnt(0);
 
         return response;
     }
@@ -127,14 +129,16 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
     public ProductsRequest update(User user, Update dto,
         ProductsRequestEntity productsRequestEntity) {
         productsRequestEntity.update(dto.getTitle(),
-            dto.getContent(), dto.getProductsRequestStatus());
+            dto.getContent(), dto.getProductsRequestStatus(), dto.getRelatedLink());
+        if (dto.getFileUrl() != null && !dto.getFileUrl().isBlank() && dto.getFileName() != null
+            && !dto.getFileName().isBlank()) {
+            productsRequestEntity.updateFile(dto.getFileName(), dto.getFileUrl());
+        }
         updateRequestTypeList(dto, productsRequestEntity);
         ProductsRequest response = productsRequestEntity.toDomain();
         List<RequestCategory> requestCategoryList = getRequestCategories(
             productsRequestEntity);
         response.setProductionRequestTypeList(requestCategoryList);
-        int commentCnt = 0;
-        response.setCommentCnt(commentCnt);
 
         return response;
     }
@@ -146,5 +150,11 @@ public class ProductsRequestRepositoryImpl implements ProductsRequestRepository,
         for (String requestType : dto.getProductionRequestTypeList()) {
             createProductsRequestAndType(productsRequestEntity, requestType);
         }
+    }
+
+    @Override
+    public Page<ProductsRequest> findAllByUser(User user, Pageable pageable) {
+        return productsRequestJpaRepository.findAllByWriterAndStatus(user, DataStatus.ACTIVE,
+            pageable).map(ProductsRequestEntity::toDomain);
     }
 }

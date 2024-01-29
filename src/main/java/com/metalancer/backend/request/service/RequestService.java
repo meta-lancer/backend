@@ -28,12 +28,13 @@ public interface RequestService {
 
     boolean updateRequestFile(PrincipalDetails user, Long requestId, File dto);
 
-    Page<ProductsRequestComment> getProductsRequestCommentsList(Long requestId, Pageable pageable);
+    Page<ProductsRequestComment> getProductsRequestCommentsList(Long requestId,
+        PrincipalDetails user, Pageable pageable);
 
     Boolean createProductsRequestComments(Long requestId, ProductsRequestCommentsDTO.Create dto,
         PrincipalDetails user);
 
-    Boolean deleteProductsRequestComments(Long requestId, ProductsRequestCommentsDTO.Update dto,
+    Boolean deleteProductsRequestComments(Long requestId,
         Long commentId, PrincipalDetails user);
 
 }

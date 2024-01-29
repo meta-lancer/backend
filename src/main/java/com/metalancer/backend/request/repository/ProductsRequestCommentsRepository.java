@@ -1,5 +1,6 @@
 package com.metalancer.backend.request.repository;
 
+import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.request.entity.ProductsRequestCommentsEntity;
 import com.metalancer.backend.request.entity.ProductsRequestEntity;
 import java.util.Optional;
@@ -10,7 +11,7 @@ public interface ProductsRequestCommentsRepository {
 
 
     Page<ProductsRequestCommentsEntity> findAllByPage(ProductsRequestEntity productsRequestEntity,
-        Pageable pageable);
+        PrincipalDetails user, Pageable pageable);
 
     void save(ProductsRequestCommentsEntity createdProductsRequestCommentsEntity);
 

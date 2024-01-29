@@ -24,7 +24,9 @@ public class ProductsRequest {
     private final String updatedAtEng;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
-    private Integer commentCnt;
+    private final String fileUrl;
+    private final String fileName;
+    private final String relatedLink;
 
     @Builder
     public ProductsRequest(Long productsRequestId, Long writerId, String nickname,
@@ -32,7 +34,7 @@ public class ProductsRequest {
         ProductsRequestStatus productsRequestStatus, String title, String content,
         String createdAtKor, String updatedAtKor,
         String createdAtEng, String updatedAtEng, LocalDateTime createdAt,
-        LocalDateTime updatedAt) {
+        LocalDateTime updatedAt, String fileUrl, String fileName, String relatedLink) {
         this.productsRequestId = productsRequestId;
         this.writerId = writerId;
         this.nickname = nickname;
@@ -46,6 +48,9 @@ public class ProductsRequest {
         this.updatedAtEng = updatedAtEng;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.fileUrl = fileUrl;
+        this.fileName = fileName;
+        this.relatedLink = relatedLink;
     }
 
     public void setProductionRequestTypeList(
@@ -53,7 +58,4 @@ public class ProductsRequest {
         this.productsRequestTypeList = requestCategoryList;
     }
 
-    public void setCommentCnt(Integer commentCnt) {
-        this.commentCnt = commentCnt;
-    }
 }

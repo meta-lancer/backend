@@ -9,7 +9,6 @@ public class ProductsRequestComment {
 
     private final Long productsRequestCommentId;
     private final ProductsRequest productsRequest;
-    private final Long writerId;
     private final String nickname;
     private final String profileImg;
     private final String content;
@@ -19,15 +18,15 @@ public class ProductsRequestComment {
     private final String updatedAtEng;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+    private boolean isWriter;
 
     @Builder
     public ProductsRequestComment(Long productsRequestCommentId, ProductsRequest productsRequest,
-        Long writerId, String nickname, String profileImg, String content, String createdAtKor,
+        String nickname, String profileImg, String content, String createdAtKor,
         String updatedAtKor, String createdAtEng, String updatedAtEng, LocalDateTime createdAt,
         LocalDateTime updatedAt) {
         this.productsRequestCommentId = productsRequestCommentId;
         this.productsRequest = productsRequest;
-        this.writerId = writerId;
         this.nickname = nickname;
         this.profileImg = profileImg;
         this.content = content;
@@ -37,5 +36,9 @@ public class ProductsRequestComment {
         this.updatedAtEng = updatedAtEng;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public void checkIsWriter(boolean isWriter) {
+        this.isWriter = isWriter;
     }
 }

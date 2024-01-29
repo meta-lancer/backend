@@ -16,6 +16,7 @@ import com.metalancer.backend.creators.dto.CreatorResponseDTO;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.service.CreatorReadService;
 import com.metalancer.backend.creators.service.CreatorService;
+import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.users.domain.Portfolio;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -298,5 +299,18 @@ public class MyCreatorsController {
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
             creatorService.deleteMyPaymentInfoManagement(user));
+    }
+
+    @Operation(summary = "제작요청 판매글 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = CreatorResponseDTO.AssetCreatedResponse.class)))
+    @PostMapping("/request")
+    public BaseResponse<ProductsDetail> createRequestProducts(
+        @RequestPart(value = "thumbnails", required = false) MultipartFile[] thumbnails,
+        @RequestPart(required = true) CreatorRequestDTO.RequestProductsCreate dto,
+        @AuthenticationPrincipal PrincipalDetails user) throws IOException {
+        log.info("제작요청 판매글 등록 DTO - {}", dto);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<ProductsDetail>(
+            creatorService.createRequestProducts(user.getUser(), thumbnails, dto));
     }
 }

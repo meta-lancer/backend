@@ -8,8 +8,10 @@ import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManage
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManagementUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.RequestProductsCreate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
+import com.metalancer.backend.products.domain.ProductsDetail;
 import com.metalancer.backend.users.domain.Portfolio;
 import com.metalancer.backend.users.entity.User;
 import java.io.IOException;
@@ -54,4 +56,7 @@ public interface CreatorService {
     boolean updateMyPaymentInfoManagement(MultipartFile idCardCopyFile,
         MultipartFile accountCopyFile, MyPaymentInfoManagementUpdate dto,
         PrincipalDetails user) throws IOException;
+
+    ProductsDetail createRequestProducts(User user, MultipartFile[] thumbnails,
+        RequestProductsCreate dto) throws IOException;
 }

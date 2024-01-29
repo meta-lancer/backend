@@ -14,6 +14,7 @@ import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManage
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.MyPaymentInfoManagementUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioCreate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.PortfolioUpdate;
+import com.metalancer.backend.creators.dto.CreatorRequestDTO.RequestProductsCreate;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetCreatedResponse;
 import com.metalancer.backend.creators.dto.CreatorResponseDTO.AssetUpdatedResponse;
 import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
@@ -22,6 +23,7 @@ import com.metalancer.backend.creators.repository.PaymentInfoManagementRepositor
 import com.metalancer.backend.external.aws.s3.S3Service;
 import com.metalancer.backend.products.domain.AssetFile;
 import com.metalancer.backend.products.domain.ProductsDetail;
+import com.metalancer.backend.products.domain.RequestOption;
 import com.metalancer.backend.products.entity.ProductsAssetFileEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsTagEntity;
@@ -30,6 +32,7 @@ import com.metalancer.backend.products.entity.ProductsViewsEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
 import com.metalancer.backend.products.repository.ProductsCategoryRepository;
 import com.metalancer.backend.products.repository.ProductsRepository;
+import com.metalancer.backend.products.repository.ProductsRequestOptionRepository;
 import com.metalancer.backend.products.repository.ProductsTagRepository;
 import com.metalancer.backend.products.repository.ProductsThumbnailRepository;
 import com.metalancer.backend.products.repository.ProductsViewsRepository;
@@ -72,6 +75,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final UserRepository userRepository;
     private final PortfolioImagesRepository portfolioImagesRepository;
     private final PaymentInfoManagementRepository paymentInfoManagementRepository;
+    private final ProductsRequestOptionRepository productsRequestOptionRepository;
 
     @Override
     public AssetCreatedResponse createAsset(User user, @NotNull MultipartFile[] thumbnails,
@@ -87,7 +91,7 @@ public class CreatorServiceImpl implements CreatorService {
             createProductsAssetFileEntity(dto, savedProductsEntity);
             log.info("에셋 등록 - ProductsAssetFile 생성");
             Long savedProductsId = savedProductsEntity.getId();
-            saveTagList(dto, savedProductsEntity);
+            saveTagList(dto.getTagList(), savedProductsEntity);
             log.info("에셋 등록 - tagList 생성");
             uploadThumbnailImages(savedProductsId, savedProductsEntity, thumbnails);
             log.info("에셋 등록 - 썸네일 업로드");
@@ -457,9 +461,9 @@ public class CreatorServiceImpl implements CreatorService {
         productsThumbnailRepository.saveAll(productsThumbnailEntities);
     }
 
-    private void saveTagList(AssetRequest dto, ProductsEntity savedProductsEntity) {
+    private void saveTagList(List<String> tagList, ProductsEntity savedProductsEntity) {
         List<ProductsTagEntity> tagEntities = new ArrayList<>();
-        for (String tag : dto.getTagList()) {
+        for (String tag : tagList) {
             ProductsTagEntity createdProductsTagEntity = ProductsTagEntity.builder()
                 .productsEntity(savedProductsEntity).name(tag).build();
             tagEntities.add(createdProductsTagEntity);
@@ -640,5 +644,59 @@ public class CreatorServiceImpl implements CreatorService {
         return portfolioRepository.findAllByCreator(creatorEntity);
     }
 
+    @Override
+    public ProductsDetail createRequestProducts(User user, MultipartFile[] thumbnails,
+        RequestProductsCreate dto) throws IOException {
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(user,
+            DataStatus.ACTIVE);
+        ProductsEntity savedRequestProductsEntity = createRequestProductsEntity(dto, creatorEntity);
+        log.info("제작요청 판매글 등록 - products 생성");
+        createRequestProductsAssetFileInfoEntity(dto, savedRequestProductsEntity);
+        log.info("제작요청 판매글 등록 - ProductsAssetFile 정보 생성");
+        Long savedProductsId = savedRequestProductsEntity.getId();
+        saveTagList(dto.getTagList(), savedRequestProductsEntity);
+        log.info("제작요청 판매글 등록 - tagList 생성");
+        uploadThumbnailImages(savedProductsId, savedRequestProductsEntity, thumbnails);
+        log.info("제작요청 판매글 등록 - 썸네일 업로드");
+        long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
+        double satisficationRate = 0.0;
+        ProductsDetail productsDetail = savedRequestProductsEntity.toProductsDetail(taskCnt,
+            satisficationRate);
+        getProductsDetailTagList(savedRequestProductsEntity, productsDetail);
+        AssetFile assetFile = getProductsDetailAssetFile(savedRequestProductsEntity,
+            productsDetail);
+        productsDetail.setAssetFile(assetFile);
+        List<RequestOption> productsRequestOptionEntityList = productsRequestOptionRepository.findAllByProducts(
+            savedRequestProductsEntity);
+        productsDetail.setRequestOptionList(productsRequestOptionEntityList);
+        return productsDetail;
+    }
 
+    private ProductsEntity createRequestProductsEntity(RequestProductsCreate dto,
+        CreatorEntity creatorEntity) {
+        ProductsEntity createdProductsEntity = ProductsEntity.builder()
+            .creatorEntity(creatorEntity).title(dto.getTitle()).price(dto.getPrice())
+            .assetDetail(dto.getAssetDetail())
+            .assetNotice(
+                dto.getAssetNotice()).assetCopyRight(dto.getAssetCopyRight())
+            .build();
+        productsRepository.save(createdProductsEntity);
+        return productsRepository.findProductById(
+            createdProductsEntity.getId());
+    }
+
+    private void createRequestProductsAssetFileInfoEntity(RequestProductsCreate dto,
+        ProductsEntity savedProductsEntity) {
+        ProductsAssetFileEntity createdProductsAssetFileEntity = ProductsAssetFileEntity.builder().
+            productsEntity(savedProductsEntity)
+            .productionProgram(String.join(", ", dto.getProductionProgram()))
+            .fileName("")
+            .url("")
+            .compatibleProgram(
+                String.join(", ", dto.getCompatibleProgram())).support(dto.getSupport())
+            .animation(dto.getAnimation()).rigging(dto.getRigging()).copyRight(dto.getCopyRight())
+            .extList(String.join(", ", dto.getExtList())).fileSize(dto.getFileSize())
+            .recentVersion(dto.getRecentVersion()).build();
+        productsAssetFileRepository.save(createdProductsAssetFileEntity);
+    }
 }

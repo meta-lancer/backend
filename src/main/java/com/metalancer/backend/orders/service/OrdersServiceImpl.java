@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.constants.PaymentType;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.common.exception.NotFoundException;
@@ -200,17 +201,21 @@ public class OrdersServiceImpl implements OrdersService {
         PaymentType paymentType = PaymentType.getType(paymentMethod, paymentPgType);
         // 장바구니에서 삭제
         for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
-            cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity());
+            // 옵션...!
+            cartRepository.deleteCart(user, orderProductsEntity.getProductsEntity(),
+                orderProductsEntity.getProductsRequestOptionEntity());
             // 다운로드 허용
-            ProductsEntity foundProductEntity = orderProductsEntity.getProductsEntity();
-            String assetUrl = productsAssetFileRepository.findUrlByProduct(foundProductEntity);
-            PayedAssetsEntity createdPayedAssetsEntity = PayedAssetsEntity.builder().user(user)
-                .orderProductsEntity(orderProductsEntity)
-                .products(foundProductEntity)
-                .orderPaymentEntity(savedOrderPaymentEntity)
-                .downloadLink(assetUrl).build();
-            payedAssetsRepository.save(createdPayedAssetsEntity);
-
+            if (ProductsType.NORMAL.equals(
+                orderProductsEntity.getProductsEntity().getProductsType())) {
+                ProductsEntity foundProductEntity = orderProductsEntity.getProductsEntity();
+                String assetUrl = productsAssetFileRepository.findUrlByProduct(foundProductEntity);
+                PayedAssetsEntity createdPayedAssetsEntity = PayedAssetsEntity.builder().user(user)
+                    .orderProductsEntity(orderProductsEntity)
+                    .products(foundProductEntity)
+                    .orderPaymentEntity(savedOrderPaymentEntity)
+                    .downloadLink(assetUrl).build();
+                payedAssetsRepository.save(createdPayedAssetsEntity);
+            }
             // 판매자 판매내역
             CurrencyType currencyType = CurrencyType.valueOf(savedOrderPaymentEntity.getCurrency());
             ProductsSalesEntity createdProductsSalesEntity = orderProductsEntity.toProductsSalesEntity();

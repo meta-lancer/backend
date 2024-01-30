@@ -68,10 +68,17 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
-    public void deleteCart(User user, ProductsEntity productsEntity) {
-        Optional<CartEntity> foundCartEntity = cartJpaRepository.findByUserAndProductsAndStatus(
-            user, productsEntity, DataStatus.ACTIVE);
-        foundCartEntity.ifPresent(CartEntity::deleteCart);
+    public void deleteCart(User user, ProductsEntity productsEntity,
+        ProductsRequestOptionEntity productsRequestOptionEntity) {
+        if (productsRequestOptionEntity == null) {
+            Optional<CartEntity> foundCartEntity = cartJpaRepository.findByUserAndProductsAndStatus(
+                user, productsEntity, DataStatus.ACTIVE);
+            foundCartEntity.ifPresent(CartEntity::deleteCart);
+        } else {
+            Optional<CartEntity> foundCartEntity = cartJpaRepository.findByUserAndProductsAndProductsRequestOptionEntityAndStatus(
+                user, productsEntity, productsRequestOptionEntity, DataStatus.ACTIVE);
+            foundCartEntity.ifPresent(CartEntity::deleteCart);
+        }
     }
 
     @Override
@@ -86,6 +93,7 @@ public class CartRepositoryImpl implements CartRepository {
     public void createCartWithOption(User user, ProductsEntity foundProductsEntity,
         ProductsRequestOptionEntity productsRequestOptionEntity) {
         CartEntity savedCartEntity = CartEntity.builder().user(user).products(foundProductsEntity)
+            .productsRequestOptionEntity(productsRequestOptionEntity)
             .build();
         cartJpaRepository.save(savedCartEntity);
     }

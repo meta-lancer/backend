@@ -27,7 +27,8 @@ public interface CartRepository {
 
     int countCartCnt(User user);
 
-    void deleteCart(User user, ProductsEntity productsEntity);
+    void deleteCart(User user, ProductsEntity productsEntity,
+        ProductsRequestOptionEntity productsRequestOptionEntity);
 
     Optional<CartEntity> findCartByUserAndAssetAndOption(User user,
         ProductsEntity foundProductsEntity,

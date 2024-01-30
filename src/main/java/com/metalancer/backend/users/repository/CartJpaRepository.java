@@ -28,5 +28,9 @@ public interface CartJpaRepository extends JpaRepository<CartEntity, Long> {
     Optional<CartEntity> findByUserAndProductsAndStatus(User user, ProductsEntity products,
         DataStatus status);
 
+    Optional<CartEntity> findByUserAndProductsAndProductsRequestOptionEntityAndStatus(User user,
+        ProductsEntity products, ProductsRequestOptionEntity productsRequestOptionEntity,
+        DataStatus status);
+
     Optional<CartEntity> findByIdAndUser(Long id, User user);
 }

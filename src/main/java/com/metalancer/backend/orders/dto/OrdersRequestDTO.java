@@ -23,6 +23,17 @@ public class OrdersRequestDTO {
 //        private Integer totalPoint;
         @Schema(description = "결제할 에셋 고유번호 목록", example = "[1, 3, 4]")
         private List<Long> productsIdList;
+
+        @Schema(description = "결제할 제작요청 옵션 목록", example = "[1, 3, 4]")
+        private List<RequestOption> optionIdList;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class RequestOption {
+
+        private Long productsId;
+        private Long requestOptionId;
     }
 
     @Data

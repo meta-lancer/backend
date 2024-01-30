@@ -45,9 +45,11 @@ public class CartServiceImpl implements CartService {
     @Override
     public boolean createCart(User user, CreateCartRequest dto) {
         ProductsEntity foundProductsEntity = productsRepository.findProductById(dto.getAssetId());
-        Optional<ProductsRequestOptionEntity> productsRequestOptionEntity = productsRequestOptionRepository.findOptionById(
-            dto.getRequestOptionId());
-        // 옵션에 따라
+        // 옵션이 있는지 없는 지의 여부에 따라
+        Optional<ProductsRequestOptionEntity> productsRequestOptionEntity =
+            dto.getRequestOptionId() != null ? productsRequestOptionRepository.findOptionById(
+                dto.getRequestOptionId()) : Optional.empty();
+        // 조회한 옵션에 따라
         Optional<CartEntity> cartEntity =
             productsRequestOptionEntity.isEmpty() ? cartRepository.findCartByUserAndAsset(user,
                 foundProductsEntity)

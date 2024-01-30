@@ -12,5 +12,9 @@ public interface ProductsRequestOptionRepository {
 
     Optional<ProductsRequestOptionEntity> findOptionById(Long requestOptionId);
 
+    Optional<ProductsRequestOptionEntity> findOptionByProductsAndId(
+        ProductsEntity productsEntity,
+        Long requestOptionId);
+
     void save(ProductsRequestOptionEntity createdProductsRequestOptionEntity);
 }

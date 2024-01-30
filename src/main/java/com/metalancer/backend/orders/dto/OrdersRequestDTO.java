@@ -25,7 +25,7 @@ public class OrdersRequestDTO {
         private List<Long> productsIdList;
 
         @Schema(description = "결제할 제작요청 옵션 목록", example = "[1, 3, 4]")
-        private List<RequestOption> optionIdList;
+        private List<RequestOption> optionList;
     }
 
     @Data

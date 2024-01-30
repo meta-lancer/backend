@@ -29,6 +29,13 @@ public class ProductsRequestOptionRepositoryImpl implements ProductsRequestOptio
     }
 
     @Override
+    public Optional<ProductsRequestOptionEntity> findOptionByProductsAndId(
+        ProductsEntity productsEntity, Long requestOptionId) {
+        return productsRequestOptionJpaRepository.findByProductsEntityAndIdAndStatus(productsEntity,
+            requestOptionId, DataStatus.ACTIVE);
+    }
+
+    @Override
     public void save(ProductsRequestOptionEntity createdProductsRequestOptionEntity) {
         productsRequestOptionJpaRepository.save(createdProductsRequestOptionEntity);
     }

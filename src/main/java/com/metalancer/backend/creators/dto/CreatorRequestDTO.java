@@ -1,6 +1,9 @@
 package com.metalancer.backend.creators.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -238,8 +241,11 @@ public class CreatorRequestDTO {
     @NoArgsConstructor
     public static class RequestProductsOption {
 
+        @NotBlank
+        @Size(min = 1, max = 30, message = "option name size validation")
         @Schema(description = "옵션명", example = "")
         private String optionName;
+        @Max(5000000)
         @Schema(description = "추가 가격", example = "")
         private int additionalPrice;
     }

@@ -3,6 +3,7 @@ package com.metalancer.backend.products.repository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.PeriodType;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.products.domain.HotPickAsset;
@@ -173,10 +174,16 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
-    public Page<ProductsEntity> findAllDistinctByTagListAndStatus(List<String> tagList,
+    public Page<ProductsEntity> findAllDistinctByTagListAndStatus(ProductsType productsType,
+        List<String> tagList,
         DataStatus status, Pageable pageable) {
-        return productsJpaRepository.findDistinctProductsByTagNamesAndStatus(tagList, status,
-            pageable);
+        if (ProductsType.NORMAL.equals(productsType)) {
+            return productsJpaRepository.findDistinctProductsByTagNamesAndStatus(tagList, status,
+                pageable);
+        } else {
+            return productsJpaRepository.findDistinctProductsByTagNamesAndProductsTypeAndStatus(
+                tagList, productsType, status, pageable);
+        }
     }
 
     @Override
@@ -207,15 +214,19 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
-    public Page<ProductsEntity> findAllByStatusWithPriceOption(DataStatus dataStatus,
+    public Page<ProductsEntity> findAllByStatusWithPriceOption(ProductsType productsType,
+        DataStatus dataStatus,
         List<Integer> priceOption, Pageable pageable) {
         QProductsEntity qProductsEntity = QProductsEntity.productsEntity;
         BooleanBuilder whereClause = new BooleanBuilder();
         DataStatus activeStatus = DataStatus.ACTIVE;
         // 가격 옵션
         setWhereClauseWithPriceOptions(priceOption, whereClause);
-        // 에셋파일 업로드 true
-        setWhereClauseWithAssetUploadedSuccess(whereClause);
+        if (ProductsType.NORMAL.equals(productsType)) {
+            // 에셋파일 업로드 true
+            setWhereClauseWithAssetUploadedSuccess(whereClause);
+        }
+        setWhereClauseWithProductsType(whereClause, productsType);
         whereClause.and(qProductsEntity.status.eq(activeStatus));
         List<ProductsEntity> response = queryFactory.selectFrom(
                 qProductsEntity)
@@ -233,18 +244,22 @@ public class ProductsRepositoryImpl implements ProductsRepository {
 
     @Override
     public Page<ProductsEntity> findAllDistinctByTagListAndStatusWithPriceOption(
-        List<String> tagList, DataStatus status, List<Integer> priceOption, Pageable pageable) {
+        ProductsType productsType, List<String> tagList, DataStatus status,
+        List<Integer> priceOption,
+        Pageable pageable) {
         QProductsEntity qProductsEntity = QProductsEntity.productsEntity;
         BooleanBuilder whereClause = new BooleanBuilder();
         DataStatus activeStatus = DataStatus.ACTIVE;
-
         // tagList에 맞게
         setWhereClauseWithTagList(tagList, whereClause);
         // 가격 옵션
         setWhereClauseWithPriceOptions(priceOption, whereClause);
-        // 에셋파일 업로드 true인 것들만
-        setWhereClauseWithAssetUploadedSuccess(whereClause);
 
+        if (ProductsType.NORMAL.equals(productsType)) {
+            // 에셋파일 업로드 true인 것들만
+            setWhereClauseWithAssetUploadedSuccess(whereClause);
+        }
+        setWhereClauseWithProductsType(whereClause, productsType);
         whereClause.and(qProductsEntity.status.eq(activeStatus));
         List<ProductsEntity> response = queryFactory.selectFrom(
                 qProductsEntity)
@@ -314,6 +329,11 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         whereClause.and(whereTagListClause);
     }
 
+    private void setWhereClauseWithProductsType(
+        BooleanBuilder whereClause, ProductsType productsType) {
+        whereClause.and(QProductsEntity.productsEntity.productsType.eq(productsType));
+    }
+
     private void setWhereClauseWithAssetUploadedSuccess(
         BooleanBuilder whereClause) {
         whereClause.and(QProductsEntity.productsEntity.productsAssetFileEntity.success.eq(true));
@@ -331,9 +351,15 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
-    public Page<ProductsEntity> findAllByStatus(DataStatus status, Pageable pageable) {
-        return productsJpaRepository.findAllByStatusAndProductsAssetFileEntitySuccessOrderByCreatedAtDesc(
-            status, true, pageable);
+    public Page<ProductsEntity> findAllByStatus(ProductsType productsType, DataStatus status,
+        Pageable pageable) {
+        if (ProductsType.NORMAL.equals(productsType)) {
+            return productsJpaRepository.findAllByStatusAndProductsAssetFileEntitySuccessOrderByCreatedAtDesc(
+                status, true, pageable);
+        } else {
+            return productsJpaRepository.findAllByStatusAndProductsTypeOrderByCreatedAtDesc(status,
+                productsType, pageable);
+        }
     }
 
     @Override

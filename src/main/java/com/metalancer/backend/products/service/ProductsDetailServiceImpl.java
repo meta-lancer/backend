@@ -202,7 +202,8 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
         ProductsAssetFileEntity productsAssetFileEntity = productsAssetFileRepository.findByProducts(
             savedProductsEntity);
 
-        if (!productsAssetFileEntity.getSuccess()) {
+        if (savedProductsEntity.getProductsType().equals(ProductsType.NORMAL)
+            && !productsAssetFileEntity.getSuccess()) {
             throw new InvalidParamException(ErrorCode.NOT_EXIST_ASSET);
         }
 

@@ -8,6 +8,7 @@ import com.metalancer.backend.category.repository.TrendSpotlightTypeRepository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.HotPickType;
 import com.metalancer.backend.common.constants.PeriodType;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.products.domain.Asset;
 import com.metalancer.backend.products.domain.FilterAsset;
@@ -97,7 +98,7 @@ public class ProductsListServiceImpl implements ProductsListService {
         }
 
         Page<ProductsEntity> productsEntities = productsRepository.findAllDistinctByTagListAndStatus(
-            tagList, DataStatus.ACTIVE, pageable);
+            ProductsType.NORMAL, tagList, DataStatus.ACTIVE, pageable);
         Page<TrendSpotlight> trendSpotlights = productsEntities.map(
             ProductsEntity::toTrendSpotLight);
         if (trendSpotlights.getContent().size() > 0) {
@@ -130,7 +131,7 @@ public class ProductsListServiceImpl implements ProductsListService {
         }
 
         Page<ProductsEntity> productsEntities = productsRepository.findAllDistinctByTagListAndStatus(
-            tagList, DataStatus.ACTIVE, pageable);
+            ProductsType.NORMAL, tagList, DataStatus.ACTIVE, pageable);
         Page<GenreGalaxy> genreGalaxies = productsEntities.map(ProductsEntity::toGenreGalaxy);
         if (genreGalaxies.getContent().size() > 0) {
             for (Asset genreGalaxyAsset : genreGalaxies) {
@@ -152,8 +153,10 @@ public class ProductsListServiceImpl implements ProductsListService {
         if (isNullOrEmpty(categoryOption) && isNullOrEmpty(trendOption)) {
             Page<ProductsEntity> productsEntities =
                 priceOption == null || priceOption.size() == 0 ?
-                    productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
-                    productsRepository.findAllByStatusWithPriceOption(DataStatus.ACTIVE,
+                    productsRepository.findAllByStatus(ProductsType.NORMAL, DataStatus.ACTIVE,
+                        pageable) :
+                    productsRepository.findAllByStatusWithPriceOption(ProductsType.NORMAL,
+                        DataStatus.ACTIVE,
                         priceOption, pageable);
 
             Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
@@ -173,9 +176,9 @@ public class ProductsListServiceImpl implements ProductsListService {
         Page<ProductsEntity> productsEntities =
             priceOption == null || priceOption.size() == 0 ?
                 productsRepository.findAllDistinctByTagListAndStatus(
-                    tagList, DataStatus.ACTIVE, pageable)
+                    ProductsType.NORMAL, tagList, DataStatus.ACTIVE, pageable)
                 : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
-                    tagList, DataStatus.ACTIVE, priceOption, pageable);
+                    ProductsType.NORMAL, tagList, DataStatus.ACTIVE, priceOption, pageable);
 
         Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
 
@@ -199,8 +202,10 @@ public class ProductsListServiceImpl implements ProductsListService {
                             DataStatus.ACTIVE,
                             priceOption, keyword, pageable))
                     : priceOption == null || priceOption.isEmpty() ?
-                        productsRepository.findAllByStatus(DataStatus.ACTIVE, pageable) :
-                        productsRepository.findAllByStatusWithPriceOption(DataStatus.ACTIVE,
+                        productsRepository.findAllByStatus(ProductsType.NORMAL, DataStatus.ACTIVE,
+                            pageable) :
+                        productsRepository.findAllByStatusWithPriceOption(ProductsType.NORMAL,
+                            DataStatus.ACTIVE,
                             priceOption, pageable);
 
             Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
@@ -227,14 +232,48 @@ public class ProductsListServiceImpl implements ProductsListService {
                 :
                     priceOption == null || priceOption.isEmpty() ?
                         productsRepository.findAllDistinctByTagListAndStatus(
-                            tagList, DataStatus.ACTIVE, pageable)
+                            ProductsType.NORMAL, tagList, DataStatus.ACTIVE, pageable)
                         : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
-                            tagList, DataStatus.ACTIVE, priceOption, pageable);
+                            ProductsType.NORMAL, tagList, DataStatus.ACTIVE, priceOption, pageable);
 
         Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
-
         setProductsTagList(response);
+        return response;
+    }
 
+    @Override
+    public Page<FilterAsset> getFilterRequestAssetList(List<String> categoryOption,
+        List<String> trendOption, List<Integer> priceOption, Pageable pageable) {
+        List<String> tagList = new ArrayList<>();
+        if (isNullOrEmpty(categoryOption) && isNullOrEmpty(trendOption)) {
+            Page<ProductsEntity> productsEntities =
+                priceOption == null || priceOption.isEmpty() ?
+                    productsRepository.findAllByStatus(ProductsType.REQUEST, DataStatus.ACTIVE,
+                        pageable) :
+                    productsRepository.findAllByStatusWithPriceOption(ProductsType.REQUEST,
+                        DataStatus.ACTIVE,
+                        priceOption, pageable);
+            Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
+            setProductsTagList(response);
+            return response;
+        }
+
+        if (!categoryOption.contains("전체") && !isNullOrEmpty(categoryOption)) {
+            setTagListByOption(categoryOption, tagList);
+        }
+        if (!isNullOrEmpty(trendOption)) {
+            setTagListByOption(trendOption, tagList);
+        }
+
+        // tagList를 가져온다.
+        Page<ProductsEntity> productsEntities =
+            priceOption == null || priceOption.isEmpty() ?
+                productsRepository.findAllDistinctByTagListAndStatus(
+                    ProductsType.REQUEST, tagList, DataStatus.ACTIVE, pageable)
+                : productsRepository.findAllDistinctByTagListAndStatusWithPriceOption(
+                    ProductsType.REQUEST, tagList, DataStatus.ACTIVE, priceOption, pageable);
+        Page<FilterAsset> response = productsEntities.map(ProductsEntity::toFilterAsset);
+        setProductsTagList(response);
         return response;
     }
 

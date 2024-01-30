@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DuplicatedException;
+import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetRequest;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
@@ -649,6 +650,9 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public ProductsDetail createRequestProducts(User user, MultipartFile[] thumbnails,
         RequestProductsCreate dto) throws IOException {
+        if (dto.getOptionList().size() > 3) {
+            throw new InvalidParamException("옵션은 3개까지만 가능합니다. ", ErrorCode.INVALID_PARAMETER);
+        }
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(user,
             DataStatus.ACTIVE);
         ProductsEntity savedRequestProductsEntity = createRequestProductsEntity(dto, creatorEntity);

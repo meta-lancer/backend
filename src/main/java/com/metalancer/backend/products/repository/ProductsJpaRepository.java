@@ -1,6 +1,7 @@
 package com.metalancer.backend.products.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.time.LocalDateTime;
@@ -64,6 +65,12 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
         @Param("tagList") List<String> tagList, @Param("status") DataStatus status,
         Pageable pageable);
 
+    @Query("SELECT DISTINCT pt.productsEntity FROM products_tag pt WHERE pt.name IN :tagList and pt.productsEntity.productsType = :productsType and pt.productsEntity.status = :status")
+    Page<ProductsEntity> findDistinctProductsByTagNamesAndProductsTypeAndStatus(
+        @Param("tagList") List<String> tagList, @Param("productsType") ProductsType productsType,
+        @Param("status") DataStatus status,
+        Pageable pageable);
+
     @Query("SELECT DISTINCT pt.productsEntity FROM products_tag pt WHERE pt.name IN :tagList and pt.productsEntity.status = :status and pt.productsEntity.productsAssetFileEntity.success = true and pt.productsEntity.title like concat('%', :keyword,'%') ")
     Page<ProductsEntity> findDistinctProductsByTagNamesAndStatusAndKeyword(
         @Param("tagList") List<String> tagList, @Param("status") DataStatus status,
@@ -74,6 +81,9 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
 
     Page<ProductsEntity> findAllByStatusAndProductsAssetFileEntitySuccessOrderByCreatedAtDesc(
         DataStatus status, Boolean success, Pageable pageable);
+
+    Page<ProductsEntity> findAllByStatusAndProductsTypeOrderByCreatedAtDesc(
+        DataStatus status, ProductsType productsType, Pageable pageable);
 
     Page<ProductsEntity> findAllByStatusAndProductsAssetFileEntitySuccessAndTitleContainsOrderByCreatedAtDesc(
         DataStatus status, Boolean success, String keyword, Pageable pageable);

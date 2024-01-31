@@ -58,6 +58,7 @@ public class CartController {
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter @RequestBody CreateCartRequest dto) {
         log.info("로그인되어있는 유저: {}", user);
+        log.info("장바구니 생성: {}", dto);
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(
             cartService.createCart(user.getUser(), dto));
@@ -70,6 +71,7 @@ public class CartController {
         @AuthenticationPrincipal PrincipalDetails user,
         @Parameter @RequestBody DeleteCartRequest dto) {
         log.info("로그인되어있는 유저: {}", user);
+        log.info("장바구니 삭제: {}", dto);
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(
             cartService.deleteCart(user.getUser(), dto));

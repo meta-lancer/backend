@@ -8,6 +8,7 @@ import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,8 @@ public class CartRepositoryImpl implements CartRepository {
 
     @Override
     public Page<Cart> findAllByUser(User user, Pageable pageable) {
-        return cartJpaRepository.findAllByUser(user, pageable).map(CartEntity::toDomain);
+        return cartJpaRepository.findAllByUserAndStatus(user, DataStatus.ACTIVE, pageable)
+            .map(CartEntity::toDomain);
     }
 
     @Override
@@ -60,6 +62,11 @@ public class CartRepositoryImpl implements CartRepository {
     @Override
     public Optional<CartEntity> findCartByUserAndAsset(User user, ProductsEntity asset) {
         return cartJpaRepository.findByUserAndProducts(user, asset);
+    }
+
+    @Override
+    public List<CartEntity> findAllCartByUserAndAsset(User user, ProductsEntity asset) {
+        return cartJpaRepository.findAllByUserAndProducts(user, asset);
     }
 
     @Override

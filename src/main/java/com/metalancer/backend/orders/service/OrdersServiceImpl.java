@@ -106,7 +106,7 @@ public class OrdersServiceImpl implements OrdersService {
                     : foundProductEntity.getSalePrice();
             // # 제작요청
             // 만약 productsId가 같은 requsetOption이 있다면!
-            boolean anyProductsIdMatch = dto.getOptionList().stream()
+            boolean anyProductsIdMatch = dto.getOptionList() != null && dto.getOptionList().stream()
                 .anyMatch(option -> productsId.equals(option.getProductsId()));
             if (anyProductsIdMatch) {
                 List<RequestOption> requestOptions = dto.getOptionList().stream()

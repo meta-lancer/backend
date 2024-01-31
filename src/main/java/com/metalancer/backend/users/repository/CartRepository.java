@@ -5,6 +5,7 @@ import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,8 @@ public interface CartRepository {
     Cart findCartById(User user, Long cartId);
 
     Optional<CartEntity> findCartByUserAndAsset(User user, ProductsEntity asset);
+
+    List<CartEntity> findAllCartByUserAndAsset(User user, ProductsEntity asset);
 
     int countCartCnt(User user);
 

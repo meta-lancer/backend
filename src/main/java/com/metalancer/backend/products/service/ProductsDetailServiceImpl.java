@@ -105,10 +105,18 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
-            Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(foundUser,
-                foundProductsEntity);
-            response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
-                .equals(DataStatus.ACTIVE));
+            if (foundProductsEntity.getProductsType().equals(ProductsType.REQUEST)) {
+                List<CartEntity> foundCartEntityList = cartRepository.findAllCartByUserAndAsset(
+                    foundUser, foundProductsEntity);
+                response.setHasCart(foundCartEntityList.size() > 0 && foundCartEntityList.stream()
+                    .anyMatch(cart -> DataStatus.ACTIVE.equals(cart.getStatus())));
+            } else {
+                Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(
+                    foundUser,
+                    foundProductsEntity);
+                response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
+                    .equals(DataStatus.ACTIVE));
+            }
             //        response.setHasOrder();
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);

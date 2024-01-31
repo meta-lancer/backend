@@ -8,6 +8,7 @@ import com.metalancer.backend.products.repository.ProductsRepository;
 import com.metalancer.backend.products.repository.ProductsRequestOptionRepository;
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCartRequest;
+import com.metalancer.backend.users.dto.UserRequestDTO.DeleteCartRequest;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
@@ -73,10 +74,17 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public boolean deleteCart(User user, Long assetId) {
-        ProductsEntity foundProductsEntity = productsRepository.findProductById(assetId);
-        Optional<CartEntity> cartEntity = cartRepository.findCartByUserAndAsset(user,
-            foundProductsEntity);
+    public boolean deleteCart(User user, DeleteCartRequest dto) {
+        ProductsEntity foundProductsEntity = productsRepository.findProductById(dto.getAssetId());
+        // 옵션이 있는지 없는 지의 여부에 따라
+        Optional<ProductsRequestOptionEntity> productsRequestOptionEntity =
+            dto.getRequestOptionId() != null ? productsRequestOptionRepository.findOptionById(
+                dto.getRequestOptionId()) : Optional.empty();
+        Optional<CartEntity> cartEntity =
+            productsRequestOptionEntity.isEmpty() ? cartRepository.findCartByUserAndAsset(user,
+                foundProductsEntity)
+                : cartRepository.findCartByUserAndAssetAndOption(user, foundProductsEntity,
+                    productsRequestOptionEntity.get());
         if (cartEntity.isPresent() && cartEntity.get().getStatus().equals(DataStatus.ACTIVE)) {
             cartEntity.get().deleteCart();
             return true;

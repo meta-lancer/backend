@@ -387,6 +387,7 @@ public class CreatorServiceImpl implements CreatorService {
         PaymentInfoManagementEntity createdPaymentInfoManagementEntity = PaymentInfoManagementEntity.builder()
             .creatorEntity(creatorEntity).registerNo(dto.getRegisterNo()).idCardCopy(idCardCopyUrl)
             .bank(dto.getBank()).accountCopy(accountCopyUrl)
+            .accountNo(dto.getAccountNo())
             .incomeAgree(dto.isIncomeAgree())
             .build();
         paymentInfoManagementRepository.save(createdPaymentInfoManagementEntity);
@@ -410,7 +411,7 @@ public class CreatorServiceImpl implements CreatorService {
             throw new NotFoundException("결제정보 관리", ErrorCode.NOT_FOUND);
         }
         PaymentInfoManagementEntity paymentInfoManagementEntity = optionalPaymentInfoManagement.get();
-        paymentInfoManagementEntity.update(dto.getRegisterNo(), dto.getBank());
+        paymentInfoManagementEntity.update(dto.getRegisterNo(), dto.getBank(), dto.getAccountNo());
 
         if (idCardCopyFile != null && !idCardCopyFile.isEmpty()) {
             String randomString1 = uploadService.getRandomStringForImageName(8);

@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.dto;
 
+import com.metalancer.backend.common.constants.PaymentInfoType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
@@ -179,10 +180,14 @@ public class CreatorRequestDTO {
     @Data
     public static class MyPaymentInfoManagementCreate {
 
+        @Schema(description = "결제정보 종류")
+        PaymentInfoType paymentType;
         @Schema(description = "주민등록번호")
         private String registerNo;
         @Schema(description = "은행")
         private String bank;
+        @Schema(description = "계좌번호")
+        private String accountNo;
         @Schema(description = "소득 지급 관련 정보 동의")
         private boolean incomeAgree;
 
@@ -191,10 +196,14 @@ public class CreatorRequestDTO {
     @Data
     public static class MyPaymentInfoManagementUpdate {
 
+        @Schema(description = "결제정보 종류")
+        PaymentInfoType paymentType;
         @Schema(description = "주민등록번호")
         private String registerNo;
         @Schema(description = "은행")
         private String bank;
+        @Schema(description = "계좌번호")
+        private String accountNo;
     }
 
     @Data

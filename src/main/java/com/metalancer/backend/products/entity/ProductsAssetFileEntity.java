@@ -87,6 +87,8 @@ public class ProductsAssetFileEntity extends BaseTimeEntity implements Serializa
     }
 
     public void success() {
+        this.url = url.replace("https://metaovis-asset.s3.ap-northeast-2.amazonaws.com",
+            "https://d3b12udozciweo.cloudfront.net");
         this.success = true;
     }
 

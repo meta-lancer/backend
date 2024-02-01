@@ -120,9 +120,9 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
                     foundProductsEntity);
                 response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
                     .equals(DataStatus.ACTIVE));
-                Optional<PayedAssetsEntity> freePayedAssetEntityOptional = payedAssetsRepository.findByUserAndProductsAndStatus(
+                List<PayedAssetsEntity> freePayedAssetEntityList = payedAssetsRepository.findAllByUserAndProductsAndStatus(
                     foundUser, foundProductsEntity, DataStatus.ACTIVE);
-                response.setHasOrder(freePayedAssetEntityOptional.isPresent());
+                response.setHasOrder(freePayedAssetEntityList.size() > 0);
             }
 
         }
@@ -175,9 +175,9 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
                     foundProductsEntity);
                 response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
                     .equals(DataStatus.ACTIVE));
-                Optional<PayedAssetsEntity> freePayedAssetEntityOptional = payedAssetsRepository.findByUserAndProductsAndStatus(
+                List<PayedAssetsEntity> freePayedAssetEntityList = payedAssetsRepository.findAllByUserAndProductsAndStatus(
                     foundUser, foundProductsEntity, DataStatus.ACTIVE);
-                response.setHasOrder(freePayedAssetEntityOptional.isPresent());
+                response.setHasOrder(freePayedAssetEntityList.size() > 0);
             }
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);

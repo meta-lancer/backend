@@ -7,6 +7,7 @@ import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,13 @@ public class PayedAssetsRepositoryImpl implements PayedAssetsRepository {
     public Optional<PayedAssetsEntity> findByUserAndProductsAndStatus(User user,
         ProductsEntity productsEntity, DataStatus status) {
         return payedAssetsJpaRepository.findByUserAndProductsAndStatus(user, productsEntity,
+            status);
+    }
+
+    @Override
+    public List<PayedAssetsEntity> findAllByUserAndProductsAndStatus(User user,
+        ProductsEntity productsEntity, DataStatus status) {
+        return payedAssetsJpaRepository.findAllByUserAndProductsAndStatus(user, productsEntity,
             status);
     }
 

@@ -89,4 +89,9 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
         DataStatus status, Boolean success, String keyword, Pageable pageable);
 
     Page<ProductsEntity> findAllByCreatorEntity(CreatorEntity creatorEntity, Pageable pageable);
+
+    @Query("select p from products p where p.creatorEntity = :creatorEntity and p.status = 'ACTIVE' and (p.productsAssetFileEntity.success = true or p.productsType = 'REQUEST')")
+    Page<ProductsEntity> findAllValidProductsByCreator(
+        @Param("creatorEntity") CreatorEntity creatorEntity,
+        Pageable pageable);
 }

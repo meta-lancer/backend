@@ -186,7 +186,8 @@ public class SalesServiceImpl implements SalesService {
     public Page<SettlementReportList> getSettlementReportList(PrincipalDetails user,
         Pageable pageable) {
         CreatorEntity creatorEntity = getCreatorEntity(user);
-        Page<ProductsEntity> productsEntityList = productsRepository.findAllByCreator(creatorEntity,
+        Page<ProductsEntity> productsEntityList = productsRepository.findAllValidProductsByCreator(
+            creatorEntity,
             pageable);
         long totalCnt = productsEntityList.getTotalElements();
         List<SettlementReportList> reportLists = new ArrayList<>();

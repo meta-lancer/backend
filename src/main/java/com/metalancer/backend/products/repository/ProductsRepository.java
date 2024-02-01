@@ -29,7 +29,8 @@ public interface ProductsRepository {
         DataStatus status,
         Pageable pageable);
 
-    Page<ProductsEntity> findAllByCreator(CreatorEntity creatorEntity, Pageable pageable);
+    Page<ProductsEntity> findAllValidProductsByCreator(CreatorEntity creatorEntity,
+        Pageable pageable);
 
     Page<ProductsEntity> findAllByCreatorAndStatus(CreatorEntity creatorEntity, DataStatus status,
         Pageable pageable);

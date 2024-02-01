@@ -61,9 +61,20 @@ public class OrdersController {
     /// 구매하기를 누르면 장바구니 담기와 같이! 대신 response가 결제하기 페이지를 위한 게 있어야겠지???
 
 
+    @Operation(summary = "무료 구매하기", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = CreatedOrder.class)))
+    @PostMapping("/free")
+    public BaseResponse<PaymentResponse> createFreeOrder(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody OrdersRequestDTO.CreateFreeOrder dto) {
+        log.info("무료 주문서 만들기: {}", dto);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<>(
+            ordersService.createFreeOrder(user.getUser(), dto));
+    }
+
     @Operation(summary = "주문서 만들기", description = "결제하기를 누르면 결제완료 이전의 주문서가 만들어집니다. \n\n " +
-        "여기서 결제모듈에 사용될 orderNo가 생성됩니다. \n\n " +
-        "로그인 후, Session값이 제대로 설정될 때까지 유저1로 진행됩니다.")
+        "여기서 결제모듈에 사용될 orderNo가 생성됩니다.")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = CreatedOrder.class)))
     @PostMapping
     public BaseResponse<CreatedOrder> createOrder(
@@ -73,6 +84,20 @@ public class OrdersController {
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<>(
             ordersService.createOrder(user.getUser(), dto));
+    }
+
+    @Operation(summary = "주문서 만들기(외화)", description = "결제하기를 누르면 결제완료 이전의 주문서가 만들어집니다. \n\n " +
+        "여기서 결제모듈에 사용될 orderNo가 생성됩니다. \n\n " +
+        "로그인 후, Session값이 제대로 설정될 때까지 유저1로 진행됩니다.")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = CreatedOrder.class)))
+    @PostMapping("/en")
+    public BaseResponse<CreatedOrder> createOrderByEn(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody OrdersRequestDTO.CreateOrder dto) {
+        log.info("주문서 만들기: {}", dto);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<>(
+            ordersService.createOrderByEn(user.getUser(), dto));
     }
 
 

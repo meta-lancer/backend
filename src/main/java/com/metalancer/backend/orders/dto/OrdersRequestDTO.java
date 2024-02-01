@@ -13,6 +13,14 @@ public class OrdersRequestDTO {
 
     @Data
     @NoArgsConstructor
+    public static class CreateFreeOrder {
+
+        @Schema(description = "결제할 에셋 고유번호", example = "")
+        private Long productsId;
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class CreateOrder {
 
         @Schema(description = "총 금액", example = "5000")

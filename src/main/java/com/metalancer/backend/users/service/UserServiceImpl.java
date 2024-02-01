@@ -210,6 +210,7 @@ public class UserServiceImpl implements UserService {
             .email(foundUser.getEmail()).build();
         createdCreatorEntity.setPending();
         creatorRepository.save(createdCreatorEntity);
+
         // 포트폴리오 생성
         CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
             DataStatus.PENDING);
@@ -336,6 +337,18 @@ public class UserServiceImpl implements UserService {
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
+
+        // 만약 크리에이터가 아닌 경우, 업무 경력 등록하면...!
+        Optional<CreatorEntity> foundCreatorEntity = creatorRepository.findOptionalByUserAndStatus(
+            foundUser, DataStatus.ACTIVE);
+        if (foundCreatorEntity.isEmpty()) {
+            // 크리에이터 생성 + 승인대기
+            CreatorEntity createdCreatorEntity = CreatorEntity.builder().user(foundUser)
+                .email(foundUser.getEmail()).build();
+            createdCreatorEntity.setPending();
+            creatorRepository.save(createdCreatorEntity);
+        }
+
         CareerEntity createdCareerEntity = CareerEntity.builder().user(foundUser).title(
                 dto.getTitle()).description(dto.getDescription())
             .beginAt(dto.getBeginAt()).endAt(dto.getEndAt()).build();
@@ -368,5 +381,17 @@ public class UserServiceImpl implements UserService {
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
         );
         return productsRequestRepository.findAllByUser(foundUser, pageable);
+    }
+
+    @Override
+    public Boolean checkCreatorPending(PrincipalDetails user) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        Optional<CreatorEntity> creatorEntity = creatorRepository.findOptionalByUser(
+            foundUser);
+        return creatorEntity.isPresent() && DataStatus.PENDING.equals(
+            creatorEntity.get().getStatus());
     }
 }

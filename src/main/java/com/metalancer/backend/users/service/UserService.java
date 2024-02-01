@@ -58,4 +58,6 @@ public interface UserService {
     List<Portfolio> getMyPortfolio(PrincipalDetails user);
 
     Page<ProductsRequest> getProductsRequestList(PrincipalDetails user, Pageable pageable);
+
+    Boolean checkCreatorPending(PrincipalDetails user);
 }

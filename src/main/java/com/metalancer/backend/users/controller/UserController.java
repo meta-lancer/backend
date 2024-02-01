@@ -218,6 +218,18 @@ public class UserController {
         return new BaseResponse<List<Portfolio>>(userService.getMyPortfolio(user));
     }
 
+    @Operation(summary = "마이페이지 - 크리에이터 승인중 확인", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @GetMapping("/creator/status")
+    public BaseResponse<Boolean> checkCreatorPending(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(userService.checkCreatorPending(user));
+    }
+
     @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))

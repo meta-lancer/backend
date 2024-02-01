@@ -29,4 +29,6 @@ public interface AuthService {
     boolean resetPassword(String email);
 
     Boolean resetMyPassword(PrincipalDetails user, PasswordRequest dto);
+
+    Boolean findEmailId(String email);
 }

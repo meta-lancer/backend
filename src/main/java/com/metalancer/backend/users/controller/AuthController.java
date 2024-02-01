@@ -5,6 +5,7 @@ import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.users.dto.AuthRequestDTO;
+import com.metalancer.backend.users.dto.AuthRequestDTO.ResetPasswordRequest;
 import com.metalancer.backend.users.dto.AuthResponseDTO;
 import com.metalancer.backend.users.dto.UserRequestDTO;
 import com.metalancer.backend.users.service.AuthService;
@@ -81,12 +82,20 @@ public class AuthController {
         return session.getAttribute(key);
     }
 
-    @Operation(summary = "비밀번호 찾기", description = "이메일과 링크 일치 여부 판단 -> 비밀번호 변경")
-    @PatchMapping("/password/reset")
-    public BaseResponse<Boolean> resetPassword(
+    @Operation(summary = "아이디 찾기", description = "이메일과 링크 일치 여부 판단 -> 비밀번호 변경")
+    @GetMapping("/email")
+    public BaseResponse<Boolean> findEmailId(
         @RequestParam("email") String email
     ) {
-        return new BaseResponse<Boolean>(authService.resetPassword(email));
+        return new BaseResponse<Boolean>(authService.findEmailId(email));
+    }
+
+    @Operation(summary = "비밀번호 찾기", description = "이메일과 링크 일치 여부 판단 -> 비밀번호 변경")
+    @PostMapping("/password")
+    public BaseResponse<Boolean> resetPassword(
+        @RequestBody ResetPasswordRequest dto
+    ) {
+        return new BaseResponse<Boolean>(authService.resetPassword(dto.getEmail()));
     }
 
     @Operation(summary = "비밀번호 변경", description = "성공여부에 따라 리턴값")

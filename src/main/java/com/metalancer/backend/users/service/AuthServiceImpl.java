@@ -310,4 +310,9 @@ public class AuthServiceImpl implements AuthService {
         foundUser.changeNewPassword(passwordEncoder, dto.getNewPassword1());
         return passwordEncoder.matches(dto.getNewPassword1(), foundUser.getPassword());
     }
+
+    @Override
+    public Boolean findEmailId(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }

@@ -22,8 +22,10 @@ import com.metalancer.backend.products.repository.ProductsViewsRepository;
 import com.metalancer.backend.products.repository.ProductsWishRepository;
 import com.metalancer.backend.users.entity.CartEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.CartRepository;
+import com.metalancer.backend.users.repository.PayedAssetsRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +50,8 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     private final ProductsAssetFileRepository productsAssetFileRepository;
     private final UserRepository userRepository;
     private final ProductsRequestOptionRepository productsRequestOptionRepository;
+    private final PayedAssetsRepository payedAssetsRepository;
+
 
     @Override
     public String getProductDetailSharedLink(Long productId) {
@@ -116,8 +120,11 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
                     foundProductsEntity);
                 response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
                     .equals(DataStatus.ACTIVE));
+                Optional<PayedAssetsEntity> freePayedAssetEntityOptional = payedAssetsRepository.findByUserAndProductsAndStatus(
+                    foundUser, foundProductsEntity, DataStatus.ACTIVE);
+                response.setHasOrder(freePayedAssetEntityOptional.isPresent());
             }
-            //        response.setHasOrder();
+
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);
@@ -138,8 +145,7 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
     @Override
     public ProductsDetail getProductDetailBySharedLink(PrincipalDetails user, String link) {
         ProductsEntity foundProductsEntity = productsRepository.findProductBySharedLinkAndStatus(
-            link,
-            DataStatus.ACTIVE);
+            link, DataStatus.ACTIVE);
 
         CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
@@ -158,11 +164,21 @@ public class ProductsDetailServiceImpl implements ProductsDetailService {
             Optional<ProductsWishEntity> foundProductsWishEntity = productsWishRepository.findByUserAndProduct(
                 foundUser, foundProductsEntity);
             response.setHasWish(foundProductsWishEntity.isPresent());
-            Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(foundUser,
-                foundProductsEntity);
-            response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
-                .equals(DataStatus.ACTIVE));
-            //        response.setHasOrder();
+            if (foundProductsEntity.getProductsType().equals(ProductsType.REQUEST)) {
+                List<CartEntity> foundCartEntityList = cartRepository.findAllCartByUserAndAsset(
+                    foundUser, foundProductsEntity);
+                response.setHasCart(foundCartEntityList.size() > 0 && foundCartEntityList.stream()
+                    .anyMatch(cart -> DataStatus.ACTIVE.equals(cart.getStatus())));
+            } else {
+                Optional<CartEntity> foundCartEntity = cartRepository.findCartByUserAndAsset(
+                    foundUser,
+                    foundProductsEntity);
+                response.setHasCart(foundCartEntity.isPresent() && foundCartEntity.get().getStatus()
+                    .equals(DataStatus.ACTIVE));
+                Optional<PayedAssetsEntity> freePayedAssetEntityOptional = payedAssetsRepository.findByUserAndProductsAndStatus(
+                    foundUser, foundProductsEntity, DataStatus.ACTIVE);
+                response.setHasOrder(freePayedAssetEntityOptional.isPresent());
+            }
         }
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         response.setTagList(tagList);

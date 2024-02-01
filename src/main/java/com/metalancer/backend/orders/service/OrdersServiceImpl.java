@@ -53,10 +53,14 @@ import com.siot.IamportRestClient.response.Payment;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -281,6 +285,23 @@ public class OrdersServiceImpl implements OrdersService {
         if (foundProductEntity.getPrice() != 0) {
             throw new InvalidParamException("product is not free", ErrorCode.INVALID_PARAMETER);
         }
+
+        Optional<PayedAssetsEntity> freePayedAssetEntityOptional = payedAssetsRepository.findByUserAndProductsAndStatus(
+            user, foundProductEntity, DataStatus.ACTIVE);
+
+        if (freePayedAssetEntityOptional.isPresent()) {
+            PayedAssetsEntity payedAssetsEntity = freePayedAssetEntityOptional.get();
+            OrdersEntity ordersEntity = payedAssetsEntity.getOrderProductsEntity()
+                .getOrdersEntity();
+            OrderPaymentEntity orderPaymentEntity = payedAssetsEntity.getOrderPaymentEntity();
+            Date purchasedAtDate = convertLocalDateTimeToDate(orderPaymentEntity.getPurchasedAt());
+            PaymentResponse response = getPaymentResponse(user,
+                ordersEntity, ordersEntity.getOrderStatus(),
+                purchasedAtDate);
+            log.info("무료 결제처리 응답: {}", response);
+            return response;
+        }
+
         // 포트원용 주문번호 만들기
         String orderNo = createOrderNo();
         OrdersEntity createdOrdersEntity = getCreatedOrdersEntity(user, BigDecimal.ZERO,
@@ -319,8 +340,7 @@ public class OrdersServiceImpl implements OrdersService {
         ProductsSalesEntity createdProductsSalesEntity = createdOrderProductsEntity.toProductsSalesEntity();
         createdProductsSalesEntity.setCurrency(currencyType);
         createdProductsSalesEntity.setPaymentType(paymentType);
-        BigDecimal chargeRate = portOneChargeRepository.getChargeRate(paymentType);
-        createdProductsSalesEntity.setChargeRate(chargeRate);
+        createdProductsSalesEntity.setChargeRate(BigDecimal.ZERO);
         productsSalesRepository.save(createdProductsSalesEntity);
 
         // response 만들기
@@ -329,6 +349,12 @@ public class OrdersServiceImpl implements OrdersService {
             createdOrdersEntity, createdOrdersEntity.getOrderStatus(), purchasedAt);
         log.info("무료 결제처리 응답: {}", response);
         return response;
+    }
+
+    private Date convertLocalDateTimeToDate(LocalDateTime localDateTime) {
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        Instant instant = zonedDateTime.toInstant();
+        return Date.from(instant);
     }
 
 

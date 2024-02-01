@@ -39,4 +39,5 @@ public class OrderProductsRepositoryImpl implements OrderProductsRepository {
         return orderProductsJpaRepository.findAllByOrderProductStatusIsNotAndStatus(orderStatus,
             dataStatus);
     }
+
 }

@@ -17,4 +17,5 @@ public interface OrderProductsRepository {
 
     List<OrderProductsEntity> findAllByOrderProductStatusIsNotAndStatus(OrderStatus orderStatus,
         DataStatus dataStatus);
+
 }

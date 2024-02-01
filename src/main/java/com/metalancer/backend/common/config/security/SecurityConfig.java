@@ -41,6 +41,7 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final MemberLoginFailService memberLoginFailService;
     private final LoginLogsRepository loginLogsRepository;
+    private final PrincipalDetailsService principalDetailsService;
 
     @Value("${spring.security.oauth2.client.targetUrl}")
     private String targetUrl;
@@ -53,6 +54,11 @@ public class SecurityConfig {
 
     @Value("${spring.failUrl}")
     private String failUrl;
+
+    int VALID_SECONDS = 60 * 60 * 24 * 7; // 1주일
+
+    @Value("${spring.security.rememberMe.key}")
+    private String rememberMeKey;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -131,11 +137,17 @@ public class SecurityConfig {
             .logoutSuccessHandler((request, response, authentication) -> {
                 response.sendRedirect(loginPage);
             }) // 로그아웃 성공 핸들러
-            .deleteCookies("remember-me"); // 로그아웃 후 삭제할 쿠키 지정
+            .deleteCookies("SESSION", "remember-me"); // 로그아웃 후 삭제할 쿠키 지정
 
         http.exceptionHandling()
             .authenticationEntryPoint(authenticationEntryPoint)
             .accessDeniedHandler(accessDeniedHandler);
+
+        http.rememberMe()
+            .key(rememberMeKey)
+            .tokenValiditySeconds(VALID_SECONDS)
+            .rememberMeParameter("rememberMe")
+            .userDetailsService(principalDetailsService);
 
         return http.build();
     }

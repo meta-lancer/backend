@@ -94,4 +94,6 @@ public interface ProductsJpaRepository extends JpaRepository<ProductsEntity, Lon
     Page<ProductsEntity> findAllValidProductsByCreator(
         @Param("creatorEntity") CreatorEntity creatorEntity,
         Pageable pageable);
+
+    Optional<ProductsEntity> findByIdAndStatus(Long productsId, DataStatus status);
 }

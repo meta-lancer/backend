@@ -11,4 +11,6 @@ public interface AdminProductsService {
     Page<ProductsList> getAdminProductsList(Pageable pageable);
 
     ProductsDetail getProductDetail(Long productId);
+
+    boolean deleteProduct(Long productId);
 }

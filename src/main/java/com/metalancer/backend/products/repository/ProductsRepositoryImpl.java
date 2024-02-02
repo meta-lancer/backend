@@ -79,6 +79,11 @@ public class ProductsRepositoryImpl implements ProductsRepository {
     }
 
     @Override
+    public Optional<ProductsEntity> findOptionalByIdAndStatus(Long productsId, DataStatus status) {
+        return productsJpaRepository.findByIdAndStatus(productsId, status);
+    }
+
+    @Override
     public ProductsEntity findAdminProductById(Long productsId) {
         Optional<ProductsEntity> productsEntity = productsJpaRepository.findById(productsId);
         if (productsEntity.isEmpty()) {

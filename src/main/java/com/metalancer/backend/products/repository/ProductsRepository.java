@@ -7,6 +7,7 @@ import com.metalancer.backend.products.domain.HotPickAsset;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +20,8 @@ public interface ProductsRepository {
     ProductsEntity findProductBySharedLinkAndStatus(String SharedLink, DataStatus status);
 
     ProductsEntity findProductByIdAndStatus(Long productsId, DataStatus status);
+
+    Optional<ProductsEntity> findOptionalByIdAndStatus(Long productsId, DataStatus status);
 
     ProductsEntity findAdminProductById(Long productsId);
 

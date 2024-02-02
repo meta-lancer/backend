@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.ProductsList;
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.InvalidParamException;
@@ -59,7 +60,6 @@ public class AdminProductsServiceImpl implements AdminProductsService {
     @Override
     public ProductsDetail getProductDetail(Long productId) {
         ProductsEntity foundProductsEntity = productsRepository.findAdminProductById(productId);
-        foundProductsEntity.addViewCnt();
         List<String> tagList = productsTagRepository.findTagListByProduct(foundProductsEntity);
         CreatorEntity creatorEntity = foundProductsEntity.getCreatorEntity();
         long taskCnt = productsRepository.countAllByCreatorEntity(creatorEntity);
@@ -73,6 +73,14 @@ public class AdminProductsServiceImpl implements AdminProductsService {
         response.setAssetFile(assetFile);
         response.setAssetFile(assetFile);
         return response;
+    }
+
+    @Override
+    public boolean deleteProduct(Long productId) {
+        ProductsEntity foundProductsEntity = productsRepository.findAdminProductById(productId);
+        foundProductsEntity.deleteProducts();
+        return productsRepository.findOptionalByIdAndStatus(productId, DataStatus.DELETED)
+            .isPresent();
     }
 
     private AssetFile getProductsDetailAssetFileAfterUploaded(ProductsEntity savedProductsEntity,

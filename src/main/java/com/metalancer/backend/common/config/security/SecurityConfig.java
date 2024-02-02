@@ -146,8 +146,7 @@ public class SecurityConfig {
         http.rememberMe()
             .key(rememberMeKey)
             .tokenValiditySeconds(VALID_SECONDS)
-            .rememberMeParameter("rememberMe")
-            .userDetailsService(principalDetailsService);
+            .rememberMeParameter("rememberMe");
 
         return http.build();
     }

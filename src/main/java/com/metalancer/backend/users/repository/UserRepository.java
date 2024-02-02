@@ -19,6 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByUsername(String username);
+
     int countUsersByNickname(String nickname);
 
     @Query("select count(u) from users u where u.createdAt between :startDate and :startOfNextDay")
@@ -39,4 +41,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Integer getCreatorUserCnt();
 
     Optional<User> findByNameAndRoleAndStatus(String id, Role role, DataStatus status);
+
+    Optional<User> findByUsernameOrEmail(String username, String username1);
 }

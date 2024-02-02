@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.domain.ProductsList;
+import com.metalancer.backend.admin.dto.AdminProductDTO.DeleteList;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
@@ -81,6 +82,19 @@ public class AdminProductsServiceImpl implements AdminProductsService {
         foundProductsEntity.deleteProducts();
         return productsRepository.findOptionalByIdAndStatus(productId, DataStatus.DELETED)
             .isPresent();
+    }
+
+    @Override
+    public Boolean deleteProductList(DeleteList dto) {
+        boolean result = true;
+        for (Long productsId : dto.getProductsIdList()) {
+            ProductsEntity foundProductsEntity = productsRepository.findAdminProductById(
+                productsId);
+            foundProductsEntity.deleteProducts();
+            result = productsRepository.findOptionalByIdAndStatus(productsId, DataStatus.DELETED)
+                .isPresent();
+        }
+        return result;
     }
 
     private AssetFile getProductsDetailAssetFileAfterUploaded(ProductsEntity savedProductsEntity,

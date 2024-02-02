@@ -2,6 +2,7 @@ package com.metalancer.backend.admin.controller;
 
 
 import com.metalancer.backend.admin.domain.ProductsList;
+import com.metalancer.backend.admin.dto.AdminProductDTO;
 import com.metalancer.backend.admin.service.AdminProductsService;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,5 +55,14 @@ public class AdminProductsController {
     ) {
         log.info("delete products API 호출 - {}", user.getUser().getName());
         return new BaseResponse<Boolean>(adminProductsService.deleteProduct(productId));
+    }
+
+    @DeleteMapping
+    public BaseResponse<Boolean> deleteAdminProductList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @RequestBody AdminProductDTO.DeleteList dto
+    ) {
+        log.info("delete products list API 호출 - {}", user.getUser().getName());
+        return new BaseResponse<Boolean>(adminProductsService.deleteProductList(dto));
     }
 }

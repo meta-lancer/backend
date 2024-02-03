@@ -3,6 +3,7 @@ package com.metalancer.backend.users.repository;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.users.entity.CareerEntity;
+import com.metalancer.backend.users.entity.CreatorEntity;
 import com.metalancer.backend.users.entity.User;
 import java.util.List;
 import java.util.Optional;
@@ -41,5 +42,11 @@ public class CareerRepositoryImpl implements CareerRepository {
     @Override
     public void save(CareerEntity createdCareerEntity) {
         careerJpaRepository.save(createdCareerEntity);
+    }
+
+    @Override
+    public Optional<CareerEntity> findOptionalByCreator(CreatorEntity creatorEntity) {
+        User user = creatorEntity.getUser();
+        return careerJpaRepository.findByUser(user);
     }
 }

@@ -2,6 +2,7 @@ package com.metalancer.backend.admin.controller;
 
 
 import com.metalancer.backend.admin.domain.CreatorList;
+import com.metalancer.backend.admin.domain.CreatorPendingList;
 import com.metalancer.backend.admin.domain.MemberDetail;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
@@ -9,9 +10,12 @@ import com.metalancer.backend.admin.dto.AdminMemberDTO;
 import com.metalancer.backend.admin.service.AdminMemberService;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.response.BaseResponse;
+import com.metalancer.backend.common.utils.PageFunction;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,6 +56,16 @@ public class AdminMemberController {
     public BaseResponse<List<CreatorList>> getAdminCreatorList(
         @AuthenticationPrincipal PrincipalDetails user) {
         return new BaseResponse<List<CreatorList>>(adminMemberService.getAdminCreatorList());
+    }
+
+    @GetMapping("/creator/pending")
+    public BaseResponse<Page<CreatorPendingList>> getAdminCreatorPendingList(
+        @AuthenticationPrincipal PrincipalDetails user, Pageable pageable) {
+        log.info("크리에이터 승인 목록 조회 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        return new BaseResponse<Page<CreatorPendingList>>(
+            adminMemberService.getAdminCreatorPendingList(pageable));
     }
 
     @PatchMapping("/approve")

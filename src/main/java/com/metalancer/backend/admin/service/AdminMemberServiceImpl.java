@@ -14,8 +14,11 @@ import com.metalancer.backend.common.exception.NotFoundException;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.users.entity.ApproveLink;
 import com.metalancer.backend.users.entity.CreatorEntity;
+import com.metalancer.backend.users.entity.PortfolioEntity;
 import com.metalancer.backend.users.entity.User;
 import com.metalancer.backend.users.repository.ApproveLinkRepository;
+import com.metalancer.backend.users.repository.PortfolioImagesRepository;
+import com.metalancer.backend.users.repository.PortfolioRepository;
 import com.metalancer.backend.users.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     private final UserRepository userRepository;
     private final ApproveLinkRepository approveLinkRepository;
     private final CreatorRepository creatorRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final PortfolioImagesRepository portfolioImagesRepository;
 
     @Override
     public List<MemberList> getAdminMemberList() {
@@ -126,6 +131,26 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             DataStatus.ACTIVE);
         boolean isCreator = creator.isPresent();
         return MemberDetail.builder().user(user).isCreator(isCreator).build();
+    }
+
+    @Override
+    public String rejectCreator(Long memberId) {
+        User user = userRepository.findById(memberId).orElseThrow(
+            () -> new NotFoundException(ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity foundPendingCreator = creatorRepository.findByUserAndStatus(user,
+            DataStatus.PENDING);
+
+        // 만약 등록한 포트폴리오가 있다면
+        Optional<PortfolioEntity> portfolioEntityOptional = portfolioRepository.findOptionalByCreator(
+            foundPendingCreator);
+        if (portfolioEntityOptional.isPresent()) {
+            PortfolioEntity portfolioEntity = portfolioEntityOptional.get();
+            portfolioImagesRepository.deleteAllByPortfolioEntity(portfolioEntity);
+            portfolioRepository.delete(portfolioEntity);
+        }
+        creatorRepository.delete(foundPendingCreator);
+        return null;
     }
 
     private String adminApproveMember(List<User> userList) {

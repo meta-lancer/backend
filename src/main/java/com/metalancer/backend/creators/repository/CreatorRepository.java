@@ -23,4 +23,7 @@ public interface CreatorRepository {
     void save(CreatorEntity createdCreator);
 
     Integer getRegisterCntByDate(LocalDateTime date, LocalDateTime startOfNextDay);
+
+    void delete(CreatorEntity foundPendingCreator);
+    
 }

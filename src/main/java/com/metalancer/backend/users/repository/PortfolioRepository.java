@@ -18,4 +18,7 @@ public interface PortfolioRepository {
     void delete(PortfolioEntity portfolioEntity);
 
     void save(PortfolioEntity portfolioEntity);
+
+    Optional<PortfolioEntity> findOptionalByCreator(CreatorEntity creatorEntity);
+
 }

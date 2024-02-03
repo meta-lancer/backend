@@ -11,4 +11,6 @@ public interface PortfolioJpaRepository extends JpaRepository<PortfolioEntity, L
     List<PortfolioEntity> findAllByCreatorEntity(CreatorEntity creatorEntity);
 
     Optional<PortfolioEntity> findByIdAndCreatorEntity(Long id, CreatorEntity creatorEntity);
+
+    Optional<PortfolioEntity> findByCreatorEntity(CreatorEntity creatorEntity);
 }

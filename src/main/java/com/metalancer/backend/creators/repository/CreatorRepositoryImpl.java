@@ -55,4 +55,9 @@ public class CreatorRepositoryImpl implements CreatorRepository {
     public Integer getRegisterCntByDate(LocalDateTime date, LocalDateTime startOfNextDay) {
         return creatorJpaRepository.getRegisterCntByDate(date, startOfNextDay);
     }
+
+    @Override
+    public void delete(CreatorEntity foundPendingCreator) {
+        creatorJpaRepository.delete(foundPendingCreator);
+    }
 }

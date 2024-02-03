@@ -71,6 +71,14 @@ public class AdminMemberController {
         return new BaseResponse<String>(adminMemberService.improveToCreator(memberId));
     }
 
+    @DeleteMapping("/{memberId}/creator")
+    public BaseResponse<String> rejectCreator(@AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable("memberId") Long memberId) {
+        log.info("크리에이터 거절 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        return new BaseResponse<String>(adminMemberService.rejectCreator(memberId));
+    }
+
     @DeleteMapping("/{memberId}")
     public BaseResponse<String> deleteMember(@AuthenticationPrincipal PrincipalDetails user,
         @PathVariable("memberId") Long memberId) {

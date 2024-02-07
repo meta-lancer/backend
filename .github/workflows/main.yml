@@ -24,7 +24,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-          
+
       - name: Where is here
         run: pwd
 
@@ -34,31 +34,31 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build --stacktrace
         env:
-          spring.redis.host: ${{secrets.REDIS_HOST}}
-          spring.redis.port: ${{secrets.REDIS_PORT}}
-          spring.security.oauth2.client.targetUrl: ${{secrets.OAUTH_CLIENT_TARGET_URL}}
-          spring.loginPage: ${{secrets.OAUTH_LOGIN_PAGE}}
-          spring.successUrl: ${{secrets.OAUTH_SUCCESS_URL}}
-          spring.failUrl: ${{secrets.OAUTH_FAIL_URL}}
-          spring.security.rememberMe.key: ${{secrets.REMEMBERME_KEY}}
-          exchange.api.key: ${{secrets.EXCHANGE_API_KEY}}
-          cloud.aws.credentials.accessKey: ${{secrets.AWS_ACCESS_KEY}}
-          cloud.aws.credentials.secretKey: ${{secrets.AWS_SECRET_KEY}}
-          cloud.aws.s3.assetBucket: ${{secrets.ASSET_BUCKET}}
-          cloud.aws.region.static: ${{secrets.REGION_STATIC}}
-          cloud.aws.s3.cloudfront.asset: ${{secrets.CLOUDFRONT_ASSET}}
-          cloud.aws.s3.cloudfront.user: ${{secrets.CLOUDFRONT_USER}}
-          cloud.aws.s3.cloudfront.service: ${{secrets.CLOUDFRONT_SERVICE}}
-          slack.private.token: ${{secrets.SLACK_TOKEN}}
-          slack.channel.error: ${{secrets.SLACK_ERROR_CHANNEL}}
-          slack.channel.info: ${{secrets.SLACK_INFO_CHANNEL}}
-          iamport.api.key: ${{secrets.IMP_KEY}}
-          iamport.api.secret: ${{secrets.IMP_SECRET}}
-          iamport.imp_uid: ${{secrets.IMP_UID}}
-          spring.datasource.driver-class-name: ${{ secrets.RDS_DRIVER }}
-          spring.datasource.url: ${{ secrets.RDS_HOST }}
-          spring.datasource.username: ${{ secrets.RDS_USERNAME }}
-          spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
+          SPRING_REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          SPRING_REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          SPRING_SECURITY_OAUTH2_CLIENT_TARGETURL: ${{ secrets.OAUTH_CLIENT_TARGET_URL }}
+          SPRING_LOGINPAGE: ${{ secrets.OAUTH_LOGIN_PAGE }}
+          SPRING_SUCCESSURL: ${{ secrets.OAUTH_SUCCESS_URL }}
+          SPRING_FAILURL: ${{ secrets.OAUTH_FAIL_URL }}
+          SPRING_SECURITY_REMEMBERME_KEY: ${{ secrets.REMEMBERME_KEY }}
+          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+          CLOUD_AWS_CREDENTIALS_ACCESSKEY: ${{ secrets.AWS_ACCESS_KEY }}
+          CLOUD_AWS_CREDENTIALS_SECRETKEY: ${{ secrets.AWS_SECRET_KEY }}
+          CLOUD_AWS_S3_ASSETBUCKET: ${{ secrets.ASSET_BUCKET }}
+          CLOUD_AWS_REGION_STATIC: ${{ secrets.REGION_STATIC }}
+          CLOUD_AWS_S3_CLOUDFRONT_ASSET: ${{ secrets.CLOUDFRONT_ASSET }}
+          CLOUD_AWS_S3_CLOUDFRONT_USER: ${{ secrets.CLOUDFRONT_USER }}
+          CLOUD_AWS_S3_CLOUDFRONT_SERVICE: ${{ secrets.CLOUDFRONT_SERVICE }}
+          SLACK_PRIVATE_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL_ERROR: ${{ secrets.SLACK_ERROR_CHANNEL }}
+          SLACK_CHANNEL_INFO: ${{ secrets.SLACK_INFO_CHANNEL }}
+          IAMPORT_API_KEY: ${{ secrets.IMP_KEY }}
+          IAMPORT_API_SECRET: ${{ secrets.IMP_SECRET }}
+          IAMPORT_IMPUID: ${{ secrets.IMP_UID }}
+          SPRING_DATASOURCE_DRIVERCLASSNAME: ${{ secrets.RDS_DRIVER }}
+          SPRING_DATASOURCE_URL: ${{ secrets.RDS_HOST }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.RDS_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.RDS_PASSWORD }}
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1

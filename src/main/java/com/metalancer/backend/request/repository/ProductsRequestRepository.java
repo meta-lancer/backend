@@ -20,4 +20,6 @@ public interface ProductsRequestRepository {
     ProductsRequest save(User user, Create dto);
 
     ProductsRequest update(User user, Update dto, ProductsRequestEntity productsRequestEntity);
+
+    Page<ProductsRequest> findAllByUser(User foundUser, Pageable pageable);
 }

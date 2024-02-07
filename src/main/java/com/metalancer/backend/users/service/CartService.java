@@ -2,6 +2,7 @@ package com.metalancer.backend.users.service;
 
 import com.metalancer.backend.users.domain.Cart;
 import com.metalancer.backend.users.dto.UserRequestDTO.CreateCartRequest;
+import com.metalancer.backend.users.dto.UserRequestDTO.DeleteCartRequest;
 import com.metalancer.backend.users.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,5 +15,5 @@ public interface CartService {
 
     boolean createCart(User user, CreateCartRequest assetId);
 
-    boolean deleteCart(User user, Long assetId);
+    boolean deleteCart(User user, DeleteCartRequest assetId);
 }

@@ -1,5 +1,6 @@
 package com.metalancer.backend.service.entity;
 
+import com.metalancer.backend.admin.domain.Charge;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.ServiceChargesType;
 import com.metalancer.backend.users.entity.User;
@@ -45,4 +46,14 @@ public class ServiceChargeEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private User manager;
+
+    public Charge toCharge() {
+        return Charge.builder().chargeId(id).chargeName(name.toString()).chargeRate(chargeRate)
+            .build();
+    }
+
+    public void updateCharge(BigDecimal chargeRate, User manager) {
+        this.chargeRate = chargeRate;
+        this.manager = manager;
+    }
 }

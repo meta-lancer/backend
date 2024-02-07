@@ -37,6 +37,7 @@ public class TrendSpotlightTypeEntity extends BaseTimeEntity implements Serializ
     private TagsEntity tagsEntity;
 
     private String thumbnail;
+    private boolean useYn = true;
 
     @Builder
     public TrendSpotlightTypeEntity(TagsEntity tagsEntity, String thumbnail) {
@@ -50,5 +51,9 @@ public class TrendSpotlightTypeEntity extends BaseTimeEntity implements Serializ
         return TrendSpotlightCategory.builder().name(tagName)
             .nameKor(tagNameKor).thumbnail(thumbnail)
             .build();
+    }
+
+    public void toggleUse(boolean useYn) {
+        this.useYn = useYn;
     }
 }

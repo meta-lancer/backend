@@ -61,7 +61,7 @@ public class SettlementController {
         return new BaseResponse<>(salesService.getDaySalesReportByExcel(user, beginDate, endDate));
     }
 
-    @Operation(summary = "정산관리-정산요청 가능여부", description = "true면 정산요청 가능. 정산요청 불가능의 경우: 1. 판매 건수 0. 2. 이미 정산 전체 완료 3. 이미 정산요청 진행함(최근 정산 요청일이 판매내역보다 더 뒤인 경우)")
+    @Operation(summary = "정산관리-정산요청 가능여부", description = "true면 정산요청 가능. 정산요청 불가능의 경우: 1. 판매 건수 0. 2. 이미 정산 전체 완료 혹은 rejected 3. 이미 정산요청 진행함(최근 정산 요청일이 판매내역보다 더 뒤인 경우) 4. 최근 정산요청한게 아직 안 끝난 경우")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = SettlementReportList.class)))
     @GetMapping("/request/possiblity")
     public BaseResponse<Boolean> checkSettlementRequestAvailable(
@@ -77,7 +77,7 @@ public class SettlementController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         AuthUtils.validateUserAuthentication(user);
-        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(salesService.getSettlementReportList(user, pageable));
     }
 
@@ -88,7 +88,7 @@ public class SettlementController {
         @AuthenticationPrincipal PrincipalDetails user,
         Pageable pageable) {
         AuthUtils.validateUserAuthentication(user);
-        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
         return new BaseResponse<>(salesService.getSettlementRecordList(user, pageable));
     }
 

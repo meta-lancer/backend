@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.metalancer.backend.admin.domain.AdminManager;
 import com.metalancer.backend.admin.domain.MemberList;
 import com.metalancer.backend.admin.domain.RegisterList;
 import com.metalancer.backend.common.BaseEntity;
@@ -271,5 +272,24 @@ public class User extends BaseEntity implements Serializable {
 
     public void setFirstNickName(String randomNickName) {
         this.nickname = randomNickName;
+    }
+
+    public UserDomain toUserDomain() {
+        return UserDomain.builder()
+            .userId(id)
+            .email(email)
+            .nickname(nickname)
+            .role(role)
+            .mobile(mobile)
+            .profileImg(profileImg)
+            .loginType(loginType)
+            .build();
+    }
+
+    public AdminManager toAdminManager() {
+        return AdminManager.builder().memberId(id).email(email).name(name).nickname(nickname)
+            .loginType(loginType).mobile(mobile)
+            .role(role)
+            .createdAt(getCreatedAt()).updatedAt(getUpdatedAt()).status(getStatus()).build();
     }
 }

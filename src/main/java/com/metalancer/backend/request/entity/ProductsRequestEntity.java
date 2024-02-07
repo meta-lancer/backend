@@ -46,18 +46,36 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
     private int viewCnt = 0;
     @Enumerated(EnumType.STRING)
     private ProductsRequestStatus productsRequestStatus;
-
     private String fileUrl;
-
     private String fileName;
+    private String relatedLink;
 
     @Builder
     public ProductsRequestEntity(User writer,
-        String title, String content, ProductsRequestStatus productsRequestStatus) {
+        String title, String content, ProductsRequestStatus productsRequestStatus, String fileName,
+        String fileUrl, String relatedLink) {
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.productsRequestStatus = productsRequestStatus;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
+        this.relatedLink = relatedLink;
+    }
+
+    public static String shortenString(String fileName) {
+        int maxLength = 15;
+        int extensionIndex = fileName.lastIndexOf('.');
+        if (extensionIndex == -1) {
+            return fileName.substring(0, maxLength);
+        } else {
+            String nameWithoutExtension = fileName.substring(0, extensionIndex);
+            String extension = fileName.substring(extensionIndex);
+            if (nameWithoutExtension.length() > maxLength) {
+                nameWithoutExtension = nameWithoutExtension.substring(0, maxLength - 3);
+            }
+            return nameWithoutExtension + "..." + extension;
+        }
     }
 
     public void setFile(String fileUrl, String fileName) {
@@ -70,7 +88,10 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
             .nickname(writer.getNickname())
             .profileImg(writer.getProfileImg())
             .productsRequestStatus(productsRequestStatus)
-            .title(title).content(content).createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
+            .title(title).content(content)
+            .fileName(fileName != null ? shortenString(fileName) : null).fileUrl(fileUrl)
+            .relatedLink(relatedLink)
+            .createdAt(getCreatedAt()).updatedAt(getUpdatedAt())
             .createdAtKor(Time.convertDateToKorForRequest(getCreatedAt()))
             .updatedAtKor(Time.convertDateToKorForRequest(getUpdatedAt()))
             .createdAtEng(Time.convertDateToEngForRequest(getCreatedAt()))
@@ -79,10 +100,12 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
     }
 
     public void update(
-        String title, String content, ProductsRequestStatus productsRequestStatus) {
+        String title, String content, ProductsRequestStatus productsRequestStatus,
+        String relatedLink) {
         this.title = title;
         this.content = content;
         this.productsRequestStatus = productsRequestStatus;
+        this.relatedLink = relatedLink;
     }
 
     public void deleteRequest() {
@@ -91,5 +114,10 @@ public class ProductsRequestEntity extends BaseEntity implements Serializable {
 
     public void addViewCnt() {
         this.viewCnt += 1;
+    }
+
+    public void updateFile(String fileName, String fileUrl) {
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
     }
 }

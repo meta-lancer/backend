@@ -97,7 +97,8 @@ public class S3Service {
         String fileName) {
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(assetBucket, fileName)
-                .withMethod(HttpMethod.PUT).withContentType("application/zip")
+                .withMethod(HttpMethod.PUT)
+//                .withContentType("application/zip")
                 .withExpiration(getPreSignedUrlExpiration());
         generatePresignedUrlRequest.addRequestParameter(
             Headers.S3_CANNED_ACL,

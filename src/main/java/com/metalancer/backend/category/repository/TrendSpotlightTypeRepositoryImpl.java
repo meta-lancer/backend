@@ -23,6 +23,13 @@ public class TrendSpotlightTypeRepositoryImpl implements TrendSpotlightTypeRepos
     }
 
     @Override
+    public List<TrendSpotlightCategory> getTrendSpotlightCategoryListWithUseYnTrue() {
+        return trendSpotlightTypeJpaRepository.findAllByUseYnTrue().stream()
+            .map(TrendSpotlightTypeEntity::ToMainCategory).collect(
+                Collectors.toList());
+    }
+
+    @Override
     public TrendSpotlightTypeEntity findByName(String platformType) {
         return trendSpotlightTypeJpaRepository.findByName(platformType).orElseThrow(
             () -> new NotFoundException("TrendSpotLight: ", ErrorCode.TYPE_NOT_FOUND)

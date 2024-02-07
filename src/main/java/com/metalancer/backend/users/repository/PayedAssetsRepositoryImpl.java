@@ -1,10 +1,14 @@
 package com.metalancer.backend.users.repository;
 
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,6 +46,20 @@ public class PayedAssetsRepositoryImpl implements PayedAssetsRepository {
             beginAt, adjustedEndAt,
             foundUser, pageable);
         return payedAssetsEntities.map(PayedAssetsEntity::toDomain);
+    }
+
+    @Override
+    public Optional<PayedAssetsEntity> findByUserAndProductsAndStatus(User user,
+        ProductsEntity productsEntity, DataStatus status) {
+        return payedAssetsJpaRepository.findByUserAndProductsAndStatus(user, productsEntity,
+            status);
+    }
+
+    @Override
+    public List<PayedAssetsEntity> findAllByUserAndProductsAndStatus(User user,
+        ProductsEntity productsEntity, DataStatus status) {
+        return payedAssetsJpaRepository.findAllByUserAndProductsAndStatus(user, productsEntity,
+            status);
     }
 
 }

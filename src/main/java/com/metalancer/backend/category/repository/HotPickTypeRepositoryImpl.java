@@ -19,4 +19,12 @@ public class HotPickTypeRepositoryImpl implements HotPickTypeRepository {
             .collect(
                 Collectors.toList());
     }
+
+    @Override
+    public List<MainCategory> getHotPickCategoryListWithUseYnTrue() {
+        return hotPickTypeJpaRepository.findAllByUseYnTrue().stream()
+            .map(HotPickTypeEntity::ToMainCategory)
+            .collect(
+                Collectors.toList());
+    }
 }

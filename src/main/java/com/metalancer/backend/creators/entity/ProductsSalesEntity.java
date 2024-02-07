@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.PaymentType;
 import com.metalancer.backend.creators.domain.SettlementRequestList;
 import com.metalancer.backend.orders.entity.OrdersEntity;
 import com.metalancer.backend.products.entity.ProductsEntity;
+import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,8 +49,13 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "products_id", nullable = false)
     private ProductsEntity productsEntity;
+    @ManyToOne
+    @JoinColumn(name = "products_request_option_id")
+    private ProductsRequestOptionEntity productsRequestOptionEntity;
     @Column(name = "orderer_Id", nullable = false)
     private Long ordererId;
+    @Column(name = "settlement_Id")
+    private Long settlementId;
     @Column(nullable = false)
     private String orderNo;
     private String orderProductNo;
@@ -64,11 +70,13 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
 
     @Builder
     public ProductsSalesEntity(CreatorEntity creatorEntity, OrdersEntity ordersEntity,
-        ProductsEntity productsEntity, Long ordererId, String orderNo, String orderProductNo,
+        ProductsEntity productsEntity, ProductsRequestOptionEntity productsRequestOptionEntity,
+        Long ordererId, String orderNo, String orderProductNo,
         BigDecimal price, BigDecimal chargeRate, PaymentType paymentType, CurrencyType currency) {
         this.creatorEntity = creatorEntity;
         this.ordersEntity = ordersEntity;
         this.productsEntity = productsEntity;
+        this.productsRequestOptionEntity = productsRequestOptionEntity;
         this.ordererId = ordererId;
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
@@ -90,8 +98,9 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
         this.currency = currency;
     }
 
-    public void setSettled() {
+    public void setSettled(SettlementEntity settlementEntity) {
         this.settled = true;
+        this.settlementId = settlementEntity.getId();
     }
 
     public SettlementRequestList toSettlementRequestList() {
@@ -99,4 +108,5 @@ public class ProductsSalesEntity extends BaseEntity implements Serializable {
             .assetTitle(productsEntity.getTitle()).price(price).currencyType(currency)
             .chargeRate(chargeRate).paymentType(paymentType).build();
     }
+
 }

@@ -27,4 +27,11 @@ public class AuthRequestDTO {
         }
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class ResetPasswordRequest {
+
+        private String email;
+    }
+
 }

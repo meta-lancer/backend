@@ -1,5 +1,6 @@
 package com.metalancer.backend.creators.repository;
 
+import com.metalancer.backend.common.constants.SettlementStatus;
 import com.metalancer.backend.creators.entity.SettlementEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
 import java.time.LocalDateTime;
@@ -16,4 +17,7 @@ public interface SettlementRepository {
     void save(SettlementEntity settlementEntity);
 
     Optional<SettlementEntity> findById(Long id);
+
+    Page<SettlementEntity> findAllBySettlementStatus(SettlementStatus settlementStatus,
+        Pageable pageable);
 }

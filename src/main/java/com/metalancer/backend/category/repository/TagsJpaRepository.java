@@ -22,4 +22,6 @@ public interface TagsJpaRepository extends JpaRepository<TagsEntity, Long> {
 
     @Query("select t from tags t where t.depth = 3 and t.tagName like :tagName")
     List<TagsEntity> findAllByTagNameContains(@Param("tagName") String tagName);
+
+    List<TagsEntity> findAllByDepth(int depth);
 }

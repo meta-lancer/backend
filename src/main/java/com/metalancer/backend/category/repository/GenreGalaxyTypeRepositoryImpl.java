@@ -24,6 +24,15 @@ public class GenreGalaxyTypeRepositoryImpl implements GenreGalaxyTypeRepository 
     }
 
     @Override
+    public List<MainCategory> getGenreGalaxyCategoryListWithUseYnTrue() {
+        return genreGalaxyTypeJpaRepository.findAllByUseYnTrue().stream()
+            .map(GenreGalaxyTypeEntity::ToMainCategory)
+            .collect(
+                Collectors.toList());
+    }
+
+
+    @Override
     public GenreGalaxyTypeEntity findByName(String type) {
         return genreGalaxyTypeJpaRepository.findByName(type).orElseThrow(
             () -> new NotFoundException("GenreGalaxy: ", ErrorCode.TYPE_NOT_FOUND)

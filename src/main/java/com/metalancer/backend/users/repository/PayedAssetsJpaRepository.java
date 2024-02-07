@@ -2,9 +2,12 @@ package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.users.entity.PayedAssetsEntity;
 import com.metalancer.backend.users.entity.User;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,4 +35,10 @@ public interface PayedAssetsJpaRepository extends JpaRepository<PayedAssetsEntit
         @Param("endAt") LocalDateTime endAt,
         @Param("user") User user,
         Pageable pageable);
+
+    Optional<PayedAssetsEntity> findByUserAndProductsAndStatus(User user, ProductsEntity products,
+        DataStatus status);
+
+    List<PayedAssetsEntity> findAllByUserAndProductsAndStatus(User user, ProductsEntity products,
+        DataStatus status);
 }

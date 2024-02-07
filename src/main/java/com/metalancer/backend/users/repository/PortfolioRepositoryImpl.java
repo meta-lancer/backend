@@ -59,4 +59,9 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
     public void save(PortfolioEntity portfolioEntity) {
         portfolioJpaRepository.save(portfolioEntity);
     }
+
+    @Override
+    public Optional<PortfolioEntity> findOptionalByCreator(CreatorEntity creatorEntity) {
+        return portfolioJpaRepository.findByCreatorEntity(creatorEntity);
+    }
 }

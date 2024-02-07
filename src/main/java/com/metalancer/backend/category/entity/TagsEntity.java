@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.entity;
 
+import com.metalancer.backend.admin.domain.OutLineOrdersStatList;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,4 +41,10 @@ public class TagsEntity implements Serializable {
     public MainCategory toMainCategory() {
         return MainCategory.builder().name(tagNameEn).nameKor(tagName).build();
     }
+
+    public OutLineOrdersStatList toOutLineOrdersStatList() {
+        return OutLineOrdersStatList.builder().tagsId(id).tagName(tagName).tagNameEn(tagNameEn)
+            .build();
+    }
+
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum PaymentType {
 
-    CARD, TOSS_PAY, KAKAO_PAY, NAVER_PAY, PAYPAL;
+    CARD, TOSS_PAY, KAKAO_PAY, NAVER_PAY, PAYPAL, FREE;
 
     private PaymentType() {
     }
@@ -20,6 +20,9 @@ public enum PaymentType {
 
         if ("naverpay".equals(type)) {
             return NAVER_PAY;
+        }
+        if ("free".equals(type)) {
+            return FREE;
         }
         // 토스페이 구분
 

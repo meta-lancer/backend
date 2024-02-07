@@ -6,6 +6,8 @@ import com.metalancer.backend.users.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CreatorRepository {
 
@@ -23,4 +25,9 @@ public interface CreatorRepository {
     void save(CreatorEntity createdCreator);
 
     Integer getRegisterCntByDate(LocalDateTime date, LocalDateTime startOfNextDay);
+
+    void delete(CreatorEntity foundPendingCreator);
+
+    Page<CreatorEntity> findAllByStatusAndActiveUserAndPageable(DataStatus dataStatus,
+        Pageable pageable);
 }

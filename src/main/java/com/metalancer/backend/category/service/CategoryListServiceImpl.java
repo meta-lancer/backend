@@ -30,22 +30,22 @@ public class CategoryListServiceImpl implements CategoryListService {
 
     @Override
     public List<MainCategory> getHotPickCategoryList() {
-        return hotPickTypeRepository.getHotPickCategoryList();
+        return hotPickTypeRepository.getHotPickCategoryListWithUseYnTrue();
     }
 
     @Override
     public List<TrendSpotlightCategory> getTrendSpotlightCategoryList() {
-        return trendSpotlightTypeRepository.getTrendSpotlightCategoryList();
+        return trendSpotlightTypeRepository.getTrendSpotlightCategoryListWithUseYnTrue();
     }
 
     @Override
     public List<MainCategory> getGenreGalaxyCategoryList() {
-        return genreGalaxyTypeRepository.getGenreGalaxyCategoryList();
+        return genreGalaxyTypeRepository.getGenreGalaxyCategoryListWithUseYnTrue();
     }
 
     @Override
     public List<RequestCategory> getRequestCategoryList() {
-        return productsRequestTypeRepository.getRequestCategoryList();
+        return productsRequestTypeRepository.getRequestCategoryListWithUseYn();
     }
 
     @Override

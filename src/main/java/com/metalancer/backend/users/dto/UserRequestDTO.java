@@ -119,4 +119,13 @@ public class UserRequestDTO {
         private Long requestOptionId;
 
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class DeleteCartRequest {
+
+        private Long assetId;
+        private Long requestOptionId;
+
+    }
 }

@@ -6,6 +6,7 @@ import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
+import com.metalancer.backend.request.domain.ProductsRequest;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
@@ -217,6 +218,18 @@ public class UserController {
         return new BaseResponse<List<Portfolio>>(userService.getMyPortfolio(user));
     }
 
+    @Operation(summary = "마이페이지 - 크리에이터 승인중 확인", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Portfolio.class)))
+    })
+    @GetMapping("/creator/status")
+    public BaseResponse<Boolean> checkCreatorPending(
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(userService.checkCreatorPending(user));
+    }
+
     @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
@@ -228,5 +241,20 @@ public class UserController {
         log.info("구매 관리 문의 등록 dto: {}", dto);
         return new BaseResponse<Boolean>(
             userService.createInquiry(user, dto));
+    }
+
+    @Operation(summary = "마이페이지 - 제작요청 목록 조회", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = ProductsRequest.class)))
+    })
+    @GetMapping("/request/list")
+    public BaseResponse<Page<ProductsRequest>> getProductsRequestList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        Pageable pageable) {
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Page<ProductsRequest>>(
+            userService.getProductsRequestList(user, pageable));
     }
 }

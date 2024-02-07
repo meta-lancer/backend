@@ -1,5 +1,7 @@
 package com.metalancer.backend.orders.repository;
 
+import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.orders.domain.OrderProducts;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
 import com.metalancer.backend.orders.entity.OrdersEntity;
@@ -30,4 +32,12 @@ public class OrderProductsRepositoryImpl implements OrderProductsRepository {
             .collect(
                 Collectors.toList());
     }
+
+    @Override
+    public List<OrderProductsEntity> findAllByOrderProductStatusIsNotAndStatus(
+        OrderStatus orderStatus, DataStatus dataStatus) {
+        return orderProductsJpaRepository.findAllByOrderProductStatusIsNotAndStatus(orderStatus,
+            dataStatus);
+    }
+
 }

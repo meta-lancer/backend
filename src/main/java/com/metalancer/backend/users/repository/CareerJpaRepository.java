@@ -11,4 +11,6 @@ public interface CareerJpaRepository extends JpaRepository<CareerEntity, Long> {
     List<CareerEntity> findAllByUserOrderByBeginAtDesc(User user);
 
     Optional<CareerEntity> findByIdAndUser(Long id, User user);
+
+    Optional<CareerEntity> findByUser(User user);
 }

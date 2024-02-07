@@ -280,7 +280,7 @@ public class AuthServiceImpl implements AuthService {
     public boolean resetPassword(String email) {
 
         Optional<User> foundUser = userRepository.findByEmail(email);
-        if (foundUser.isPresent()) {
+        if (foundUser.isPresent() && LoginType.NORMAL.equals(foundUser.get().getLoginType())) {
             String tempPassword =
                 (char) ((int) (Math.random() * 26) + 97) + RandomStringUtils.randomAlphanumeric(10)
                     + ((int) (Math.random() * 99) + 1);
@@ -309,5 +309,10 @@ public class AuthServiceImpl implements AuthService {
         }
         foundUser.changeNewPassword(passwordEncoder, dto.getNewPassword1());
         return passwordEncoder.matches(dto.getNewPassword1(), foundUser.getPassword());
+    }
+
+    @Override
+    public Boolean findEmailId(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 }

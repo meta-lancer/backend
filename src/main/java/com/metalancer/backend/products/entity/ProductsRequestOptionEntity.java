@@ -41,24 +41,22 @@ public class ProductsRequestOptionEntity extends BaseEntity implements Serializa
     @JoinColumn(name = "products_id", nullable = false)
     private ProductsEntity productsEntity;
 
-    private String title;
     private String content;
     private int price;
     private int ord;
 
     @Builder
     public ProductsRequestOptionEntity(CreatorEntity creatorEntity, ProductsEntity productsEntity,
-        String title, String content, int price, int ord) {
+        String content, int price, int ord) {
         this.creatorEntity = creatorEntity;
         this.productsEntity = productsEntity;
-        this.title = title;
         this.content = content;
         this.price = price;
         this.ord = ord;
     }
 
     public RequestOption toRequestOption() {
-        return RequestOption.builder().requestOptionId(id).title(title).content(content)
+        return RequestOption.builder().requestOptionId(id).content(content)
             .price(price).ord(ord).build();
     }
 }

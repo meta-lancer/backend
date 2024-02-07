@@ -35,6 +35,7 @@ public class GenreGalaxyTypeEntity extends BaseTimeEntity implements Serializabl
     @ManyToOne
     @JoinColumn(name = "tag_id")
     private TagsEntity tagsEntity;
+    private boolean useYn = true;
 
     @Builder
     public GenreGalaxyTypeEntity(TagsEntity tagsEntity, String name, String nameKor) {
@@ -45,5 +46,9 @@ public class GenreGalaxyTypeEntity extends BaseTimeEntity implements Serializabl
         String tagName = tagsEntity != null ? tagsEntity.getTagNameEn() : "all";
         String tagNameKor = tagsEntity != null ? tagsEntity.getTagName() : "전체";
         return MainCategory.builder().name(tagName).nameKor(tagNameKor).build();
+    }
+
+    public void toggleUse(boolean useYn) {
+        this.useYn = useYn;
     }
 }

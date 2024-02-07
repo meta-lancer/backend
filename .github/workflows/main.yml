@@ -26,10 +26,20 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Set yml file
-        uses: microsoft/variable-substitution@v1
-        #        with:
-        #          files: ${{ env.RESOURCE_PATH }}
+      #      - name: Set yml file
+      #        uses: microsoft/variable-substitution@v1
+      #        with:
+      #          files: ${{ env.RESOURCE_PATH }}
+
+
+      - name: Where is here
+        run: pwd
+
+      - name: Executable Gradle
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build --stacktrace
         env:
           spring.redis.host: ${{secrets.REDIS_HOST}}
           spring.redis.port: ${{secrets.REDIS_PORT}}
@@ -56,15 +66,6 @@ jobs:
           spring.datasource.url: ${{ secrets.RDS_HOST }}
           spring.datasource.username: ${{ secrets.RDS_USERNAME }}
           spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
-
-      - name: Where is here
-        run: pwd
-
-      - name: Executable Gradle
-        run: chmod +x ./gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew clean build --stacktrace
 
       - name: AWS credential 설정
         uses: aws-actions/configure-aws-credentials@v1

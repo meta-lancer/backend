@@ -10,6 +10,7 @@ env:
   AWS_S3_BUCKET: metaovis-service
   AWS_CODE_DEPLOY_APPLICATION: Backend-CICD
   AWS_CODE_DEPLOY_GROUP: Backend-CICD-Group
+  RESOURCE_PATH: ./src/main/resources/application.yml
 
 jobs:
   build-with-gradle:
@@ -24,6 +25,37 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+
+      - name: Set yml file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.RESOURCE_PATH }}
+        env:
+          spring.redis.host: ${}
+          spring.redis.port: ${}
+          spring.security.oauth2.client.targetUrl: ${}
+          spring.loginPage: ${}
+          spring.successUrl: ${}
+          spring.failUrl: ${}
+          spring.security.rememberMe.key: ${}
+          exchange.api.key: ${}
+          cloud.aws.credentials.accessKey: ${}
+          cloud.aws.credentials.secretKey: ${}
+          cloud.aws.s3.assetBucket: ${}
+          cloud.aws.region.static: ${}
+          cloud.aws.s3.cloudfront.asset: ${}
+          cloud.aws.s3.cloudfront.user: ${}
+          cloud.aws.s3.cloudfront.service: ${}
+          slack.private.token: ${}
+          slack.channel.error: ${}
+          slack.channel.info: ${}
+          iamport.api.key: ${}
+          iamport.api.secret: ${}
+          iamport.imp_uid: ${}
+          spring.datasource.driver-class-name: ${{ secrets.RDS_HOST }}
+          spring.datasource.url: ${{ secrets.RDS_HOST }}
+          spring.datasource.username: ${{ secrets.RDS_USERNAME }}
+          spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
 
       - name: Where is here
         run: pwd

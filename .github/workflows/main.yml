@@ -28,8 +28,8 @@ jobs:
 
       - name: Set yml file
         uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.RESOURCE_PATH }}
+        #        with:
+        #          files: ${{ env.RESOURCE_PATH }}
         env:
           spring.redis.host: ${{secrets.REDIS_HOST}}
           spring.redis.port: ${{secrets.REDIS_PORT}}

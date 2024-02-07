@@ -10,7 +10,7 @@ env:
   AWS_S3_BUCKET: metaovis-service
   AWS_CODE_DEPLOY_APPLICATION: Backend-CICD
   AWS_CODE_DEPLOY_GROUP: Backend-CICD-Group
-  RESOURCE_PATH: ./src/main/resources/application.yml
+#  RESOURCE_PATH: ./src/main/resources/application.yml
 
 jobs:
   build-with-gradle:

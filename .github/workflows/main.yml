@@ -10,6 +10,7 @@ env:
   AWS_S3_BUCKET: metaovis-service
   AWS_CODE_DEPLOY_APPLICATION: Backend-CICD
   AWS_CODE_DEPLOY_GROUP: Backend-CICD-Group
+  RESOURCE_PATH: ./src/main/resources/application.yml
 
 jobs:
   build-with-gradle:
@@ -24,6 +25,37 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+
+      - name: Set yml file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.RESOURCE_PATH }}
+        env:
+          spring.redis.host: ${{secrets.REDIS_HOST}}
+          spring.redis.port: ${{secrets.REDIS_PORT}}
+          spring.security.oauth2.client.targetUrl: ${{secrets.OAUTH_CLIENT_TARGET_URL}}
+          spring.loginPage: ${{secrets.OAUTH_LOGIN_PAGE}}
+          spring.successUrl: ${{secrets.OAUTH_SUCCESS_URL}}
+          spring.failUrl: ${{secrets.OAUTH_FAIL_URL}}
+          spring.security.rememberMe.key: ${{secrets.REMEMBERME_KEY}}
+          exchange.api.key: ${{secrets.EXCHANGE_API_KEY}}
+          cloud.aws.credentials.accessKey: ${{secrets.AWS_ACCESS_KEY}}
+          cloud.aws.credentials.secretKey: ${{secrets.AWS_SECRET_KEY}}
+          cloud.aws.s3.assetBucket: ${{secrets.ASSET_BUCKET}}
+          cloud.aws.region.static: ${{secrets.REGION_STATIC}}
+          cloud.aws.s3.cloudfront.asset: ${{secrets.CLOUDFRONT_ASSET}}
+          cloud.aws.s3.cloudfront.user: ${{secrets.CLOUDFRONT_USER}}
+          cloud.aws.s3.cloudfront.service: ${{secrets.CLOUDFRONT_SERVICE}}
+          slack.private.token: ${{secrets.SLACK_TOKEN}}
+          slack.channel.error: ${{secrets.SLACK_ERROR_CHANNEL}}
+          slack.channel.info: ${{secrets.SLACK_INFO_CHANNEL}}
+          iamport.api.key: ${{secrets.IMP_KEY}}
+          iamport.api.secret: ${{secrets.IMP_SECRET}}
+          iamport.imp_uid: ${{secrets.IMP_UID}}
+          spring.datasource.driver-class-name: ${{ secrets.RDS_DRIVER }}
+          spring.datasource.url: ${{ secrets.RDS_HOST }}
+          spring.datasource.username: ${{ secrets.RDS_USERNAME }}
+          spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
 
       - name: Where is here
         run: pwd

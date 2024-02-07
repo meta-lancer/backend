@@ -10,7 +10,6 @@ env:
   AWS_S3_BUCKET: metaovis-service
   AWS_CODE_DEPLOY_APPLICATION: Backend-CICD
   AWS_CODE_DEPLOY_GROUP: Backend-CICD-Group
-#  RESOURCE_PATH: ./src/main/resources/application.yml
 
 jobs:
   build-with-gradle:
@@ -25,13 +24,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-
-      #      - name: Set yml file
-      #        uses: microsoft/variable-substitution@v1
-      #        with:
-      #          files: ${{ env.RESOURCE_PATH }}
-
-
+          
       - name: Where is here
         run: pwd
 

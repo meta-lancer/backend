@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 ROOT_PATH="/home/ubuntu/backend"
 JAR="$ROOT_PATH/meta-lancer-backend-0.0.1-SNAPSHOT.jar"
 

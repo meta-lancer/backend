@@ -1,10 +1,12 @@
 package com.metalancer.backend.category.repository;
 
+import com.metalancer.backend.admin.dto.AdminCategoryDTO;
 import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.entity.TrendSpotlightTypeEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,9 +18,9 @@ public class TrendSpotlightTypeRepositoryImpl implements TrendSpotlightTypeRepos
     private final TrendSpotlightTypeJpaRepository trendSpotlightTypeJpaRepository;
 
     @Override
-    public List<TrendSpotlightCategory> getTrendSpotlightCategoryList() {
+    public List<AdminCategoryDTO.TrendSpotlightCategory> getTrendSpotlightCategoryList() {
         return trendSpotlightTypeJpaRepository.findAll().stream()
-            .map(TrendSpotlightTypeEntity::ToMainCategory).collect(
+            .map(TrendSpotlightTypeEntity::ToAdminCategory).collect(
                 Collectors.toList());
     }
 
@@ -34,5 +36,13 @@ public class TrendSpotlightTypeRepositoryImpl implements TrendSpotlightTypeRepos
         return trendSpotlightTypeJpaRepository.findByName(platformType).orElseThrow(
             () -> new NotFoundException("TrendSpotLight: ", ErrorCode.TYPE_NOT_FOUND)
         );
+    }
+
+    @Override
+    public void updateCategoryUseYn(Long categoryId) {
+        Optional<TrendSpotlightTypeEntity> optionalTrendSpotlightTypeEntity = trendSpotlightTypeJpaRepository.findById(
+            categoryId);
+        optionalTrendSpotlightTypeEntity.ifPresent(
+            TrendSpotlightTypeEntity::toggleUse);
     }
 }

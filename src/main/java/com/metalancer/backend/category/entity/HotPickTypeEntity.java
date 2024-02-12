@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.entity;
 
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.common.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -44,7 +45,12 @@ public class HotPickTypeEntity extends BaseTimeEntity implements Serializable {
         return MainCategory.builder().name(name).nameKor(nameKor).build();
     }
 
-    public void toggleUse(boolean useYn) {
-        this.useYn = useYn;
+    public CategoryList ToAdminCategory() {
+        return CategoryList.builder().categoryId(id).name(name).nameKor(nameKor).useYn(useYn)
+            .build();
+    }
+
+    public void toggleUse() {
+        this.useYn = !useYn;
     }
 }

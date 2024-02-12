@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.entity;
 
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.common.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -48,7 +49,14 @@ public class GenreGalaxyTypeEntity extends BaseTimeEntity implements Serializabl
         return MainCategory.builder().name(tagName).nameKor(tagNameKor).build();
     }
 
-    public void toggleUse(boolean useYn) {
-        this.useYn = useYn;
+    public CategoryList ToAdminCategory() {
+        String tagName = tagsEntity != null ? tagsEntity.getTagNameEn() : "all";
+        String tagNameKor = tagsEntity != null ? tagsEntity.getTagName() : "전체";
+        return CategoryList.builder().categoryId(id).name(tagName).nameKor(tagNameKor).useYn(useYn)
+            .build();
+    }
+
+    public void toggleUse() {
+        this.useYn = !useYn;
     }
 }

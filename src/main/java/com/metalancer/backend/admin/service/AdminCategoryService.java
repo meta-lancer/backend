@@ -1,17 +1,20 @@
 package com.metalancer.backend.admin.service;
 
-import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
-import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
-import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.TrendSpotlightCategory;
+import com.metalancer.backend.common.constants.CategoryType;
 import java.util.List;
 
 public interface AdminCategoryService {
 
-    List<MainCategory> getAdminHotPickCategoryList();
+    List<CategoryList> getAdminHotPickCategoryList();
 
     List<TrendSpotlightCategory> getAdminTrendSpotlightCategoryList();
 
-    List<MainCategory> getAdminGenreGalaxyCategoryList();
+    List<CategoryList> getAdminGenreGalaxyCategoryList();
 
-    List<RequestCategory> getAdminRequestCategoryList();
+    List<CategoryList> getAdminRequestCategoryList();
+
+
+    boolean updateCategoryUseYn(CategoryType categoryType, Long categoryId);
 }

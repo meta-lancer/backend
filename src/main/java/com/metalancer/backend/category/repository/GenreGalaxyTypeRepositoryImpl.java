@@ -1,10 +1,12 @@
 package com.metalancer.backend.category.repository;
 
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.entity.GenreGalaxyTypeEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,9 +18,9 @@ public class GenreGalaxyTypeRepositoryImpl implements GenreGalaxyTypeRepository 
     private final GenreGalaxyTypeJpaRepository genreGalaxyTypeJpaRepository;
 
     @Override
-    public List<MainCategory> getGenreGalaxyCategoryList() {
+    public List<CategoryList> getGenreGalaxyCategoryList() {
         return genreGalaxyTypeJpaRepository.findAll().stream()
-            .map(GenreGalaxyTypeEntity::ToMainCategory)
+            .map(GenreGalaxyTypeEntity::ToAdminCategory)
             .collect(
                 Collectors.toList());
     }
@@ -45,5 +47,13 @@ public class GenreGalaxyTypeRepositoryImpl implements GenreGalaxyTypeRepository 
             .map(GenreGalaxyTypeEntity::ToMainCategory)
             .collect(
                 Collectors.toList());
+    }
+
+    @Override
+    public void updateCategoryUseYn(Long categoryId) {
+        Optional<GenreGalaxyTypeEntity> optionalGenreGalaxyTypeEntity = genreGalaxyTypeJpaRepository.findById(
+            categoryId);
+        optionalGenreGalaxyTypeEntity.ifPresent(
+            GenreGalaxyTypeEntity::toggleUse);
     }
 }

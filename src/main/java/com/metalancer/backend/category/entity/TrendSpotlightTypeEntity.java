@@ -1,5 +1,6 @@
 package com.metalancer.backend.category.entity;
 
+import com.metalancer.backend.admin.dto.AdminCategoryDTO;
 import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.common.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -53,7 +54,15 @@ public class TrendSpotlightTypeEntity extends BaseTimeEntity implements Serializ
             .build();
     }
 
-    public void toggleUse(boolean useYn) {
-        this.useYn = useYn;
+    public AdminCategoryDTO.TrendSpotlightCategory ToAdminCategory() {
+        String tagName = tagsEntity != null ? tagsEntity.getTagNameEn() : "all";
+        String tagNameKor = tagsEntity != null ? tagsEntity.getTagName() : "전체";
+        return AdminCategoryDTO.TrendSpotlightCategory.builder().categoryId(id).name(tagName)
+            .nameKor(tagNameKor)
+            .thumbnail(thumbnail).useYn(useYn).build();
+    }
+
+    public void toggleUse() {
+        this.useYn = !useYn;
     }
 }

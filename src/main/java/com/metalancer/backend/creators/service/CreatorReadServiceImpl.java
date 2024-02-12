@@ -5,6 +5,7 @@ import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.creators.domain.CommissionSales;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.domain.ManageCommission;
@@ -12,6 +13,8 @@ import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.creators.entity.PaymentInfoManagementEntity;
 import com.metalancer.backend.creators.repository.CreatorRepository;
 import com.metalancer.backend.creators.repository.PaymentInfoManagementRepository;
+import com.metalancer.backend.orders.entity.OrderRequestProductsEntity;
+import com.metalancer.backend.orders.repository.OrderRequestProductsRepository;
 import com.metalancer.backend.products.domain.RequestOption;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.repository.ProductsAssetFileRepository;
@@ -58,6 +61,7 @@ public class CreatorReadServiceImpl implements CreatorReadService {
     private final UserInterestsRepository userInterestsRepository;
     private final PaymentInfoManagementRepository paymentInfoManagementRepository;
     private final ProductsRequestOptionRepository productsRequestOptionRepository;
+    private final OrderRequestProductsRepository orderRequestProductsRepository;
 
     @Override
     public OtherCreatorBasicInfo getCreatorBasicInfo(PrincipalDetails user,
@@ -205,5 +209,25 @@ public class CreatorReadServiceImpl implements CreatorReadService {
             manageCommissions.add(manageCommission);
         }
         return new PageImpl<>(manageCommissions, pageable, productsEntities.getTotalElements());
+    }
+
+    @Override
+    public Page<CommissionSales> getMyManageCommissionSaleList(PrincipalDetails user,
+        Pageable pageable) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        CreatorEntity creatorEntity = creatorRepository.findByUserAndStatus(foundUser,
+            DataStatus.ACTIVE);
+        Page<OrderRequestProductsEntity> orderRequestProductsEntities = orderRequestProductsRepository.findAllOrderRequestProductsByCreator(
+            creatorEntity, pageable);
+        List<CommissionSales> commissionSaleList = new ArrayList<>();
+        for (OrderRequestProductsEntity orderRequestProductsEntity : orderRequestProductsEntities) {
+            CommissionSales commissionSales = orderRequestProductsEntity.toCommissionSales();
+            commissionSaleList.add(commissionSales);
+        }
+        return new PageImpl<>(commissionSaleList, pageable,
+            orderRequestProductsEntities.getTotalElements());
     }
 }

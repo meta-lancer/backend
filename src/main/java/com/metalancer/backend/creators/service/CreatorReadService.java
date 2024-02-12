@@ -1,6 +1,7 @@
 package com.metalancer.backend.creators.service;
 
 import com.metalancer.backend.common.config.security.PrincipalDetails;
+import com.metalancer.backend.creators.domain.CommissionSales;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.domain.ManageCommission;
@@ -32,4 +33,6 @@ public interface CreatorReadService {
     PaymentInfoManagement getMyPaymentInfoManagement(PrincipalDetails user);
 
     Page<ManageCommission> getMyManageCommissionList(PrincipalDetails user, Pageable pageable);
+
+    Page<CommissionSales> getMyManageCommissionSaleList(PrincipalDetails user, Pageable pageable);
 }

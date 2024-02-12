@@ -3,6 +3,9 @@ package com.metalancer.backend.orders.entity;
 import com.metalancer.backend.common.BaseEntity;
 import com.metalancer.backend.common.constants.CurrencyType;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.utils.Time;
+import com.metalancer.backend.creators.domain.CommissionSales;
+import com.metalancer.backend.products.domain.RequestOption;
 import com.metalancer.backend.products.entity.ProductsEntity;
 import com.metalancer.backend.products.entity.ProductsRequestOptionEntity;
 import com.metalancer.backend.users.entity.CreatorEntity;
@@ -67,6 +70,9 @@ public class OrderRequestProductsEntity extends BaseEntity implements Serializab
     @Column(nullable = false)
     private LocalDateTime purchasedAt;
 
+    @Column(nullable = false)
+    private LocalDateTime payConfirmedAt;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus orderProductStatus = OrderStatus.PAY_DONE;
 
@@ -84,5 +90,17 @@ public class OrderRequestProductsEntity extends BaseEntity implements Serializab
         this.price = price;
         this.currency = currency;
         this.purchasedAt = purchasedAt;
+    }
+
+    public CommissionSales toCommissionSales() {
+        RequestOption requestOption = productsRequestOptionEntity.toRequestOption();
+        return CommissionSales.builder().buyer(buyer).productsPrice(price)
+            .requestOption(requestOption).orderStatus(orderProductStatus)
+            .purchasedAt(Time.convertDateToFullString(purchasedAt))
+            .payConfirmedAt(Time.convertDateToFullString(payConfirmedAt)).build();
+    }
+
+    public void payConfirm() {
+        this.payConfirmedAt = LocalDateTime.now();
     }
 }

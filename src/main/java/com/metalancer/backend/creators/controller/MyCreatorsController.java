@@ -7,6 +7,7 @@ import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.response.BaseResponse;
 import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
+import com.metalancer.backend.creators.domain.CommissionSales;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
 import com.metalancer.backend.creators.domain.ManageCommission;
@@ -252,6 +253,21 @@ public class MyCreatorsController {
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<ManageCommission>>(
             creatorReadService.getMyManageCommissionList(user, pageable));
+    }
+
+    @Operation(summary = "커미션 판매 목록 조회", description = "파라미터에 page=1&size=5&sort=createdAt,desc 처럼 붙여주셔야 최근 등록일 순으로 정렬됩니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = CommissionSales.class)))
+    })
+    @GetMapping("/request/{productsId}/sales")
+    public BaseResponse<Page<CommissionSales>> getMyManageCommissionSaleList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable Long productsId,
+        Pageable pageable) {
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Page<CommissionSales>>(
+            creatorReadService.getMyManageCommissionSaleList(user, pageable));
     }
 
     public boolean checkImageTypeValidate(String fileType) {

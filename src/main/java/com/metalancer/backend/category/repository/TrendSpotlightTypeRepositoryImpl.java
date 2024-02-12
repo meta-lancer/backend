@@ -1,6 +1,7 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.admin.dto.AdminCategoryDTO;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CreateCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.entity.TrendSpotlightTypeEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
@@ -44,5 +45,10 @@ public class TrendSpotlightTypeRepositoryImpl implements TrendSpotlightTypeRepos
             categoryId);
         optionalTrendSpotlightTypeEntity.ifPresent(
             TrendSpotlightTypeEntity::toggleUse);
+    }
+
+    @Override
+    public void createCategory(CreateCategory dto) {
+  
     }
 }

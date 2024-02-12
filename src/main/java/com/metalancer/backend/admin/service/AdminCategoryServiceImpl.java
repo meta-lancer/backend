@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.service;
 
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CreateCategory;
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.category.repository.GenreGalaxyTypeRepository;
 import com.metalancer.backend.category.repository.HotPickTypeRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -61,6 +63,25 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
             }
             case REQUEST -> {
                 productsRequestTypeRepository.updateCategoryUseYn(categoryId);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean createCategory(CreateCategory dto, MultipartFile thumbnail) {
+        switch (dto.getCategoryType()) {
+            case HOT_PICK -> {
+                hotPickTypeRepository.createCategory(dto);
+            }
+            case TREND_SPOTLIGHT -> {
+                trendSpotlightTypeRepository.createCategory(dto);
+            }
+            case GENRE_GALAXY -> {
+                genreGalaxyTypeRepository.createCategory(dto);
+            }
+            case REQUEST -> {
+                productsRequestTypeRepository.createCategory(dto);
             }
         }
         return true;

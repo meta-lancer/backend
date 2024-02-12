@@ -1,5 +1,6 @@
 package com.metalancer.backend.admin.dto;
 
+import com.metalancer.backend.common.constants.CategoryType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,6 +45,22 @@ public class AdminCategoryDTO {
             this.nameKor = nameKor;
             this.thumbnail = thumbnail;
             this.useYn = useYn;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class CreateCategory {
+
+        private CategoryType categoryType;
+        private String name;
+        private String nameKor;
+
+        @Builder
+        public CreateCategory(CategoryType categoryType, String name, String nameKor) {
+            this.categoryType = categoryType;
+            this.name = name;
+            this.nameKor = nameKor;
         }
     }
 }

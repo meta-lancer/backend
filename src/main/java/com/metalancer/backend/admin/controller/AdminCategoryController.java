@@ -1,6 +1,7 @@
 package com.metalancer.backend.admin.controller;
 
 
+import com.metalancer.backend.admin.dto.AdminCategoryDTO;
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.TrendSpotlightCategory;
 import com.metalancer.backend.admin.service.AdminCategoryService;
@@ -18,8 +19,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -112,4 +116,18 @@ public class AdminCategoryController {
         return new BaseResponse<>(
             adminCategoryService.updateCategoryUseYn(CategoryType.REQUEST, categoryId));
     }
+
+    @Operation(summary = "어드민 request 카테고리 등록", description = "")
+    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    @PostMapping
+    public BaseResponse<Boolean> createCategory(
+        @RequestPart AdminCategoryDTO.CreateCategory dto,
+        @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
+        @AuthenticationPrincipal PrincipalDetails user) {
+        log.info("어드민 카테고리 등록 API 호출 - 고유번호 {}, 이름 {}", user.getUser().getId(),
+            user.getUser().getName());
+        return new BaseResponse<>(
+            adminCategoryService.createCategory(dto, thumbnail));
+    }
+
 }

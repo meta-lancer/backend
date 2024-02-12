@@ -1,6 +1,7 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CreateCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.entity.GenreGalaxyTypeEntity;
 import com.metalancer.backend.common.constants.ErrorCode;
@@ -55,5 +56,13 @@ public class GenreGalaxyTypeRepositoryImpl implements GenreGalaxyTypeRepository 
             categoryId);
         optionalGenreGalaxyTypeEntity.ifPresent(
             GenreGalaxyTypeEntity::toggleUse);
+    }
+
+    @Override
+    public void createCategory(CreateCategory dto) {
+        GenreGalaxyTypeEntity createdGenreGalaxyTypeEntity = GenreGalaxyTypeEntity.builder()
+            .nameKor(
+                dto.getNameKor()).name(dto.getName()).build();
+        genreGalaxyTypeJpaRepository.save(createdGenreGalaxyTypeEntity);
     }
 }

@@ -1,6 +1,7 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CreateCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.MainCategory;
 import com.metalancer.backend.category.entity.HotPickTypeEntity;
 import java.util.List;
@@ -36,5 +37,12 @@ public class HotPickTypeRepositoryImpl implements HotPickTypeRepository {
             categoryId);
         optionalHotPickTypeEntity.ifPresent(
             HotPickTypeEntity::toggleUse);
+    }
+
+    @Override
+    public void createCategory(CreateCategory dto) {
+        HotPickTypeEntity createdHotPickTypeEntity = HotPickTypeEntity.builder().nameKor(
+            dto.getNameKor()).name(dto.getName()).build();
+        hotPickTypeJpaRepository.save(createdHotPickTypeEntity);
     }
 }

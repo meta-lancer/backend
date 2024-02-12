@@ -1,6 +1,7 @@
 package com.metalancer.backend.category.repository;
 
 import com.metalancer.backend.admin.dto.AdminCategoryDTO.CategoryList;
+import com.metalancer.backend.admin.dto.AdminCategoryDTO.CreateCategory;
 import com.metalancer.backend.category.dto.CategoryDTO.RequestCategory;
 import com.metalancer.backend.category.entity.ProductsRequestTypeEntity;
 import java.util.List;
@@ -33,5 +34,13 @@ public class ProductsRequestTypeRepositoryImpl implements ProductsRequestTypeRep
             categoryId);
         optionalProductsRequestTypeEntity.ifPresent(
             ProductsRequestTypeEntity::toggleUseYn);
+    }
+
+    @Override
+    public void createCategory(CreateCategory dto) {
+        ProductsRequestTypeEntity createdProductsRequestTypeEntity = ProductsRequestTypeEntity.builder()
+            .nameKor(
+                dto.getNameKor()).name(dto.getName()).build();
+        productsRequestTypeJpaRepository.save(createdProductsRequestTypeEntity);
     }
 }

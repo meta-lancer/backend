@@ -427,6 +427,14 @@ public class ProductsRepositoryImpl implements ProductsRepository {
         return new PageImpl<>(response, pageable, total);
     }
 
+    @Override
+    public Page<ProductsEntity> findCommissionListByCreator(CreatorEntity creatorEntity,
+        Pageable pageable) {
+        return productsJpaRepository.findAllByCreatorEntityAndProductsTypeAndStatus(
+            creatorEntity, ProductsType.REQUEST,
+            DataStatus.ACTIVE, pageable);
+    }
+
     @NotNull
     private static LocalDateTime getStartDateTimeWeeklyOrMonthly(PeriodType period,
         LocalDateTime endDateTime) {

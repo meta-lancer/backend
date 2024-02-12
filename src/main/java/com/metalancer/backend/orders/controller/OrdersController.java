@@ -156,7 +156,7 @@ public class OrdersController {
         return new BaseResponse<PaymentResponse>(
             ordersService.completePaymentByWebhook(dto));
     }
-
+    
     @Operation(summary = "결제 전체 취소 요청", description = "")
     @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = PaymentResponse.class)))
     @PatchMapping("/payments/cancellation/all")

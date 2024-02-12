@@ -9,6 +9,7 @@ import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.domain.CreatorAssetList;
 import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.domain.ManageCommission;
 import com.metalancer.backend.creators.domain.PaymentInfoManagement;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
@@ -237,6 +238,20 @@ public class MyCreatorsController {
         AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Page<ManageAsset>>(
             creatorReadService.getMyManageAssetList(user, pageable));
+    }
+
+    @Operation(summary = "커미션 관리 목록 조회", description = "파라미터에 page=1&size=5&sort=createdAt,desc 처럼 붙여주셔야 최근 등록일 순으로 정렬됩니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = ManageCommission.class)))
+    })
+    @GetMapping("/request/management")
+    public BaseResponse<Page<ManageCommission>> getMyManageCommissionList(
+        @AuthenticationPrincipal PrincipalDetails user,
+        Pageable pageable) {
+        pageable = PageFunction.convertToOneBasedPageable(pageable);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Page<ManageCommission>>(
+            creatorReadService.getMyManageCommissionList(user, pageable));
     }
 
     public boolean checkImageTypeValidate(String fileType) {

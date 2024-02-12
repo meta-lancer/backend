@@ -82,4 +82,7 @@ public interface ProductsRepository {
     Page<ProductsEntity> findAllDistinctByTagListAndKeywordAndStatusWithPriceOption(
         List<String> tagList, DataStatus dataStatus, List<Integer> priceOption,
         String keyword, Pageable pageable);
+
+    Page<ProductsEntity> findCommissionListByCreator(CreatorEntity creatorEntity,
+        Pageable pageable);
 }

@@ -8,6 +8,7 @@ import com.metalancer.backend.common.constants.ProductsType;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.common.exception.DataStatusException;
 import com.metalancer.backend.creators.domain.ManageAsset;
+import com.metalancer.backend.creators.domain.ManageCommission;
 import com.metalancer.backend.creators.domain.SettlementReportList;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdate;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.AssetUpdateWithOutThumbnail;
@@ -210,6 +211,12 @@ public class ProductsEntity extends BaseEntity implements Serializable {
             .viewCnt(viewCnt).build();
     }
 
+    public ManageCommission toManageCommission() {
+        return ManageCommission.builder().productsId(id).thumbnail(thumbnail).title(title)
+            .price(price)
+            .viewCnt(viewCnt).build();
+    }
+
     public void setSalePrice(int salePrice) {
         if (salePrice < price) {
             this.salePrice = salePrice;
@@ -222,7 +229,6 @@ public class ProductsEntity extends BaseEntity implements Serializable {
 
     public void deleteProducts() {
         delete();
-        ;
     }
 
     public GenreGalaxy toGenreGalaxy() {

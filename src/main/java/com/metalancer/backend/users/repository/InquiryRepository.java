@@ -1,6 +1,7 @@
 package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.admin.domain.InquiryList;
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.users.domain.MyInquiryList;
 import com.metalancer.backend.users.entity.InquiryEntity;
 import com.metalancer.backend.users.entity.User;
@@ -14,6 +15,8 @@ public interface InquiryRepository {
 
     Optional<InquiryEntity> findById(Long id);
 
+    Optional<InquiryEntity> findByIdAndStatus(Long id, DataStatus status);
+
     Page<InquiryList> findAdminAll(Pageable pageable);
 
     Integer countNewCnt();
@@ -22,4 +25,5 @@ public interface InquiryRepository {
 
     Page<MyInquiryList> findAllByUser(User foundUser, Pageable pageable);
 
+    InquiryEntity findEntityByIdAndUser(Long inquiryId, User foundUser);
 }

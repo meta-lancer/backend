@@ -262,6 +262,20 @@ public class UserController {
             userService.createInquiry(user, dto, file));
     }
 
+    @Operation(summary = "마이페이지 - 문의 삭제", description = "")
+    @ApiResponse(responseCode = "200", description = "삭제 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @DeleteMapping("/inquiry/{inquiryId}")
+    public BaseResponse<Boolean> deleteInquiry(
+        @AuthenticationPrincipal PrincipalDetails user,
+        @PathVariable Long inquiryId) {
+        log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
+        return new BaseResponse<Boolean>(
+            userService.deleteInquiry(user, inquiryId));
+    }
+
     @Operation(summary = "마이페이지 - 제작요청 목록 조회", description = "")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = ProductsRequest.class)))

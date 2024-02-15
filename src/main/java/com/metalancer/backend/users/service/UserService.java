@@ -63,4 +63,7 @@ public interface UserService {
     Boolean checkCreatorPending(PrincipalDetails user);
 
     Page<MyInquiryList> getInquiry(PrincipalDetails user, Pageable pageable);
+
+    Boolean deleteInquiry(PrincipalDetails user, Long inquiryId);
+    
 }

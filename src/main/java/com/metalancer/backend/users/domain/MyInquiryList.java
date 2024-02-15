@@ -1,5 +1,6 @@
 package com.metalancer.backend.users.domain;
 
+import com.metalancer.backend.common.utils.Time;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +19,8 @@ public class MyInquiryList {
     private String adminName;
     private boolean reply;
     private String replyContent;
-    private LocalDateTime replyAt;
-    private LocalDateTime replyUpdatedAt;
+    private String replyAt;
+    private String replyUpdatedAt;
 
     @Builder
     public MyInquiryList(Long inquiryId, String title,
@@ -36,7 +37,7 @@ public class MyInquiryList {
         this.adminName = adminName;
         this.reply = reply;
         this.replyContent = replyContent;
-        this.replyAt = replyAt;
-        this.replyUpdatedAt = replyUpdatedAt;
+        this.replyAt = Time.convertDateToFullString(replyAt);
+        this.replyUpdatedAt = Time.convertDateToFullString(replyUpdatedAt);
     }
 }

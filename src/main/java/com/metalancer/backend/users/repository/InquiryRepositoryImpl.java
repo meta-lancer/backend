@@ -33,6 +33,11 @@ public class InquiryRepositoryImpl implements InquiryRepository {
     }
 
     @Override
+    public Optional<InquiryEntity> findByIdAndStatus(Long id, DataStatus status) {
+        return inquiryJpaRepository.findByIdAndStatus(id, status);
+    }
+
+    @Override
     public Page<InquiryList> findAdminAll(Pageable pageable) {
         return inquiryJpaRepository.findAllBy(pageable).map(InquiryEntity::toInquiryList);
     }
@@ -53,5 +58,13 @@ public class InquiryRepositoryImpl implements InquiryRepository {
     public Page<MyInquiryList> findAllByUser(User user, Pageable pageable) {
         return inquiryJpaRepository.findAllByUserAndStatus(user, DataStatus.ACTIVE, pageable)
             .map(InquiryEntity::toMyInquiryList);
+    }
+
+    @Override
+    public InquiryEntity findEntityByIdAndUser(Long inquiryId, User foundUser) {
+        return inquiryJpaRepository.findByIdAndUserAndStatus(inquiryId, foundUser,
+            DataStatus.ACTIVE).orElseThrow(
+            () -> new NotFoundException("문의", ErrorCode.NOT_FOUND)
+        );
     }
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 public class ValidationText {
 
     public final static String EMAIL_INVALID_REGEX = "invalid email regex";
+    public final static String STRING_100_LENGTH_VALIDATION = "size needs to be under 100";
+    public final static String STRING_LONG_LENGTH_VALIDATION = "size needs to be under 5000";
     public final static String STRING_SHORT_LENGTH_VALIDATION = "size needs to be under 30";
     public final static String PASSWORD_LENGTH_VALIDATION = "password length is between 8 and 30";
     public final static String ID_OVER_ZERO_VALIDATION = "id should be over 0";

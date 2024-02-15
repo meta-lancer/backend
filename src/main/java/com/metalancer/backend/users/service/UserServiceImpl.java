@@ -417,4 +417,16 @@ public class UserServiceImpl implements UserService {
         );
         return inquiryRepository.findAllByUser(foundUser, pageable);
     }
+
+    @Override
+    public Boolean deleteInquiry(PrincipalDetails user, Long inquiryId) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        InquiryEntity foundInquiryEntity = inquiryRepository.findEntityByIdAndUser(inquiryId,
+            foundUser);
+        foundInquiryEntity.deleteInquiry();
+        return inquiryRepository.findByIdAndStatus(inquiryId, DataStatus.ACTIVE).isEmpty();
+    }
 }

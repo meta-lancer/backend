@@ -106,9 +106,10 @@ public class UserRequestDTO {
     @NoArgsConstructor
     public static class CreateInquiryRequest {
 
+        @Size(max = 100, message = ValidationText.STRING_100_LENGTH_VALIDATION)
         private String title;
+        @Size(max = 5000, message = ValidationText.STRING_LONG_LENGTH_VALIDATION)
         private String content;
-//        private Long orderProductId;
     }
 
     @Data

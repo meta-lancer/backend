@@ -150,6 +150,21 @@ public class S3Service {
         return readBucketName + "/" + fileName;
     }
 
+    public String uploadToInquiryReference(Long userId, MultipartFile file,
+        String randomString)
+        throws IOException {
+        String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName = randomString + "." + ext;
+        String bucketName = assetBucket + "/inquiry/user/" + userId;
+        String readBucketName =
+            readAssetBucket + "/inquiry/user/" + userId;
+        ObjectMetadata metadata = getObjectMetadata(file, ext);
+        s3Client.putObject(
+            new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        return readBucketName + "/" + fileName;
+    }
+
     @NotNull
     private ObjectMetadata getObjectMetadata(MultipartFile file, String ext) {
         ObjectMetadata metadata = new ObjectMetadata();

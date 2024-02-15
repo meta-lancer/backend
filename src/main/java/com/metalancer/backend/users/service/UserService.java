@@ -3,6 +3,7 @@ package com.metalancer.backend.users.service;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO.ApplyCreator;
 import com.metalancer.backend.request.domain.ProductsRequest;
+import com.metalancer.backend.users.domain.MyInquiryList;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
@@ -53,11 +54,13 @@ public interface UserService {
 
     boolean applyCreator(MultipartFile[] files, ApplyCreator dto, PrincipalDetails user);
 
-    boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto);
+    boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto, MultipartFile file);
 
     List<Portfolio> getMyPortfolio(PrincipalDetails user);
 
     Page<ProductsRequest> getProductsRequestList(PrincipalDetails user, Pageable pageable);
 
     Boolean checkCreatorPending(PrincipalDetails user);
+
+    Page<MyInquiryList> getInquiry(PrincipalDetails user, Pageable pageable);
 }

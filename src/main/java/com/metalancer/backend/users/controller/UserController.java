@@ -7,6 +7,7 @@ import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.common.utils.PageFunction;
 import com.metalancer.backend.creators.dto.CreatorRequestDTO;
 import com.metalancer.backend.request.domain.ProductsRequest;
+import com.metalancer.backend.users.domain.MyInquiryList;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
@@ -230,17 +231,35 @@ public class UserController {
         return new BaseResponse<Boolean>(userService.checkCreatorPending(user));
     }
 
-    @Operation(summary = "마이페이지 - 구매 관리 문의 등록", description = "")
+    @Operation(summary = "마이페이지 - 문의 조회", description = "")
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = {
+        @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
+    })
+    @GetMapping("/inquiry")
+    public BaseResponse<Page<MyInquiryList>> getInquiry(
+        @AuthenticationPrincipal PrincipalDetails user,
+        Pageable pageable) {
+        log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
+        pageable = PageFunction.convertToOneBasedPageableDescending(pageable);
+        return new BaseResponse<Page<MyInquiryList>>(
+            userService.getInquiry(user, pageable));
+    }
+
+    @Operation(summary = "마이페이지 - 문의 등록", description = "")
     @ApiResponse(responseCode = "200", description = "등록 성공", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = Boolean.class)))
     })
     @PostMapping("/inquiry")
     public BaseResponse<Boolean> createInquiry(
         @AuthenticationPrincipal PrincipalDetails user,
-        @RequestBody UserRequestDTO.CreateInquiryRequest dto) {
+        @RequestPart(value = "file", required = false) MultipartFile file,
+        @RequestPart UserRequestDTO.CreateInquiryRequest dto) {
         log.info("구매 관리 문의 등록 dto: {}", dto);
+        log.info("로그인되어있는 유저: {}", user);
+        AuthUtils.validateUserAuthentication(user);
         return new BaseResponse<Boolean>(
-            userService.createInquiry(user, dto));
+            userService.createInquiry(user, dto, file));
     }
 
     @Operation(summary = "마이페이지 - 제작요청 목록 조회", description = "")

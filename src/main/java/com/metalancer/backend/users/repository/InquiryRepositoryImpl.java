@@ -1,9 +1,12 @@
 package com.metalancer.backend.users.repository;
 
 import com.metalancer.backend.admin.domain.InquiryList;
+import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.NotFoundException;
+import com.metalancer.backend.users.domain.MyInquiryList;
 import com.metalancer.backend.users.entity.InquiryEntity;
+import com.metalancer.backend.users.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,5 +47,11 @@ public class InquiryRepositoryImpl implements InquiryRepository {
         return inquiryJpaRepository.findById(inquiryId).orElseThrow(
             () -> new NotFoundException("inquiry", ErrorCode.NOT_FOUND)
         );
+    }
+
+    @Override
+    public Page<MyInquiryList> findAllByUser(User user, Pageable pageable) {
+        return inquiryJpaRepository.findAllByUserAndStatus(user, DataStatus.ACTIVE, pageable)
+            .map(InquiryEntity::toMyInquiryList);
     }
 }

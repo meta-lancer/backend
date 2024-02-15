@@ -16,6 +16,7 @@ import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.request.domain.ProductsRequest;
 import com.metalancer.backend.request.repository.ProductsRequestRepository;
 import com.metalancer.backend.users.domain.Career;
+import com.metalancer.backend.users.domain.MyInquiryList;
 import com.metalancer.backend.users.domain.OrderStatusList;
 import com.metalancer.backend.users.domain.PayedAssets;
 import com.metalancer.backend.users.domain.PayedOrder;
@@ -254,7 +255,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto) {
+    public boolean createInquiry(PrincipalDetails user, CreateInquiryRequest dto,
+        MultipartFile file) {
         User foundUser = user.getUser();
         foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
             () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
@@ -262,6 +264,18 @@ public class UserServiceImpl implements UserService {
         InquiryEntity inquiryEntity = InquiryEntity.builder().user(foundUser).title(dto.getTitle())
             .content(dto.getContent()).build();
         inquiryRepository.save(inquiryEntity);
+        if (file != null && file.getSize() > 0) {
+            try {
+                String randomFileName = uploadService.getRandomStringForImageName(8);
+                String uploadedUrl = uploadService.uploadToInquiryReference(
+                    foundUser.getId(), file,
+                    randomFileName);
+                inquiryEntity.setFileUrl(uploadedUrl);
+            } catch (Exception e) {
+                log.error(e.getLocalizedMessage() + ": ", e);
+                throw new BaseException(ErrorCode.REFERENCE_UPLOAD_FAILED);
+            }
+        }
         Optional<InquiryEntity> foundInquiryEntity = inquiryRepository.findById(
             inquiryEntity.getId());
         return foundInquiryEntity.isPresent();
@@ -393,5 +407,14 @@ public class UserServiceImpl implements UserService {
             foundUser);
         return creatorEntity.isPresent() && DataStatus.PENDING.equals(
             creatorEntity.get().getStatus());
+    }
+
+    @Override
+    public Page<MyInquiryList> getInquiry(PrincipalDetails user, Pageable pageable) {
+        User foundUser = user.getUser();
+        foundUser = userRepository.findById(foundUser.getId()).orElseThrow(
+            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
+        );
+        return inquiryRepository.findAllByUser(foundUser, pageable);
     }
 }

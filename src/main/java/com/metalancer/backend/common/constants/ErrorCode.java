@@ -58,6 +58,8 @@ public enum ErrorCode {
     PORTONE_ERROR(EXTERNAL_API_CALL_FAILED, "F002", "포트원 api 호출에 실패했습니다."),
     ILLEGAL_ORDER_STATUS(INVALID_VALUE, "F003", "잘못된 주문 상태 입니다."),
     FAIL_TO_ORDER(INVALID_VALUE, "F004", "주문에 실패했습니다."),
+    FAIL_TO_REFUND_ALL(INVALID_VALUE, "F005", "전액 환불에 실패했습니다."),
+    FAIL_TO_REFUND_PARTIALLY(INVALID_VALUE, "F006", "부분 환불에 실패했습니다."),
 
     /**
      * 이미지

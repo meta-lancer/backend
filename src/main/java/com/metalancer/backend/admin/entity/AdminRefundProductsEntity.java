@@ -34,13 +34,16 @@ public class AdminRefundProductsEntity extends BaseTimeEntity {
     private String productsTitle;
     @Column(nullable = false)
     private BigDecimal refundPrice;
+    private String reason;
 
     @Builder
     public AdminRefundProductsEntity(AdminRefundEntity adminRefundEntity,
-        OrderProductsEntity orderProductsEntity, String productsTitle, BigDecimal refundPrice) {
+        OrderProductsEntity orderProductsEntity, String productsTitle, BigDecimal refundPrice,
+        String reason) {
         this.adminRefundEntity = adminRefundEntity;
         this.orderProductsEntity = orderProductsEntity;
         this.productsTitle = productsTitle;
         this.refundPrice = refundPrice;
+        this.reason = reason;
     }
 }

@@ -10,6 +10,7 @@ import com.metalancer.backend.admin.entity.AdminRefundProductsRepository;
 import com.metalancer.backend.admin.entity.AdminRefundRepository;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.metalancer.backend.common.constants.DataStatus;
+import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.exception.BaseException;
 import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
@@ -67,9 +68,10 @@ public class AdminOrdersServiceImpl implements AdminOrdersService {
         cancelData.setChecksum(checksum);
         // 포트원 캔슬 진행
         IamportResponse<Payment> canceledPayment = client.cancelPaymentByImpUid(cancelData);
-        log.info("결제취소 응답 메시지: {}", canceledPayment.getMessage());
-        log.info("결제취소 응답 코드: {}", canceledPayment.getCode());
-        log.info("결제취소 응답: {}", canceledPayment);
+        boolean cancelSuccess = canceledPayment.getCode() == 0;
+        if (!cancelSuccess) {
+            throw new BaseException(ErrorCode.FAIL_TO_REFUND_ALL);
+        }
         Payment paymentResponse = canceledPayment.getResponse();
         // 성공하면 db에서 주문상태 처리
         OrdersEntity ordersEntity = ordersRepository.findEntityByOrderNo(merchantUid);
@@ -92,6 +94,7 @@ public class AdminOrdersServiceImpl implements AdminOrdersService {
             .type(paymentResponse.getPgProvider())
             .method(paymentResponse.getPayMethod())
             .refundedAt(refundedAt)
+            .reason(reason)
             .build();
         adminRefundRepository.save(createdAdminRefundEntity);
         for (OrderProductsEntity orderProductsEntity : orderProductsEntityList) {
@@ -100,6 +103,7 @@ public class AdminOrdersServiceImpl implements AdminOrdersService {
                 .orderProductsEntity(orderProductsEntity)
                 .productsTitle(orderProductsEntity.getProductsEntity().getTitle())
                 .refundPrice(orderProductsEntity.getPrice())
+                .reason(reason)
                 .build();
             adminRefundProductsRepository.save(createdAdminRefundProductsEntity);
         }

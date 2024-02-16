@@ -48,12 +48,13 @@ public class AdminRefundEntity extends BaseTimeEntity {
     private BigDecimal refundTotalPrice;
     @Column(nullable = false)
     private LocalDateTime refundedAt;
+    private String reason;
 
     @Builder
     public AdminRefundEntity(String adminName, OrdersEntity ordersEntity, String impUid,
         String orderNo,
         String title, String type, String method, String currency, BigDecimal refundTotalPrice,
-        LocalDateTime refundedAt) {
+        LocalDateTime refundedAt, String reason) {
         this.adminName = adminName;
         this.ordersEntity = ordersEntity;
         this.impUid = impUid;
@@ -64,5 +65,6 @@ public class AdminRefundEntity extends BaseTimeEntity {
         this.currency = currency;
         this.refundTotalPrice = refundTotalPrice;
         this.refundedAt = refundedAt;
+        this.reason = reason;
     }
 }

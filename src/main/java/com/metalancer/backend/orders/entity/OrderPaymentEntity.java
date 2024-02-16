@@ -21,10 +21,8 @@ import java.util.Date;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Entity(name = "orders_payment")
 public class OrderPaymentEntity extends BaseEntity {

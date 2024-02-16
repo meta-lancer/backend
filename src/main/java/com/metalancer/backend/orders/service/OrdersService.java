@@ -25,7 +25,7 @@ public interface OrdersService {
     boolean checkPayment(OrdersRequestDTO.CheckPayment dto)
         throws IamportResponseException, IOException;
 
-    PaymentResponse cancelAllPayment(User user, CancelAllPayment dto)
+    boolean cancelAllPayment(CancelAllPayment dto)
         throws IamportResponseException, IOException;
 
     CreatedOrder createOrderByEn(User user, CreateOrder dto);

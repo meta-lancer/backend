@@ -7,7 +7,6 @@ import com.metalancer.backend.common.utils.AuthUtils;
 import com.metalancer.backend.orders.domain.CreatedOrder;
 import com.metalancer.backend.orders.domain.PaymentResponse;
 import com.metalancer.backend.orders.dto.OrdersRequestDTO;
-import com.metalancer.backend.orders.dto.OrdersRequestDTO.CancelAllPayment;
 import com.metalancer.backend.orders.service.OrdersService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -156,19 +154,19 @@ public class OrdersController {
         return new BaseResponse<PaymentResponse>(
             ordersService.completePaymentByWebhook(dto));
     }
-    
-    @Operation(summary = "결제 전체 취소 요청", description = "")
-    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = PaymentResponse.class)))
-    @PatchMapping("/payments/cancellation/all")
-    public BaseResponse<PaymentResponse> cancelAllPayment(
-        @AuthenticationPrincipal PrincipalDetails user,
-        @RequestBody CancelAllPayment dto
-    ) throws Exception {
-        log.info("결제 전체 취소 요청 객체: {}", dto);
-        AuthUtils.validateUserAuthentication(user);
-        return new BaseResponse<PaymentResponse>(
-            ordersService.cancelAllPayment(user.getUser(), dto));
-    }
+
+//    @Operation(summary = "결제 전체 취소 요청", description = "")
+//    @ApiResponse(responseCode = "200", description = "처리 성공", content = @Content(schema = @Schema(implementation = PaymentResponse.class)))
+//    @PatchMapping("/payments/cancellation/all")
+//    public BaseResponse<Boolean> cancelAllPayment(
+////        @AuthenticationPrincipal PrincipalDetails user,
+//        @RequestBody CancelAllPayment dto
+//    ) throws Exception {
+//        log.info("결제 전체 취소 요청 객체: {}", dto);
+////        AuthUtils.validateUserAuthentication(user);
+//        return new BaseResponse<Boolean>(
+//            ordersService.cancelAllPayment(dto));
+//    }
 
 //    @PostMapping("/cancel")
 //    public BaseResponse<Boolean> cancelPayments(

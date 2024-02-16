@@ -597,11 +597,8 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public PaymentResponse cancelAllPayment(User user, CancelAllPayment dto)
+    public boolean cancelAllPayment(CancelAllPayment dto)
         throws IamportResponseException, IOException {
-        user = userRepository.findById(user.getId()).orElseThrow(
-            () -> new NotFoundException("유저: ", ErrorCode.NOT_FOUND)
-        );
         String orderNo = dto.getMerchantUid();
         String impUid = dto.getImpUid();
         OrdersEntity foundOrdersEntity = ordersRepository.findEntityByOrderNo(orderNo);
@@ -609,7 +606,7 @@ public class OrdersServiceImpl implements OrdersService {
             foundOrdersEntity.getTotalPaymentPrice(),
             dto.getReason());
         cancelOrder(foundOrdersEntity);
-        return null;
+        return true;
     }
 
     private IamportResponse<Payment> portoneCancelPayments(String impUid, String merchantUid,
@@ -617,10 +614,12 @@ public class OrdersServiceImpl implements OrdersService {
         String reason)
         throws IamportResponseException, IOException {
         IamportClient client = new IamportClient(apiKey, apiSecret, true);
-        IamportResponse<Payment> payment_response = client.paymentByImpUid(impUid);
-        Payment paymentResponse = payment_response.getResponse();
-        CancelData cancelData = new CancelData(merchantUid, true, amount);
+        // 굳이...?
+//        IamportResponse<Payment> payment_response = client.paymentByImpUid(impUid);
+//        Payment paymentResponse = payment_response.getResponse();
+        CancelData cancelData = new CancelData(merchantUid, false, amount);
         cancelData.setReason(reason);
+        // 캔슬 진행
         IamportResponse<Payment> canceledPayment = client.cancelPaymentByImpUid(cancelData);
         log.info("결제취소 응답: {}", canceledPayment);
         if (canceledPayment.getResponse().getStatus().equals("")) {

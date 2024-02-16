@@ -44,6 +44,7 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User orderer;
+    private String impUid;
     @Column(nullable = false)
     private String orderNo;
     @Column(nullable = false)
@@ -57,7 +58,7 @@ public class OrdersEntity extends BaseEntity implements Serializable {
 
     @Builder
     public OrdersEntity(User orderer, String orderNo, BigDecimal totalPrice,
-        BigDecimal totalPaymentPrice) {
+        BigDecimal totalPaymentPrice, String impUid) {
         this.orderer = orderer;
         this.orderNo = orderNo;
         this.totalPrice = totalPrice;
@@ -67,6 +68,7 @@ public class OrdersEntity extends BaseEntity implements Serializable {
             throw new InvalidParamException("check totalPrice, totalPaymentPrice, totalPoint",
                 ErrorCode.INVALID_PARAMETER);
         }
+        this.impUid = impUid;
     }
 
     public CreatedOrder toCreatedOrderDomain() {

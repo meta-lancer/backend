@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,4 +48,21 @@ public class AdminRefundEntity extends BaseTimeEntity {
     private BigDecimal refundTotalPrice;
     @Column(nullable = false)
     private LocalDateTime refundedAt;
+
+    @Builder
+    public AdminRefundEntity(String adminName, OrdersEntity ordersEntity, String impUid,
+        String orderNo,
+        String title, String type, String method, String currency, BigDecimal refundTotalPrice,
+        LocalDateTime refundedAt) {
+        this.adminName = adminName;
+        this.ordersEntity = ordersEntity;
+        this.impUid = impUid;
+        this.orderNo = orderNo;
+        this.title = title;
+        this.type = type;
+        this.method = method;
+        this.currency = currency;
+        this.refundTotalPrice = refundTotalPrice;
+        this.refundedAt = refundedAt;
+    }
 }

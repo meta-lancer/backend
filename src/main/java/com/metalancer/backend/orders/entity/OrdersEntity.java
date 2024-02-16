@@ -53,6 +53,8 @@ public class OrdersEntity extends BaseEntity implements Serializable {
     private BigDecimal totalPrice;
     @Column(nullable = false)
     private BigDecimal totalPaymentPrice;
+    @Column(nullable = false)
+    private BigDecimal totalChecksum;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PAY_ING;
 
@@ -64,6 +66,7 @@ public class OrdersEntity extends BaseEntity implements Serializable {
         this.totalPrice = totalPrice;
         if (totalPrice.subtract(this.totalPoint).equals(totalPaymentPrice)) {
             this.totalPaymentPrice = totalPaymentPrice;
+            this.totalChecksum = totalPaymentPrice;
         } else {
             throw new InvalidParamException("check totalPrice, totalPaymentPrice, totalPoint",
                 ErrorCode.INVALID_PARAMETER);
@@ -113,6 +116,11 @@ public class OrdersEntity extends BaseEntity implements Serializable {
         } else {
             throw new DataStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_DATA_STATUS);
         }
+    }
+
+    public void refundOrder() {
+        this.orderStatus = OrderStatus.CANCEL_DONE;
+        this.totalChecksum = BigDecimal.ZERO;
     }
 
     public void deleteOrder() {

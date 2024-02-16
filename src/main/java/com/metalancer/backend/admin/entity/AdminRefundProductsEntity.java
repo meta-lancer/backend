@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,4 +34,13 @@ public class AdminRefundProductsEntity extends BaseTimeEntity {
     private String productsTitle;
     @Column(nullable = false)
     private BigDecimal refundPrice;
+
+    @Builder
+    public AdminRefundProductsEntity(AdminRefundEntity adminRefundEntity,
+        OrderProductsEntity orderProductsEntity, String productsTitle, BigDecimal refundPrice) {
+        this.adminRefundEntity = adminRefundEntity;
+        this.orderProductsEntity = orderProductsEntity;
+        this.productsTitle = productsTitle;
+        this.refundPrice = refundPrice;
+    }
 }

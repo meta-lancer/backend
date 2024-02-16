@@ -82,7 +82,7 @@ public class OrderPaymentEntity extends BaseEntity {
         this.paidStatus = paidStatus;
         this.pgTid = pgTid;
     }
-
+    
     public UserCompletedOrder toUserCompletedOrder() {
         String paymentMethod = method;
         String paymentPgType = type;
@@ -92,6 +92,7 @@ public class OrderPaymentEntity extends BaseEntity {
             .orderNo(ordersEntity.getOrderNo())
             .orderStatus(ordersEntity.getOrderStatus())
             .price(paymentPrice)
+            .totalChecksum(ordersEntity.getTotalChecksum())
             .currencyType("KRW".equals(currency) ? CurrencyType.KRW : CurrencyType.USD)
             .payMethod(PaymentType.getType(paymentMethod, paymentPgType))
             .purchasedAt(Time.convertDateToFullString(purchasedAt))

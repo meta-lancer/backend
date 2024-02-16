@@ -60,6 +60,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
     private String orderNo;
     private String orderProductNo;
     private BigDecimal price;
+    private BigDecimal checksum;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderProductStatus = OrderStatus.PAY_ING;
     @Enumerated(EnumType.STRING)
@@ -78,6 +79,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
         this.orderNo = orderNo;
         this.orderProductNo = orderProductNo;
         this.price = price;
+        this.checksum = price;
         this.productsRequestOptionEntity = productsRequestOptionEntity;
     }
 
@@ -99,12 +101,21 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
         }
     }
 
-    public void confirmOrder() {
+    public void confirmOrderProduct() {
         if (this.orderProductStatus.equals(OrderStatus.PAY_DONE)) {
             this.orderProductStatus = OrderStatus.PAY_CONFIRM;
         } else {
             throw new OrderStatusException("올바르지않은 주문 상태 변경입니다.", ErrorCode.ILLEGAL_ORDER_STATUS);
         }
+    }
+
+    public void refundOrderProduct() {
+        this.orderProductStatus = OrderStatus.CANCEL_DONE;
+        this.checksum = BigDecimal.ZERO;
+    }
+
+    public void refundOrderProductPartially() {
+        this.orderProductStatus = OrderStatus.PARTIAL_REFUND;
     }
 
     public OrderProducts toOrderProducts() {
@@ -124,6 +135,7 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
         return OrderedProduct.builder().orderProductsId(id).orderProductsNo(orderProductNo)
             .creator(productsEntity.getCreatorEntity().toDomain()).assetsId(productsEntity.getId())
             .productsPrice(price).title(productsEntity.getTitle())
+            .checksum(checksum)
             .orderStatus(orderProductStatus).thumbnail(productsEntity.getThumbnail()).build();
     }
 }

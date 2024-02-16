@@ -1,16 +1,12 @@
 package com.metalancer.backend.admin.service;
 
-import com.metalancer.backend.admin.domain.OrderedProduct;
 import com.metalancer.backend.admin.domain.OutLineOrdersStatList;
-import com.metalancer.backend.admin.domain.UserCompletedOrder;
 import com.metalancer.backend.category.entity.TagsEntity;
 import com.metalancer.backend.category.repository.TagsRepository;
 import com.metalancer.backend.common.constants.DataStatus;
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.common.exception.BaseException;
-import com.metalancer.backend.orders.entity.OrderPaymentEntity;
 import com.metalancer.backend.orders.entity.OrderProductsEntity;
-import com.metalancer.backend.orders.entity.OrdersEntity;
 import com.metalancer.backend.orders.repository.OrderPaymentRepository;
 import com.metalancer.backend.orders.repository.OrderProductsRepository;
 import com.metalancer.backend.orders.repository.OrdersRepository;
@@ -21,8 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,24 +89,5 @@ public class AdminOrdersStatServiceImpl implements AdminOrdersStatService {
         return response.stream()
             .sorted(Comparator.comparing(OutLineOrdersStatList::getCnt).reversed())
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<UserCompletedOrder> getOrderList(Pageable pageable) {
-        Page<OrderPaymentEntity> orderPaymentEntities = orderPaymentRepository.findAllByStatus(
-            DataStatus.ACTIVE, pageable);
-        Page<UserCompletedOrder> response = orderPaymentEntities.map(
-            OrderPaymentEntity::toUserCompletedOrder);
-        response.forEach(userCompletedOrder -> {
-            OrdersEntity ordersEntity = ordersRepository.findEntityByOrderNo(
-                userCompletedOrder.getOrderNo());
-            List<OrderProductsEntity> orderProductsEntityList = orderProductsRepository.findAllByOrder(
-                ordersEntity);
-            List<OrderedProduct> orderedProductList = orderProductsEntityList.stream()
-                .map(OrderProductsEntity::toOrderedProduct).toList();
-            userCompletedOrder.setOrderedProductList(orderedProductList);
-            userCompletedOrder.setBoughtCnt(orderProductsEntityList.size());
-        });
-        return response;
     }
 }

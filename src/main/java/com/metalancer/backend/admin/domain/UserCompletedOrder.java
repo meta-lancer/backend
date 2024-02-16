@@ -21,13 +21,14 @@ public class UserCompletedOrder {
     private CurrencyType currencyType;
     private PaymentType payMethod;
     private BigDecimal price;
+    private BigDecimal totalChecksum;
     private String purchasedAt;
     private List<OrderedProduct> orderedProductList;
 
     @Builder
     public UserCompletedOrder(UserDomain user, Long orderId, String orderNo,
         OrderStatus orderStatus, CurrencyType currencyType, PaymentType payMethod, BigDecimal price,
-        String purchasedAt) {
+        BigDecimal totalChecksum, String purchasedAt) {
         this.user = user;
         this.orderId = orderId;
         this.orderNo = orderNo;
@@ -35,9 +36,10 @@ public class UserCompletedOrder {
         this.currencyType = currencyType;
         this.payMethod = payMethod;
         this.price = price;
+        this.totalChecksum = totalChecksum;
         this.purchasedAt = purchasedAt;
     }
-    
+
     public void setBoughtCnt(Integer boughtCnt) {
         this.boughtCnt = boughtCnt;
     }

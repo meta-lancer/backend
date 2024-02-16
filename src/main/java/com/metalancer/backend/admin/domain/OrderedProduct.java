@@ -18,6 +18,7 @@ public class OrderedProduct {
     private String title;
     private OrderStatus orderStatus;
     private BigDecimal productsPrice;
+    private BigDecimal checksum;
     private String thumbnail;
     private RequestOption requestOption;
 
@@ -25,7 +26,7 @@ public class OrderedProduct {
     public OrderedProduct(Creator creator, Long assetsId, Long orderProductsId,
         String orderProductsNo,
         String title, OrderStatus orderStatus, BigDecimal productsPrice,
-        String thumbnail,
+        BigDecimal checksum, String thumbnail,
         RequestOption requestOption) {
         this.creator = creator;
         this.assetsId = assetsId;
@@ -34,6 +35,7 @@ public class OrderedProduct {
         this.title = title;
         this.orderStatus = orderStatus;
         this.productsPrice = productsPrice;
+        this.checksum = checksum;
         this.thumbnail = thumbnail;
         this.requestOption = requestOption;
     }

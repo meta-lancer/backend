@@ -3,6 +3,7 @@ package com.metalancer.backend.admin.service;
 import com.metalancer.backend.admin.domain.UserCompletedOrder;
 import com.metalancer.backend.admin.dto.AdminOrderDTO.AllRefund;
 import com.metalancer.backend.admin.dto.AdminOrderDTO.PartialRefund;
+import com.metalancer.backend.admin.dto.AdminOrderDTO.ProductsRefund;
 import com.metalancer.backend.common.config.security.PrincipalDetails;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import java.io.IOException;
@@ -18,4 +19,11 @@ public interface AdminOrdersService {
         throws IamportResponseException, IOException;
 
     Page<UserCompletedOrder> getOrderList(Pageable pageable);
+
+
+    Boolean refundProduct(ProductsRefund dto, PrincipalDetails user)
+        throws IamportResponseException, IOException;
+
+    Boolean refundProductPartial(ProductsRefund dto, PrincipalDetails user)
+        throws IamportResponseException, IOException;
 }

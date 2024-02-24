@@ -60,4 +60,26 @@ public class AdminOrdersController {
         return new BaseResponse<Boolean>(
             adminOrdersService.refundPartially(dto, user));
     }
+
+    @PostMapping("/refund/order-products")
+    public BaseResponse<Boolean> refundProduct(
+        @RequestBody AdminOrderDTO.ProductsRefund dto,
+        @AuthenticationPrincipal PrincipalDetails user)
+        throws IamportResponseException, IOException {
+        AuthUtils.validateUserAuthentication(user);
+        log.info("refundProduct API 호출 - {}, dto - {}", user.getUser().getName(), dto);
+        return new BaseResponse<Boolean>(
+            adminOrdersService.refundProduct(dto, user));
+    }
+
+    @PostMapping("/refund/order-products/partial")
+    public BaseResponse<Boolean> refundProductPartial(
+        @RequestBody AdminOrderDTO.ProductsRefund dto,
+        @AuthenticationPrincipal PrincipalDetails user)
+        throws IamportResponseException, IOException {
+        AuthUtils.validateUserAuthentication(user);
+        log.info("refundProductPartial API 호출 - {}, dto - {}", user.getUser().getName(), dto);
+        return new BaseResponse<Boolean>(
+            adminOrdersService.refundProductPartial(dto, user));
+    }
 }

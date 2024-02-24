@@ -60,7 +60,9 @@ public enum ErrorCode {
     FAIL_TO_ORDER(INVALID_VALUE, "F004", "주문에 실패했습니다."),
     FAIL_TO_REFUND_ALL(INVALID_VALUE, "F005", "전액 환불에 실패했습니다."),
     FAIL_TO_REFUND_PARTIALLY(INVALID_VALUE, "F006", "부분 환불에 실패했습니다."),
-
+    DIFFERENT_PRICE(INVALID_VALUE, "F007", "가격이 다릅니다."),
+    DIFFERENT_CHECKSUM(INVALID_VALUE, "F008", "환불가능한 잔액이 다릅니다."),
+    DIFFERENT_CHECKSUM_MINUS(INVALID_VALUE, "F009", "환불가능한 잔액이 마이너스가 될 수 없습니다."),
     /**
      * 이미지
      */

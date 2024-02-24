@@ -40,4 +40,9 @@ public class OrderProductsRepositoryImpl implements OrderProductsRepository {
             dataStatus);
     }
 
+    @Override
+    public OrderProductsEntity findByOrderProductNo(String orderProductNo) {
+        return orderProductsJpaRepository.findByOrderProductNo(orderProductNo);
+    }
+
 }

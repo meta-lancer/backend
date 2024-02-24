@@ -6,6 +6,7 @@ import com.metalancer.backend.common.constants.ClaimStatus;
 import com.metalancer.backend.common.constants.ClaimType;
 import com.metalancer.backend.common.constants.ErrorCode;
 import com.metalancer.backend.common.constants.OrderStatus;
+import com.metalancer.backend.common.exception.InvalidParamException;
 import com.metalancer.backend.common.exception.OrderStatusException;
 import com.metalancer.backend.creators.entity.ProductsSalesEntity;
 import com.metalancer.backend.orders.domain.OrderProducts;
@@ -114,8 +115,17 @@ public class OrderProductsEntity extends BaseEntity implements Serializable {
         this.checksum = BigDecimal.ZERO;
     }
 
-    public void refundOrderProductPartially() {
+    public void refundOrderProductPartially(BigDecimal partiallyRefundPrice) {
         this.orderProductStatus = OrderStatus.PARTIAL_REFUND;
+        BigDecimal newChecksum = checksum.subtract(partiallyRefundPrice);
+        int compare = newChecksum.compareTo(BigDecimal.ZERO);
+        if (compare < 0) {
+            throw new InvalidParamException(ErrorCode.DIFFERENT_CHECKSUM_MINUS);
+        }
+        if (compare == 0) {
+            this.orderProductStatus = OrderStatus.CANCEL_DONE;
+        }
+        this.checksum = newChecksum;
     }
 
     public OrderProducts toOrderProducts() {

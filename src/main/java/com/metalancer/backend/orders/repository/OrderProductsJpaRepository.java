@@ -14,4 +14,6 @@ public interface OrderProductsJpaRepository extends JpaRepository<OrderProductsE
     List<OrderProductsEntity> findAllByOrderProductStatusIsNotAndStatus(
         OrderStatus orderProductStatus,
         DataStatus status);
+
+    OrderProductsEntity findByOrderProductNo(String orderProductNo);
 }

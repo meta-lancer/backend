@@ -123,6 +123,19 @@ public class OrdersEntity extends BaseEntity implements Serializable {
         this.totalChecksum = BigDecimal.ZERO;
     }
 
+    public void decreaseCheckSum(BigDecimal checkSum) {
+        BigDecimal newTotalChecksum = totalChecksum.subtract(checkSum);
+        int compare = newTotalChecksum.compareTo(BigDecimal.ZERO);
+        if (compare < 0) {
+            throw new InvalidParamException(ErrorCode.DIFFERENT_CHECKSUM_MINUS);
+        }
+        this.orderStatus = OrderStatus.PARTIAL_REFUND;
+        if (compare == 0) {
+            this.orderStatus = OrderStatus.CANCEL_DONE;
+        }
+        this.totalChecksum = newTotalChecksum;
+    }
+
     public void deleteOrder() {
         delete();
     }

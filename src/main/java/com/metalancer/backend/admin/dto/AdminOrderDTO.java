@@ -27,4 +27,15 @@ public class AdminOrderDTO {
         private BigDecimal vatAmount;
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class ProductsRefund {
+
+        private String orderProductNo;
+        private String reason;
+        private BigDecimal checksum;
+        private BigDecimal amount;
+        private BigDecimal vatAmount;
+    }
+
 }

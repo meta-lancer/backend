@@ -2,6 +2,7 @@ package com.metalancer.backend.creators.domain;
 
 import com.metalancer.backend.common.constants.OrderStatus;
 import com.metalancer.backend.products.domain.RequestOption;
+import com.metalancer.backend.users.dto.UserResponseDTO.OtherCreatorBasicInfo;
 import com.metalancer.backend.users.entity.User;
 import java.math.BigDecimal;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class CommissionSales {
 
-    private User buyer;
+    private OtherCreatorBasicInfo buyer;
     private RequestOption requestOption;
     private OrderStatus orderStatus;
     private BigDecimal productsPrice;
@@ -22,7 +23,7 @@ public class CommissionSales {
     @Builder
     public CommissionSales(User buyer, RequestOption requestOption, OrderStatus orderStatus,
         BigDecimal productsPrice, String purchasedAt, String payConfirmedAt) {
-        this.buyer = buyer;
+        this.buyer = buyer.toOtherCreatorBasicInfo();
         this.requestOption = requestOption;
         this.orderStatus = orderStatus;
         this.productsPrice = productsPrice;

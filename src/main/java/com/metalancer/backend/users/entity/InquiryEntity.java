@@ -85,6 +85,10 @@ public class InquiryEntity extends BaseEntity implements Serializable {
         this.fileUrl = fileUrl;
     }
 
+    public void deleteInquiry() {
+        delete();
+    }
+
 
     public InquiryList toInquiryList() {
         return InquiryList.builder().inquiryId(id).memberId(user.getId())

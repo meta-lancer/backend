@@ -246,12 +246,9 @@ public class AuthServiceImpl implements AuthService {
         setUserRandomNickname(foundUser);
 //        createdApproveLink(foundUser);
 
-        // # 포트원 심사를 위해 무조건 허용
         if (!dto.isNormalUser()) {
             createCreator(foundUser);
         }
-//        // 심사 필요없음
-//        createCreatorWithOAuthUser(foundUser);
         return foundUser.getId();
     }
 
